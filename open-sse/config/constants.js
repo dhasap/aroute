@@ -75,11 +75,12 @@ export const PROVIDERS = {
   antigravity: {
     baseUrls: [
       "https://daily-cloudcode-pa.sandbox.googleapis.com",
+      "https://daily-cloudcode-pa.googleapis.com",
       "https://cloudcode-pa.googleapis.com"
     ],
     format: "antigravity",
     headers: {
-      "User-Agent": "antigravity/1.11.5 windows/amd64"
+      "User-Agent": "antigravity/1.104.0 darwin/arm64"
     },
     clientId: "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com",
     clientSecret: "REDACTED_OAUTH_SECRET"
