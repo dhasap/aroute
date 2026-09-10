@@ -1,5 +1,7 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    const { applyLegacyEnvAliases } = await import("@/lib/legacyEnv.js");
+    applyLegacyEnvAliases();
     const { initConsoleLogCapture } = await import("@/lib/consoleLogBuffer");
     initConsoleLogCapture();
 
