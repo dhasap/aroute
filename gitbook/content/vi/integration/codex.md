@@ -113,7 +113,7 @@ Nếu gặp lỗi "model not available":
 Để dùng ARoute cloud endpoint thay vì localhost:
 
 ```bash
-export OPENAI_BASE_URL="https://aroute.com"
+export OPENAI_BASE_URL="https://9router.com"
 ```
 
 Đảm bảo bạn đã cấu hình API key trong ARoute cloud dashboard.

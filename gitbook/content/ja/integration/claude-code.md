@@ -103,7 +103,7 @@ Claude Codeは設定を `~/.claude/settings.json` に保存します。必要に
 localhostの代わりにARouteクラウドエンドポイントを使用するには:
 
 ```bash
-export ANTHROPIC_BASE_URL="https://aroute.com"
+export ANTHROPIC_BASE_URL="https://9router.com"
 ```
 
 ARouteクラウドダッシュボードでAPIキーが設定されていることを確認してください。

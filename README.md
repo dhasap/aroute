@@ -9,13 +9,13 @@
   
   [![npm](https://img.shields.io/npm/v/aroute.svg)](https://www.npmjs.com/package/aroute)
   [![Downloads](https://img.shields.io/npm/dm/aroute.svg)](https://www.npmjs.com/package/aroute)
-  [![Docker Pulls](https://img.shields.io/docker/pulls/decolua/aroute.svg?logo=docker&label=Docker%20pulls)](https://hub.docker.com/r/decolua/aroute)
-  [![GHCR](https://img.shields.io/badge/GHCR-decolua%2Faroute-blue?logo=github)](https://github.com/decolua/aroute/pkgs/container/aroute)
-  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/decolua/aroute/blob/main/LICENSE)
+  [![Docker Pulls](https://img.shields.io/docker/pulls/decolua/9router.svg?logo=docker&label=Docker%20pulls)](https://hub.docker.com/r/decolua/9router)
+  [![GHCR](https://img.shields.io/badge/GHCR-decolua%2F9router-blue?logo=github)](https://github.com/decolua/9router/pkgs/container/9router)
+  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/dhasap/aroute/blob/master/LICENSE)
 
-<a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="decolua%2Faroute | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="decolua%2F9router | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
-[🚀 Quick Start](#-quick-start) • [💡 Features](#-key-features) • [📖 Setup](#-setup-guide) • [🌐 Website](https://aroute.com)
+[🚀 Quick Start](#-quick-start) • [💡 Features](#-key-features) • [📖 Setup](#-setup-guide) • 
 
 [🇧🇷 Português (Brasil)](./i18n/README.pt-BR.md) • [🇻🇳 Tiếng Việt](./i18n/README.vi.md) • [🇨🇳 中文](./i18n/README.zh-CN.md) • [🇯🇵 日本語](./i18n/README.ja-JP.md) • [🇷🇺 Русский](./i18n/README.ru.md) • [🇹🇭 ไทย](./i18n/README.th.md) • [🇮🇷 فارسی](./i18n/README.fa_IR.md) • [🇮🇩 Indonesia](./i18n/README.id-ID.md) • [🇪🇸 Español](./i18n/README.es.md) • [🇫🇷 Français](./i18n/README.fr.md)
 
@@ -73,11 +73,14 @@ Result: Never stop coding, minimal cost + 20-40% token savings via RTK
 
 ## ⚡ Quick Start
 
-**1. Install globally:**
+**1. Install (private fork — run from source):**
 
 ```bash
-npm install -g aroute
-aroute
+git clone https://github.com/dhasap/aroute.git
+cd aroute
+cp .env.example .env
+npm install
+npm run build && npm run start
 ```
 
 🎉 Dashboard opens at `http://localhost:20128`
@@ -99,7 +102,7 @@ Claude Code/Codex/OpenClaw/Cursor/Cline Settings:
 
 **Alternative: run from source (this repository):**
 
-This repository package is private (`aroute-app`), so source/Docker execution is the expected local development path.
+`aroute-app` is private — source/Docker is the only distribution path (no npm/Docker Hub image under this name).
 
 ```bash
 cp .env.example .env
@@ -223,7 +226,7 @@ Default URLs:
 
 </div>
 
-> 🎬 **Made a video about ARoute?** Submit a [Pull Request](https://github.com/decolua/aroute/pulls) adding your video to this section — we'll merge it!
+> 🎬 **Made a video about ARoute?** Submit a [Pull Request](https://github.com/dhasap/aroute/pulls) adding your video to this section — we'll merge it!
 
 ---
 
@@ -1209,7 +1212,7 @@ Model: cc/claude-opus-4-7
 
 ```bash
 # Clone and install
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute
 npm install
 npm run build
@@ -1222,7 +1225,7 @@ export PORT="20128"
 export HOSTNAME="0.0.0.0"
 export NODE_ENV="production"
 export NEXT_PUBLIC_BASE_URL="http://localhost:20128"
-export NEXT_PUBLIC_CLOUD_URL="https://aroute.com"
+export NEXT_PUBLIC_CLOUD_URL="https://9router.com"
 export API_KEY_SECRET="endpoint-proxy-api-key-secret"
 export MACHINE_ID_SALT="endpoint-proxy-salt"
 
@@ -1240,8 +1243,8 @@ pm2 startup
 
 Published images (multi-platform `linux/amd64` + `linux/arm64`):
 
-- Docker Hub: [`decolua/aroute`](https://hub.docker.com/r/decolua/aroute)
-- GHCR: [`ghcr.io/decolua/aroute`](https://github.com/decolua/aroute/pkgs/container/aroute)
+- Docker Hub: [`decolua/9router`](https://hub.docker.com/r/decolua/9router)
+- GHCR: [`ghcr.io/decolua/9router`](https://github.com/decolua/9router/pkgs/container/9router)
 
 **Quick start (use published image):**
 
@@ -1251,7 +1254,7 @@ docker run -d \
   -p 20128:20128 \
   -v "$HOME/.aroute:/app/data" \
   -e DATA_DIR=/app/data \
-  decolua/aroute:latest
+  decolua/9router:latest
 ```
 
 → Open http://localhost:20128
@@ -1259,8 +1262,8 @@ docker run -d \
 **Build from source (dev):**
 
 ```bash
-git clone https://github.com/decolua/aroute.git
-cd aroute/app
+git clone https://github.com/dhasap/aroute.git
+cd aroute
 docker build -t aroute .
 docker run -d --name aroute -p 20128:20128 \
   -v "$HOME/.aroute:/app/data" -e DATA_DIR=/app/data aroute
@@ -1277,7 +1280,7 @@ docker run -d --name aroute -p 20128:20128 \
 docker logs -f aroute
 docker restart aroute
 docker stop aroute && docker rm aroute
-docker pull decolua/aroute:latest   # update to latest
+docker pull decolua/9router:latest   # update to latest
 ```
 
 **Data persistence:** `$HOME/.aroute/db/data.sqlite` on host ↔ `/app/data/db/data.sqlite` in container.
@@ -1293,9 +1296,9 @@ docker pull decolua/aroute:latest   # update to latest
 | `HOSTNAME`                                           | framework default                        | Bind host (Docker defaults to `0.0.0.0`)                                            |
 | `NODE_ENV`                                           | runtime default                          | Set `production` for deploy                                                         |
 | `BASE_URL`                                           | `http://localhost:20128`                 | Server-side internal base URL used by cloud sync jobs                               |
-| `CLOUD_URL`                                          | `https://aroute.com`                    | Server-side cloud sync endpoint base URL                                            |
+| `CLOUD_URL`                                          | `https://9router.com`                    | Server-side cloud sync endpoint base URL                                            |
 | `NEXT_PUBLIC_BASE_URL`                               | `http://localhost:3000`                  | Backward-compatible/public base URL (prefer `BASE_URL` for server runtime)          |
-| `NEXT_PUBLIC_CLOUD_URL`                              | `https://aroute.com`                    | Backward-compatible/public cloud URL (prefer `CLOUD_URL` for server runtime)        |
+| `NEXT_PUBLIC_CLOUD_URL`                              | `https://9router.com`                    | Backward-compatible/public cloud URL (prefer `CLOUD_URL` for server runtime)        |
 | `API_KEY_SECRET`                                     | `endpoint-proxy-api-key-secret`          | HMAC secret for generated API keys                                                  |
 | `MACHINE_ID_SALT`                                    | `endpoint-proxy-salt`                    | Salt for stable machine ID hashing                                                  |
 | `ENABLE_REQUEST_LOGS`                                | `false`                                  | Enables request/response logs under `logs/`                                         |
@@ -1478,9 +1481,9 @@ Authorization: Bearer your-api-key
 
 ## 📧 Support
 
-- **Website**: [aroute.com](https://aroute.com)
-- **GitHub**: [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **Issues**: [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **Website**: 
+- **GitHub**: [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Issues**: [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 
 ---
 
@@ -1488,13 +1491,13 @@ Authorization: Bearer your-api-key
 
 Thanks to all contributors who helped make ARoute better!
 
-[![Contributors](https://contrib.rocks/image?repo=decolua/aroute&max=150&columns=15&anon=1&v=20260309)](https://github.com/decolua/aroute/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=decolua/9router&max=150&columns=15&anon=1&v=20260309)](https://github.com/decolua/9router/graphs/contributors)
 
 ---
 
 ## 📊 Star Chart
 
-[![Star Chart](https://starchart.cc/decolua/aroute.svg?variant=adaptive)](https://starchart.cc/decolua/aroute)
+[![Star Chart](https://starchart.cc/decolua/9router.svg?variant=adaptive)](https://starchart.cc/decolua/9router)
 
 ## 🔀 Forks
 

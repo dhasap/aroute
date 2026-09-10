@@ -164,7 +164,7 @@ See [quota tracking documentation](features/quota-tracking.md) for details.
 
 ```
 Cursor Settings → Models → Advanced:
-  OpenAI API Base URL: https://aroute.com/v1
+  OpenAI API Base URL: https://9router.com/v1
   OpenAI API Key: [from dashboard]
   Model: cc/claude-opus-4-5-20251101
 ```
@@ -172,7 +172,7 @@ Cursor Settings → Models → Advanced:
 **Alternative:** Self-host on VPS with public domain:
 ```bash
 # Deploy to VPS
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute/app
 npm install && npm run build
 npm start
@@ -206,7 +206,7 @@ aroute
 
 ### VPS/Cloud
 ```bash
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute/app
 npm install && npm run build
 
@@ -316,7 +316,7 @@ aroute --version
 ```
 
 **Breaking changes:**
-- Check [CHANGELOG.md](https://github.com/decolua/aroute/blob/main/CHANGELOG.md)
+- Check [CHANGELOG.md](https://github.com/dhasap/aroute/blob/main/CHANGELOG.md)
 - Backup `~/.aroute` before major updates
 - Review migration guides for major versions
 
@@ -329,11 +329,11 @@ aroute --version
 ### Ways to contribute:
 
 1. **Report bugs:**
-   - [GitHub Issues](https://github.com/decolua/aroute/issues)
+   - [GitHub Issues](https://github.com/dhasap/aroute/issues)
    - Include error logs, steps to reproduce
 
 2. **Request features:**
-   - [GitHub Discussions](https://github.com/decolua/aroute/discussions)
+   - [GitHub Discussions](https://github.com/dhasap/aroute/discussions)
    - Describe use case and benefits
 
 3. **Submit code:**
@@ -375,13 +375,13 @@ aroute --version
 - Update documentation
 - Keep commits atomic and descriptive
 
-See [CONTRIBUTING.md](https://github.com/decolua/aroute/blob/main/CONTRIBUTING.md) for details.
+See [CONTRIBUTING.md](https://github.com/dhasap/aroute/blob/main/CONTRIBUTING.md) for details.
 
 ---
 
 ## Need More Help?
 
-- **Documentation:** [aroute.com/docs](https://aroute.com/docs)
-- **GitHub:** [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **Issues:** [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **Documentation:** [Documentation](https://github.com/dhasap/aroute/tree/master/gitbook)
+- **GitHub:** [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Issues:** [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 - **Troubleshooting:** [troubleshooting.md](troubleshooting.md)

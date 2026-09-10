@@ -74,7 +74,7 @@ npx aroute
 Clone và build từ GitHub:
 
 ```bash
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute/app
 npm install
 npm run build
@@ -473,6 +473,6 @@ nano ~/.bashrc  # or ~/.zshrc
 
 ## Cần trợ giúp?
 
-- **Website**: [aroute.com](https://aroute.com)
-- **GitHub**: [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **Issues**: [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **Website**: 
+- **GitHub**: [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Issues**: [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)

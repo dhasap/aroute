@@ -242,6 +242,6 @@ Daily routine:
 
 ## Cần trợ giúp?
 
-- **Website**: [aroute.com](https://aroute.com)
-- **GitHub**: [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **Issues**: [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **Website**: 
+- **GitHub**: [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Issues**: [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)

@@ -164,7 +164,7 @@ ARoute利用時の一般的な問題と解決策。
 4. **クラウドエンドポイントを使用:**
    localhostが動作しない場合(例: Cursor IDE):
    ```
-   Endpoint: https://aroute.com/v1
+   Endpoint: https://9router.com/v1
    ```
 
 ---
@@ -346,6 +346,6 @@ ARoute利用時の一般的な問題と解決策。
 
 ## さらにヘルプが必要?
 
-- **GitHub Issues:** [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
-- **ドキュメント:** [aroute.com/docs](https://aroute.com/docs)
+- **GitHub Issues:** [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
+- **ドキュメント:** [Documentation](https://github.com/dhasap/aroute/tree/master/gitbook)
 - **FAQ:** [faq.md](faq.md)

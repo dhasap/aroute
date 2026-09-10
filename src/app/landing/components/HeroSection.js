@@ -14,7 +14,7 @@ export default function HeroSection() {
         </div>
 
         {/* Main heading */}
-        <h1 className="text-5xl md:text-7xl font-black leading-[1.1] tracking-tight">
+        <h1 className="text-5xl md:text-7xl font-hand font-bold leading-[1.1] tracking-tight">
           One Endpoint for <br/>
           <span className="text-[#f97815]">All AI Providers</span>
         </h1>
@@ -26,15 +26,15 @@ export default function HeroSection() {
 
         {/* CTA Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-4 w-full">
-          <button className="h-12 px-8 rounded-lg bg-[#f97815] hover:bg-[#e0650a] text-[#181411] text-base font-bold transition-all shadow-[0_0_15px_rgba(249,120,21,0.4)] flex items-center gap-2">
+          <button className="h-12 px-8 sketch-pill !border-2 !border-[#f97815] bg-[#f97815] hover:bg-[#e0650a] text-[#181411] text-base font-bold transition-all shadow-[3px_4px_0_rgba(249,120,21,0.35)] flex items-center gap-2">
             <span className="material-symbols-outlined">rocket_launch</span>
             Get Started
           </button>
           <a 
-            href="https://github.com/decolua/aroute" 
+            href="https://github.com/dhasap/aroute" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="h-12 px-8 rounded-lg border border-[#3a2f27] bg-[#23180f] hover:bg-[#3a2f27] text-white text-base font-bold transition-all flex items-center gap-2"
+            className="h-12 px-8 sketch-pill !border-2 !border-[#3a2f27] bg-[#23180f] hover:bg-[#3a2f27] text-white text-base font-bold transition-all flex items-center gap-2"
           >
             <span className="material-symbols-outlined">code</span>
             View on GitHub

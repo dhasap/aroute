@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import Modal from "./Modal";
 import ProviderIcon from "./ProviderIcon";
 import CapacityBadges from "./CapacityBadges";
+import ContextBadge from "./ContextBadge";
 import { useModelCaps } from "@/shared/hooks/useModelCaps";
 import { getModelsByProviderId, getModelKind } from "@/shared/constants/models";
 import { OAUTH_PROVIDERS, APIKEY_PROVIDERS, FREE_PROVIDERS, FREE_TIER_PROVIDERS, AI_PROVIDERS, isOpenAICompatibleProvider, isAnthropicCompatibleProvider, getProviderAlias } from "@/shared/constants/providers";
@@ -610,11 +611,13 @@ export default function ModelSelectModal({
                           {model.name}
                           <span className="text-[9px] opacity-60 font-normal">custom</span>
                           <CapacityBadges caps={getCaps(model.value)} />
+                          <ContextBadge contextWindow={getCaps(model.value)?.contextWindow} />
                         </>
                       ) : (
                         <>
                           {model.name}
                           <CapacityBadges caps={getCaps(model.value)} />
+                          <ContextBadge contextWindow={getCaps(model.value)?.contextWindow} />
                         </>
                       )}
                     </span>

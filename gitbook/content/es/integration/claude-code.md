@@ -103,7 +103,7 @@ Si obtienes errores de "modelo no encontrado":
 Para usar el endpoint en la nube de ARoute en lugar de localhost:
 
 ```bash
-export ANTHROPIC_BASE_URL="https://aroute.com"
+export ANTHROPIC_BASE_URL="https://9router.com"
 ```
 
 Asegúrate de haber configurado tu API key en el dashboard en la nube de ARoute.

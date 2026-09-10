@@ -164,7 +164,7 @@
 4. **使用云端 endpoint:**
    如果 localhost 不行(例如 Cursor IDE):
    ```
-   Endpoint: https://aroute.com/v1
+   Endpoint: https://9router.com/v1
    ```
 
 ---
@@ -346,6 +346,6 @@
 
 ## 需要更多帮助?
 
-- **GitHub Issues:** [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
-- **文档:** [aroute.com/docs](https://aroute.com/docs)
+- **GitHub Issues:** [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
+- **文档:** [Documentation](https://github.com/dhasap/aroute/tree/master/gitbook)
 - **常见问题:** [faq.md](faq.md)

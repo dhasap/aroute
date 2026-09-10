@@ -24,7 +24,7 @@ Model: 任意 ARoute 模型(cc/*, cx/*, glm/*, 等)
 
 **云端 ARoute:**
 ```
-Base URL: https://aroute.com/v1
+Base URL: https://9router.com/v1
 API Key: your-api-key-from-dashboard
 Model: 任意 ARoute 模型(cc/*, cx/*, glm/*, 等)
 ```

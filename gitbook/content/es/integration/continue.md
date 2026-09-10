@@ -6,7 +6,7 @@ Integra ARoute con la extensión Continue para llevar la asistencia de IA direct
 
 - Visual Studio Code instalado
 - Extensión Continue instalada desde el marketplace de VSCode
-- API key de ARoute desde el [dashboard](https://aroute.com/dashboard)
+- API key de ARoute desde el [dashboard](https://9router.com/dashboard)
 - ARoute ejecutándose (local o en la nube)
 
 ## Pasos de configuración
@@ -76,7 +76,7 @@ Agrega la siguiente configuración a tu `config.json`:
 **Para ARoute en la nube:**
 Reemplaza `apiBase` con:
 ```json
-"apiBase": "https://aroute.com/v1"
+"apiBase": "https://9router.com/v1"
 ```
 
 ### 3. Guardar y recargar

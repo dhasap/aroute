@@ -1,3 +1,14 @@
+# Migration: 9Router → ARoute (refactor)
+
+This repository is now **ARoute**, an independent product line renamed from 9Router. What changed:
+
+- **Naming**: every internal identifier is `aroute`/`ARoute` — packages (`aroute-app`, CLI bin `aroute`), env vars (`NINEROUTER_*`/`NINE_ROUTER_*` → `AROUTE_*`), config file keys, log prefixes, DB folder, UI copy, docs.
+- **Data dir**: state moved `~/.9router` → `~/.aroute` with a one-time automatic migration (skipped when `DATA_DIR` is set or a new dir already exists).
+- **Env compat**: legacy `NINEROUTER_*` / `NINE_ROUTER_*` variables are still honored via an alias shim (`src/lib/legacyEnv.js`) and mapped to their `AROUTE_*` names at boot; set the new names and drop the old ones at your convenience.
+- **Context windows**: no universal hardcoded 200K any more on the combo path — model/combo selectors render each model's capability-derived context (e.g. `200K`, `1M`) via `ContextBadge`, resolved from the existing capabilities registry (models.dev sync + per-model overrides).
+- **Docs**: README/gitbook rewritten as ARoute-native; upstream links (Docker images `decolua/9router`, cloud endpoint `9router.com`, VS Code marketplace) intentionally remain pointed at the original services because they still live there.
+- **Intentional leftovers** (not dead): docker image refs to the upstream published images, the legacy env map, the upstream changelog fetch URL, and the VS Code marketplace extension id.
+
 # v0.5.75 (2026-09-10)
 
 ## Features

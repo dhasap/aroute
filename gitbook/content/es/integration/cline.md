@@ -34,7 +34,7 @@ http://localhost:20128/v1
 
 **Para ARoute en la nube:**
 ```
-https://aroute.com
+https://9router.com
 ```
 
 **Pasos:**
@@ -150,7 +150,7 @@ Puedes usar cualquier modelo configurado en tu dashboard de ARoute. Ejemplos com
 
 Para usar el endpoint en la nube de ARoute en lugar de localhost:
 
-1. En la configuración de Cline, establece Base URL a: `https://aroute.com`
+1. En la configuración de Cline, establece Base URL a: `https://9router.com`
 2. Asegúrate de haber configurado tu API key en el dashboard en la nube de ARoute
 3. Asegúrate de que tu endpoint en la nube esté activo y accesible
 

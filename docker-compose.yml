@@ -1,6 +1,7 @@
 services:
   aroute:
-    image: decolua/aroute:latest
+    build: .
+    image: aroute:local
     container_name: aroute
     restart: always
     ports:

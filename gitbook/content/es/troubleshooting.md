@@ -164,7 +164,7 @@ Problemas comunes y soluciones al usar ARoute.
 4. **Usa el endpoint en la nube:**
    Si localhost no funciona (ej. Cursor IDE):
    ```
-   Endpoint: https://aroute.com/v1
+   Endpoint: https://9router.com/v1
    ```
 
 ---
@@ -346,6 +346,6 @@ Problemas comunes y soluciones al usar ARoute.
 
 ## ¿Necesitas más ayuda?
 
-- **GitHub Issues:** [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
-- **Documentación:** [aroute.com/docs](https://aroute.com/docs)
+- **GitHub Issues:** [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
+- **Documentación:** [Documentation](https://github.com/dhasap/aroute/tree/master/gitbook)
 - **FAQ:** [faq.md](faq.md)

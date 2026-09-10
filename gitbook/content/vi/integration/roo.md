@@ -5,7 +5,7 @@ Tích hợp ARoute với Roo AI Assistant để truy cập nhiều model AI qua 
 ## Yêu cầu
 
 - Roo AI Assistant đã cài đặt
-- ARoute API key từ [dashboard](https://aroute.com/dashboard)
+- ARoute API key từ [dashboard](https://9router.com/dashboard)
 - ARoute đang chạy (cục bộ hoặc cloud)
 
 ## Các bước Cấu hình
@@ -28,7 +28,7 @@ API Key: your-api-key-from-dashboard
 
 **Cho ARoute cloud:**
 ```
-Base URL: https://aroute.com/v1
+Base URL: https://9router.com/v1
 API Key: your-api-key-from-dashboard
 ```
 

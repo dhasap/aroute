@@ -242,6 +242,6 @@ CLI 中使用: premium-coding
 
 ## 需要帮助?
 
-- **网站**: [aroute.com](https://aroute.com)
-- **GitHub**: [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **Issues**: [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **网站**: 
+- **GitHub**: [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Issues**: [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)

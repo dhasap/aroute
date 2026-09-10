@@ -26,6 +26,8 @@ export default function Card({
     <div
       className={cn(
         "bg-surface border border-border-subtle",
+        "sketch shadow-[var(--shadow-soft)]",
+        hover ? "sketch-tilt-r" : "sketch-tilt-l",
         elev ? "rounded-[14px] shadow-[var(--shadow-elev)]" : "rounded-[14px] shadow-[var(--shadow-soft)]",
         hover && "hover:shadow-[var(--shadow-warm)] hover:border-brand-500/30 transition-all cursor-pointer",
         paddings[padding],
@@ -43,7 +45,7 @@ export default function Card({
             )}
             <div>
               {title && (
-                <h3 className="text-text-main font-semibold">{title}</h3>
+                <h3 className="text-text-main font-hand font-bold text-base">{title}</h3>
               )}
               {subtitle && (
                 <p className="text-sm text-text-muted">{subtitle}</p>

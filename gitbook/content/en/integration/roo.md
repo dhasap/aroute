@@ -5,7 +5,7 @@ Integrate ARoute with Roo AI Assistant to access multiple AI models through a un
 ## Prerequisites
 
 - Roo AI Assistant installed
-- ARoute API key from [dashboard](https://aroute.com/dashboard)
+- ARoute API key from [dashboard](https://9router.com/dashboard)
 - ARoute running (local or cloud)
 
 ## Configuration Steps
@@ -28,7 +28,7 @@ API Key: your-api-key-from-dashboard
 
 **For Cloud ARoute:**
 ```
-Base URL: https://aroute.com/v1
+Base URL: https://9router.com/v1
 API Key: your-api-key-from-dashboard
 ```
 

@@ -164,7 +164,7 @@
 
 ```
 Cursor Settings → Models → Advanced:
-  OpenAI API Base URL: https://aroute.com/v1
+  OpenAI API Base URL: https://9router.com/v1
   OpenAI API Key: [从仪表盘获取]
   Model: cc/claude-opus-4-5-20251101
 ```
@@ -172,7 +172,7 @@ Cursor Settings → Models → Advanced:
 **替代方案:** 在 VPS 上自托管,使用公开域名:
 ```bash
 # 部署到 VPS
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute/app
 npm install && npm run build
 npm start
@@ -206,7 +206,7 @@ aroute
 
 ### VPS/云
 ```bash
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute/app
 npm install && npm run build
 
@@ -316,7 +316,7 @@ aroute --version
 ```
 
 **破坏性变更:**
-- 查看 [CHANGELOG.md](https://github.com/decolua/aroute/blob/main/CHANGELOG.md)
+- 查看 [CHANGELOG.md](https://github.com/dhasap/aroute/blob/main/CHANGELOG.md)
 - 大版本更新前备份 `~/.aroute`
 - 阅读大版本的迁移指南
 
@@ -329,11 +329,11 @@ aroute --version
 ### 贡献方式:
 
 1. **报告 bug:**
-   - [GitHub Issues](https://github.com/decolua/aroute/issues)
+   - [GitHub Issues](https://github.com/dhasap/aroute/issues)
    - 附上错误日志、复现步骤
 
 2. **功能请求:**
-   - [GitHub Discussions](https://github.com/decolua/aroute/discussions)
+   - [GitHub Discussions](https://github.com/dhasap/aroute/discussions)
    - 描述使用场景和价值
 
 3. **提交代码:**
@@ -375,13 +375,13 @@ aroute --version
 - 更新文档
 - 提交保持原子化、描述清晰
 
-详情见 [CONTRIBUTING.md](https://github.com/decolua/aroute/blob/main/CONTRIBUTING.md)。
+详情见 [CONTRIBUTING.md](https://github.com/dhasap/aroute/blob/main/CONTRIBUTING.md)。
 
 ---
 
 ## 需要更多帮助?
 
-- **文档:** [aroute.com/docs](https://aroute.com/docs)
-- **GitHub:** [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **Issues:** [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **文档:** [Documentation](https://github.com/dhasap/aroute/tree/master/gitbook)
+- **GitHub:** [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Issues:** [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 - **故障排除:** [troubleshooting.md](troubleshooting.md)

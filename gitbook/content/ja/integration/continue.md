@@ -6,7 +6,7 @@ ARouteをContinue拡張機能と統合し、Visual Studio Codeに直接AIアシ�
 
 - Visual Studio Codeがインストール済み
 - VSCodeマーケットプレイスからContinue拡張機能がインストール済み
-- [ダッシュボード](https://aroute.com/dashboard)からのARoute APIキー
+- [ダッシュボード](https://9router.com/dashboard)からのARoute APIキー
 - ARouteが動作中 (ローカルまたはクラウド)
 
 ## 設定手順
@@ -76,7 +76,7 @@ ARouteをContinue拡張機能と統合し、Visual Studio Codeに直接AIアシ�
 **クラウドARoute用:**
 `apiBase` を以下に置き換え:
 ```json
-"apiBase": "https://aroute.com/v1"
+"apiBase": "https://9router.com/v1"
 ```
 
 ### 3. 保存してリロード

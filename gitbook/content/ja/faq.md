@@ -164,7 +164,7 @@ Dashboard → Providers → Quota Tracking
 
 ```
 Cursor Settings → Models → Advanced:
-  OpenAI API Base URL: https://aroute.com/v1
+  OpenAI API Base URL: https://9router.com/v1
   OpenAI API Key: [ダッシュボードから取得]
   Model: cc/claude-opus-4-5-20251101
 ```
@@ -172,7 +172,7 @@ Cursor Settings → Models → Advanced:
 **代替案:** パブリックドメインでVPSにセルフホスト:
 ```bash
 # VPSへデプロイ
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute/app
 npm install && npm run build
 npm start
@@ -206,7 +206,7 @@ aroute
 
 ### VPS/クラウド
 ```bash
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute/app
 npm install && npm run build
 
@@ -316,7 +316,7 @@ aroute --version
 ```
 
 **破壊的変更:**
-- [CHANGELOG.md](https://github.com/decolua/aroute/blob/main/CHANGELOG.md)を確認
+- [CHANGELOG.md](https://github.com/dhasap/aroute/blob/main/CHANGELOG.md)を確認
 - メジャー更新前に`~/.aroute`をバックアップ
 - メジャーバージョンの移行ガイドを確認
 
@@ -329,11 +329,11 @@ aroute --version
 ### 貢献方法:
 
 1. **バグを報告:**
-   - [GitHub Issues](https://github.com/decolua/aroute/issues)
+   - [GitHub Issues](https://github.com/dhasap/aroute/issues)
    - エラーログ、再現手順を含める
 
 2. **機能をリクエスト:**
-   - [GitHub Discussions](https://github.com/decolua/aroute/discussions)
+   - [GitHub Discussions](https://github.com/dhasap/aroute/discussions)
    - ユースケースと利点を説明
 
 3. **コードを提出:**
@@ -375,13 +375,13 @@ aroute --version
 - ドキュメントを更新
 - コミットは小さく、わかりやすく
 
-詳細は[CONTRIBUTING.md](https://github.com/decolua/aroute/blob/main/CONTRIBUTING.md)を参照。
+詳細は[CONTRIBUTING.md](https://github.com/dhasap/aroute/blob/main/CONTRIBUTING.md)を参照。
 
 ---
 
 ## さらにヘルプが必要?
 
-- **ドキュメント:** [aroute.com/docs](https://aroute.com/docs)
-- **GitHub:** [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **Issues:** [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **ドキュメント:** [Documentation](https://github.com/dhasap/aroute/tree/master/gitbook)
+- **GitHub:** [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Issues:** [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 - **トラブルシューティング:** [troubleshooting.md](troubleshooting.md)

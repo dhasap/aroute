@@ -166,7 +166,7 @@ export default function Sidebar({ onClose }) {
               className={cn(
                 "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
                 isActive(item.href)
-                  ? "bg-primary/10 text-primary"
+                  ? "marker-highlight text-primary font-semibold"
                   : "text-text-muted hover:bg-surface-2 hover:text-text-main"
               )}
             >
@@ -184,8 +184,8 @@ export default function Sidebar({ onClose }) {
 
           {/* System section */}
           <div className="pt-3 mt-2 space-y-0.5">
-            <p className="px-4 text-xs font-semibold text-text-muted/60 uppercase tracking-wider mb-2">
-              System
+            <p className="px-4 text-sm font-hand text-text-muted/70 mb-1 -rotate-1">
+              system
             </p>
 
             {/* Media Providers accordion */}

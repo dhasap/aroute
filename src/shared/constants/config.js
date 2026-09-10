@@ -9,15 +9,16 @@ export const APP_CONFIG = {
 
 // GitHub configuration
 export const GITHUB_CONFIG = {
-  changelogUrl: "https://raw.githubusercontent.com/decolua/aroute/refs/heads/master/CHANGELOG.md",
-  donateUrl: "https://aroute.com/api/donate",
+  changelogUrl: "https://raw.githubusercontent.com/decolua/9router/refs/heads/master/CHANGELOG.md",
+  donateUrl: "https://9router.com/api/donate",
 };
 
 // Updater configuration
 export const UPDATER_CONFIG = {
   npmPackageName: "aroute",
-  installCmd: "npm i -g aroute",
-  installCmdLatest: "npm i -g aroute@latest --prefer-online",
+  // Private fork: package is NOT published to npm — update via git checkout instead.
+  installCmd: "git pull origin master && npm install && npm run build",
+  installCmdLatest: "git pull origin master && npm install && npm run build",
   shutdownCountdownSec: 3,
   exitDelayMs: 500,
   statusPort: 20129,

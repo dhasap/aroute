@@ -13,38 +13,38 @@
    ============================================================ */
 :root {
   /* Brand scale (light) - centered on #E56A4A */
-  --color-brand-50: #fdf1ed;
-  --color-brand-100: #fadccf;
-  --color-brand-200: #f4b59c;
-  --color-brand-300: #ee8d6a;
-  --color-brand-400: #ea7855;
-  --color-brand-500: #E56A4A;
-  --color-brand-600: #cc5236;
-  --color-brand-700: #a64027;
-  --color-brand-800: #7a2f1d;
-  --color-brand-900: #4d1e12;
+  --color-brand-50: #fff3e6;
+  --color-brand-100: #ffe0c2;
+  --color-brand-200: #f7b98a;
+  --color-brand-300: #ef9557;
+  --color-brand-400: #ea7c3f;
+  --color-brand-500: #E2632F;
+  --color-brand-600: #c2521f;
+  --color-brand-700: #9c4118;
+  --color-brand-800: #773215;
+  --color-brand-900: #4f220f;
 
   /* Primary (legacy alias for backward compat with existing components) */
   --color-primary: var(--color-brand-500);
   --color-primary-hover: var(--color-brand-600);
 
   /* Surfaces & backgrounds (light) */
-  --color-bg: #FDFAF6;
-  --color-bg-alt: #F7F3EE;
-  --color-surface: #ffffff;
-  --color-surface-2: #f4f4f5;
-  --color-surface-3: #e7e7e9;
-  --color-sidebar: rgba(244, 241, 236, 0.85);
+  --color-bg: #FAF4E6;
+  --color-bg-alt: #F3EAD7;
+  --color-surface: #FFFDF6;
+  --color-surface-2: #F1E8D4;
+  --color-surface-3: #E7DCBF;
+  --color-sidebar: rgba(247, 239, 221, 0.9);
 
   /* Borders */
-  --color-border: #e5e7eb;
-  --color-border-subtle: #f1f1f3;
+  --color-border: #C9BD9E;
+  --color-border-subtle: #DED3B4;
 
   /* Text */
-  --color-text: #0a0a0a;
-  --color-text-main: #0a0a0a;
-  --color-text-muted: #6B7280;
-  --color-text-subtle: #9CA3AF;
+  --color-text: #26221A;
+  --color-text-main: #26221A;
+  --color-text-muted: #6E6350;
+  --color-text-subtle: #9A8E74;
 
   /* Status */
   --color-danger: #cf222e;
@@ -53,11 +53,11 @@
   --color-info: #3B82F6;
 
   /* Radius */
-  --radius-brand: 10px;
+  --radius-brand: 10px; /* sketch base */
   --radius-brand-lg: 14px;
 
   /* Shadows */
-  --shadow-soft: 0 1px 2px 0 rgba(0,0,0,0.04);
+  --shadow-soft: 2px 3px 0 0 rgba(38,34,26,0.12);
   --shadow-warm: 0 2px 12px -2px rgba(229, 106, 74, 0.18);
   --shadow-elevated: 0 12px 28px -4px rgba(60, 50, 45, 0.06);
   --shadow-elev:
@@ -71,35 +71,35 @@
 
 .dark {
   /* Brand scale (dark) - centered on #E56A4A, same as light for consistency */
-  --color-brand-50: #fdf1ed;
-  --color-brand-100: #fadccf;
-  --color-brand-200: #f4b59c;
-  --color-brand-300: #ee8d6a;
-  --color-brand-400: #ea7855;
-  --color-brand-500: #E56A4A;
-  --color-brand-600: #cc5236;
-  --color-brand-700: #a64027;
-  --color-brand-800: #7a2f1d;
-  --color-brand-900: #4d1e12;
+  --color-brand-50: #fff3e6;
+  --color-brand-100: #ffe0c2;
+  --color-brand-200: #f7b98a;
+  --color-brand-300: #ef9557;
+  --color-brand-400: #ea7c3f;
+  --color-brand-500: #E2632F;
+  --color-brand-600: #c2521f;
+  --color-brand-700: #9c4118;
+  --color-brand-800: #773215;
+  --color-brand-900: #4f220f;
 
   --color-primary: #E56A4A;
   --color-primary-hover: #cc5236;
 
   /* Surfaces (dark - Claude-like neutral warm) */
-  --color-bg: #1a1a1a;
-  --color-bg-alt: #1F1F1E;
-  --color-surface: #262626;
-  --color-surface-2: #303030;
-  --color-surface-3: #3a3a3a;
-  --color-sidebar: rgba(30, 30, 30, 0.85);
+  --color-bg: #191612;
+  --color-bg-alt: #1F1B16;
+  --color-surface: #24201A;
+  --color-surface-2: #2E2822;
+  --color-surface-3: #3A332B;
+  --color-sidebar: rgba(28, 24, 19, 0.9);
 
-  --color-border: #333333;
-  --color-border-subtle: #2a2a2a;
+  --color-border: #453D33;
+  --color-border-subtle: #352F27;
 
-  --color-text: #ededed;
-  --color-text-main: #ededed;
-  --color-text-muted: #9ca3af;
-  --color-text-subtle: #6b7280;
+  --color-text: #F2EADB;
+  --color-text-main: #F2EADB;
+  --color-text-muted: #A99C85;
+  --color-text-subtle: #7A6F5D;
 
   --color-danger: #ef4444;
   --color-success: #22c55e;
@@ -602,3 +602,97 @@ button:disabled,
   border-top: 1px solid var(--color-border);
   margin: 1.5rem 0;
 }
+
+/* ============================================================
+   ARoute sketchbook skin — hand-drawn anime-notebook identity
+   Tokens: wobbly radii, paper texture, doodle ink
+   ============================================================ */
+:root {
+  --ink: #26221A;
+  --ink-soft: rgba(38,34,26,0.65);
+  --paper-line: rgba(38,34,26,0.07);
+  --paper-margin: rgba(226,99,47,0.35);
+  --sketch-r-sm: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --sketch-r-md: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  --sketch-r-lg: 225px 15px 255px 15px / 15px 255px 15px 225px;
+  --sketch-r-pill: 60px 20px 55px 25px / 25px 55px 20px 60px;
+}
+.dark {
+  --ink: #F2EADB;
+  --ink-soft: rgba(242,234,219,0.6);
+  --paper-line: rgba(242,234,219,0.05);
+  --paper-margin: rgba(239,149,87,0.3);
+}
+
+/* notebook paper: cream grid + red margin rule, very subtle */
+body {
+  background-image:
+    linear-gradient(var(--paper-margin) 0 0) ,
+    repeating-linear-gradient(0deg, transparent 0 27px, var(--paper-line) 27px 28px),
+    repeating-linear-gradient(90deg, transparent 0 27px, var(--paper-line) 27px 28px);
+  background-size: 2px 100%, auto, auto;
+  background-position: 38px 0, 0 0, 0 0;
+  background-attachment: fixed;
+}
+@media (max-width: 768px) { body { background-image: repeating-linear-gradient(0deg, transparent 0 27px, var(--paper-line) 27px 28px); } }
+
+/* handwritten display + mono data fonts (set in layout via next/font vars) */
+.font-hand { font-family: var(--font-hand), 'Comic Sans MS', cursive; }
+.font-note { font-family: var(--font-note), var(--font-hand), cursive; }
+.font-data { font-family: var(--font-data), ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+/* sketch borders: uneven radius + 2px ink outline, slight alternating tilt */
+.sketch { border: 2px solid var(--ink); border-radius: var(--sketch-r-md) !important; }
+.sketch-alt { border: 2px solid var(--ink); border-radius: var(--sketch-r-sm) !important; }
+.sketch-lg { border: 2px solid var(--ink); border-radius: var(--sketch-r-lg) !important; }
+.sketch-pill { border: 2px solid var(--ink); border-radius: var(--sketch-r-pill) !important; }
+.sketch-shadow { box-shadow: 3px 4px 0 0 var(--ink-soft) !important; }
+.sketch-tilt-l { transform: rotate(-0.35deg); }
+.sketch-tilt-r { transform: rotate(0.3deg); }
+.sketch-tilt-l:hover, .sketch-tilt-r:hover { transform: rotate(0deg); }
+
+/* doodle underline: squiggle instead of straight line */
+.doodle-underline {
+  text-decoration: underline wavy var(--color-brand-500);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+/* handwritten sticky-note chip */
+.sticky-note {
+  font-family: var(--font-hand), cursive;
+  background: #FFF3B0;
+  color: #4A3B12;
+  border: 1.5px solid rgba(74,59,18,0.35);
+  border-radius: 12px 3px 14px 4px / 4px 14px 3px 12px;
+  box-shadow: 2px 3px 0 rgba(74,59,18,0.18);
+  transform: rotate(-1.2deg);
+  padding: 2px 10px;
+  display: inline-block;
+}
+.dark .sticky-note { background: #3D3520; color: #F2E2A8; border-color: rgba(242,226,168,0.3); box-shadow: 2px 3px 0 rgba(0,0,0,0.4); }
+
+/* focus: hand-drawn double ring */
+:where(button,a,input,select,textarea,[tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* subtle life: cards straighten on hover, no layout thrash */
+@media (prefers-reduced-motion: reduce) {
+  .sketch-tilt-l, .sketch-tilt-r, .sticky-note { transform: none !important; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* animated pencil dash for loading/streaming accents */
+@keyframes dash-move { to { stroke-dashoffset: -24; } }
+.dash-flow { stroke-dasharray: 8 4; animation: dash-move 1.2s linear infinite; }
+
+/* highlighter marker sweep — active nav items read like pen circled in a notebook */
+.marker-highlight {
+  background-image: linear-gradient(104deg, transparent 0.7%, rgba(226,99,47,0.22) 2.4%, rgba(226,99,47,0.18) 97.6%, transparent 98.8%);
+  border-radius: 0.4em 0.6em 0.5em 0.7em / 0.7em 0.4em 0.6em 0.5em;
+  box-decoration-break: clone;
+}
+.dark .marker-highlight { background-image: linear-gradient(104deg, transparent 0.7%, rgba(239,149,87,0.26) 2.4%, rgba(239,149,87,0.18) 97.6%, transparent 98.8%); }

@@ -33,6 +33,8 @@ const nextConfig = {
   },
   env: {},
   experimental: {
+    // Low-memory CI (cgroup 4GB): cap build workers via NEXT_BUILD_CPUS; default untouched.
+    ...(process.env.NEXT_BUILD_CPUS ? { cpus: Number(process.env.NEXT_BUILD_CPUS) } : {}),
     // #1529/#1572: LLM clients can send long context or base64 image payloads through /v1 rewrites.
     proxyClientMaxBodySize,
     // Cache fetch responses across HMR refreshes for faster dev reloads.

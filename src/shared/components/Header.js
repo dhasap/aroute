@@ -272,7 +272,7 @@ export default function Header({ onMenuClick, showMenuButton = true }) {
                         fallbackText={crumb.label.slice(0, 2).toUpperCase()}
                       />
                     )}
-                    <h1 className="text-base lg:text-2xl font-semibold text-text-main tracking-tight truncate">
+                    <h1 className="text-base lg:text-2xl font-hand font-bold text-text-main tracking-tight truncate">
                       {translate(crumb.label)}
                     </h1>
                   </div>
@@ -288,7 +288,7 @@ export default function Header({ onMenuClick, showMenuButton = true }) {
                   {icon}
                 </span>
               )}
-              <h1 className="text-base lg:text-2xl font-semibold tracking-tight truncate">
+              <h1 className="text-base lg:text-2xl font-hand font-bold tracking-tight truncate">
                 {translate(title)}
               </h1>
             </div>

@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Inter, Patrick_Hand, Caveat, JetBrains_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "material-symbols/outlined.css";
 import "./globals.css";
@@ -15,6 +15,10 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
+// ARoute sketchbook identity: handwritten display + annotation + mono data faces
+const hand = Patrick_Hand({ subsets: ["latin"], weight: "400", variable: "--font-hand", display: "swap" });
+const note = Caveat({ subsets: ["latin"], weight: ["500", "700"], variable: "--font-note", display: "swap" });
+const data = JetBrains_Mono({ subsets: ["latin"], variable: "--font-data", display: "swap" });
 
 export const metadata = {
   title: "ARoute - AI Infrastructure Management",
@@ -46,7 +50,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${hand.variable} ${note.variable} ${data.variable} font-sans antialiased`}>
         <ThemeProvider>
           <RuntimeI18nProvider>
             {children}
