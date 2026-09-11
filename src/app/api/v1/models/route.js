@@ -163,6 +163,13 @@ function modelKind(model) {
   return MODEL_TYPE_TO_KIND[k] || LLM_KIND;
 }
 
+// Split "provider/model" into [provider, model]; bare ids resolve as ["", id].
+function splitProviderModel(modelStr) {
+  const s = typeof modelStr === "string" ? modelStr : "";
+  const slash = s.indexOf("/");
+  return slash > 0 ? [s.slice(0, slash), s.slice(slash + 1)] : ["", s];
+}
+
 // For dynamic/unknown model IDs (compatible providers, alias map, custom models)
 // fall back to provider-level kind matching when per-model type is unavailable.
 function inferKindFromUnknownModelId(modelId) {
@@ -312,6 +319,27 @@ export async function buildModelsList(kindFilter, options = {}) {
     };
     if (combo.kind === "webSearch" || combo.kind === "webFetch") {
       entry.kind = combo.kind;
+    }
+    // LLM combos: expose the effective context window as max over members,
+    // in both conventions clients look for (snake_case top level + camelCase
+    // nested, same as provider models above). Without it, clients reading
+    // context_length find nothing, fall back to a default (e.g. 256K), and
+    // compact far too early even though a 1M member can absorb the request.
+    if (comboMatchesKinds(combo, [LLM_KIND])) {
+      const memberCaps = (combo.models || [])
+        .map((m) => getCapabilitiesForModel(...splitProviderModel(m)))
+        .filter((c) => Number.isFinite(c?.contextWindow));
+      const contextWindow = memberCaps.length
+        ? Math.max(...memberCaps.map((c) => c.contextWindow))
+        : null;
+      const maxOutput = memberCaps.length
+        ? Math.max(...memberCaps.map((c) => c.maxOutput).filter(Number.isFinite))
+        : null;
+      if (contextWindow != null) {
+        entry.context_length = contextWindow;
+        entry.capabilities = { ...(entry.capabilities || {}), contextWindow };
+      }
+      if (maxOutput != null) entry.max_completion_tokens = maxOutput;
     }
     models.push(entry);
   }
