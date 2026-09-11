@@ -89,7 +89,10 @@ graphify-out/*
 
 # Kiro local workspace state
 .kiro/
-aroute-*
+# aroute-* CLI artifacts (skills/aroute-* are intentionally NOT ignored)
+/aroute-*
+/aroute-*.json
+/aroute-*.log
 
 # Local sensitive / temp files
 .engine-token.txt
