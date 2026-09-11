@@ -36,7 +36,7 @@ export default function ModelRow({ model, fullModel, alias, copied, onCopy, test
             <button
               onClick={onTest}
               disabled={isTesting}
-              className={`rounded p-0.5 text-text-muted transition-opacity hover:bg-sidebar hover:text-primary ${isTesting ? "opacity-100" : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"}`}
+              className={`rounded p-0.5 text-text-muted transition-opacity hover:bg-sidebar hover:text-primary ${isTesting ? "opacity-100" : "opacity-60 group-hover:opacity-100 sm:opacity-0"}`}
             >
               <span className="material-symbols-outlined text-sm" style={isTesting ? { animation: "spin 1s linear infinite" } : undefined}>
                 {isTesting ? "progress_activity" : "science"}

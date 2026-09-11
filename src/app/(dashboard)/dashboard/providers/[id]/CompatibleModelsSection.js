@@ -47,7 +47,7 @@ function CompatibleModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias,
               <button
                 onClick={onTest}
                 disabled={isTesting}
-                className="p-0.5 hover:bg-sidebar rounded text-text-muted hover:text-primary transition-colors"
+                className={`p-0.5 hover:bg-sidebar rounded text-text-muted hover:text-primary transition-colors ${isTesting ? "opacity-100" : "opacity-60 group-hover:opacity-100 sm:opacity-0"}`}
               >
                 <span className="material-symbols-outlined text-sm" style={isTesting ? { animation: "spin 1s linear infinite" } : undefined}>
                   {isTesting ? "progress_activity" : "science"}
@@ -62,7 +62,7 @@ function CompatibleModelRow({ modelId, fullModel, copied, onCopy, onDeleteAlias,
       </div>
       <button
         onClick={onDeleteAlias}
-        className="p-1 hover:bg-red-50 rounded text-red-500"
+        className={`ml-auto p-1 rounded text-red-500 hover:bg-red-50 ${isTesting ? "opacity-100" : "opacity-60 group-hover:opacity-100 sm:opacity-0"}`}
         title="Remove model"
       >
         <span className="material-symbols-outlined text-sm">delete</span>
