@@ -67,6 +67,13 @@ export const SKILLS = [
     endpoint: "/v1/web/fetch",
     icon: "language",
   },
+  {
+    id: "aroute-video",
+    name: "Video Generation",
+    description: "Text-to-video / image-to-video / edits / extensions via xAI Grok Imagine (async job flow).",
+    endpoint: "/v1/videos/generations",
+    icon: "movie",
+  },
 ];
 
 export function getSkillRawUrl(id) {
