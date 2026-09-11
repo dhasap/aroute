@@ -30,7 +30,7 @@ curl $AROUTE_URL/v1/models/stt              # speech-to-text
 curl $AROUTE_URL/v1/models/image-to-text    # vision
 ```
 
-Use `data[].id` as `model` field in requests. Combos appear with `owned_by:"combo"`.
+Use `data[].id` as `model` field in requests. Combos appear with `owned_by:"combo"` and carry `context_length` (the max context across combo members).
 
 Response shape:
 ```json
@@ -46,13 +46,14 @@ When the user needs a specific capability, fetch that skill's `SKILL.md` from it
 
 | Capability | Raw URL |
 |---|---|
-| Chat / code-gen | https://raw.githubusercontent.com/decolua/aroute/refs/heads/master/skills/aroute-chat/SKILL.md |
-| Image generation | https://raw.githubusercontent.com/decolua/aroute/refs/heads/master/skills/aroute-image/SKILL.md |
-| Text-to-speech | https://raw.githubusercontent.com/decolua/aroute/refs/heads/master/skills/aroute-tts/SKILL.md |
-| Speech-to-text | https://raw.githubusercontent.com/decolua/aroute/refs/heads/master/skills/aroute-stt/SKILL.md |
-| Embeddings | https://raw.githubusercontent.com/decolua/aroute/refs/heads/master/skills/aroute-embeddings/SKILL.md |
-| Web search | https://raw.githubusercontent.com/decolua/aroute/refs/heads/master/skills/aroute-web-search/SKILL.md |
-| Web fetch (URL → markdown) | https://raw.githubusercontent.com/decolua/aroute/refs/heads/master/skills/aroute-web-fetch/SKILL.md |
+| Chat / code-gen | https://raw.githubusercontent.com/dhasap/aroute/refs/heads/master/skills/aroute-chat/SKILL.md |
+| Image generation | https://raw.githubusercontent.com/dhasap/aroute/refs/heads/master/skills/aroute-image/SKILL.md |
+| Text-to-speech | https://raw.githubusercontent.com/dhasap/aroute/refs/heads/master/skills/aroute-tts/SKILL.md |
+| Speech-to-text | https://raw.githubusercontent.com/dhasap/aroute/refs/heads/master/skills/aroute-stt/SKILL.md |
+| Embeddings | https://raw.githubusercontent.com/dhasap/aroute/refs/heads/master/skills/aroute-embeddings/SKILL.md |
+| Web search | https://raw.githubusercontent.com/dhasap/aroute/refs/heads/master/skills/aroute-web-search/SKILL.md |
+| Web fetch (URL → markdown) | https://raw.githubusercontent.com/dhasap/aroute/refs/heads/master/skills/aroute-web-fetch/SKILL.md |
+| Video generation | https://raw.githubusercontent.com/dhasap/aroute/refs/heads/master/skills/aroute-video/SKILL.md |
 
 ## Errors
 
