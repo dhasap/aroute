@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CardSkeleton } from "@/shared/components";
 import { CLI_TOOLS } from "@/shared/constants/cliTools";
 import { getModelsByProviderId, PROVIDER_ID_TO_ALIAS } from "@/shared/constants/models";
+import { FREE_PROVIDERS } from "@/shared/constants/providers";
 import {
   ClaudeToolCard, CodexToolCard, DroidToolCard, OpenClawToolCard,
   HermesToolCard, DefaultToolCard, OpenCodeToolCard, CoworkToolCard,
@@ -65,7 +66,14 @@ export default function ToolDetailClient({ toolId, machineId }) {
     return () => { mounted = false; };
   }, []);
 
-  const getActiveProviders = () => connections.filter(c => c.isActive !== false);
+  // noAuth providers (OpenCode Free, MiMo Code Free, …) route fine with no
+  // stored connection — count them as active everywhere "active provider" lists
+  // are built from connections only.
+  const getActiveProviders = () => {
+    const connProviders = new Set(connections.filter(c => c.isActive !== false).map(c => c.provider));
+    const noAuth = Object.keys(FREE_PROVIDERS).filter(id => FREE_PROVIDERS[id].noAuth && !connProviders.has(id));
+    return [...connections.filter(c => c.isActive !== false), ...noAuth.map(id => ({ provider: id, name: FREE_PROVIDERS[id].name, noAuth: true, isActive: true }))];
+  };
 
   const getAllAvailableModels = () => {
     const activeProviders = getActiveProviders();

@@ -106,8 +106,6 @@ export default function ProvidersPage() {
     useState(false);
   const [testingMode, setTestingMode] = useState(null);
   const [testResults, setTestResults] = useState(null);
-  const [testingAllModels, setTestingAllModels] = useState(false);
-  const [allModelResults, setAllModelResults] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const notify = useNotificationStore();
   const searchQuery = useHeaderSearchStore((s) => s.query);
@@ -265,30 +263,6 @@ export default function ProvidersPage() {
     }
   };
 
-  // Ping every model of every active provider through /api/models/test-all.
-  const handleTestAllModels = async () => {
-    if (testingAllModels) return;
-    setTestingAllModels(true);
-    setAllModelResults(null);
-    try {
-      const res = await fetch("/api/models/test-all", { method: "POST" });
-      const data = await res.json();
-      setAllModelResults(data);
-      if (data.summary) {
-        const { passed, failed, total } = data.summary;
-        if (failed === 0) notify.success(`All ${total} model tests passed`);
-        else notify.warning(`${passed}/${total} model tests passed`);
-      } else {
-        notify.error(data.error || "Model test failed");
-      }
-    } catch {
-      setAllModelResults({ error: "Test request failed" });
-      notify.error("Model test failed");
-    } finally {
-      setTestingAllModels(false);
-    }
-  };
-
   const compatibleProviders = providerNodes
     .filter((node) => node.type === "openai-compatible")
     .map((node) => ({
@@ -414,22 +388,22 @@ export default function ProvidersPage() {
     <div className="flex min-w-0 flex-col gap-6 px-1 sm:px-0">
       <div className="flex items-center justify-between gap-2">
         <button
-          onClick={handleTestAllModels}
-          disabled={testingAllModels || !!testingMode}
+          onClick={() => handleBatchTest("all")}
+          disabled={!!testingMode}
           className={`flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-            testingAllModels
+            testingMode === "all"
               ? "bg-primary/20 border-primary/40 text-primary animate-pulse"
               : "bg-bg border-border text-text-muted hover:text-text-main hover:border-primary/40"
           } disabled:opacity-50`}
-          title="Ping every model on every active provider"
-          aria-label="Test all models on all providers"
+          title="Test every active provider connection"
+          aria-label="Test all provider connections"
         >
           <span
-            className={`material-symbols-outlined text-[14px]${testingAllModels ? " animate-spin" : ""}`}
+            className={`material-symbols-outlined text-[14px]${testingMode === "all" ? " animate-spin" : ""}`}
           >
-            {testingAllModels ? "progress_activity" : "science"}
+            {testingMode === "all" ? "progress_activity" : "play_arrow"}
           </span>
-          {testingAllModels ? "Testing models..." : "Test All Models"}
+          {testingMode === "all" ? "Testing..." : "Test All Providers"}
         </button>
         <select
           value={statusFilter}
@@ -729,34 +703,6 @@ export default function ProvidersPage() {
             </div>
             <div className="p-5">
               <ProviderTestResultsView results={testResults} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* All-Models Test Results Modal */}
-      {allModelResults && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center px-3 pt-[6vh] sm:pt-[10vh]"
-          onClick={() => setAllModelResults(null)}
-        >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div
-            className="relative bg-surface border border-border rounded-xl w-full max-w-[600px] max-h-[86vh] sm:max-h-[80vh] overflow-y-auto shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-3 border-b border-border bg-surface/95 backdrop-blur-sm rounded-t-xl">
-              <h3 className="font-semibold">Model Test Results</h3>
-              <button
-                onClick={() => setAllModelResults(null)}
-                className="p-1 rounded-lg hover:bg-bg text-text-muted hover:text-text-main transition-colors"
-                aria-label="Close model test results"
-              >
-                <span className="material-symbols-outlined text-lg">close</span>
-              </button>
-            </div>
-            <div className="p-5">
-              <AllModelsTestResultsView results={allModelResults} />
             </div>
           </div>
         </div>
@@ -1106,114 +1052,6 @@ ProviderTestResultsView.propTypes = {
       total: PropTypes.number,
       passed: PropTypes.number,
       failed: PropTypes.number,
-    }),
-    error: PropTypes.string,
-  }).isRequired,
-};
-
-// Results of "Test All Models" — grouped per provider, model rows stacked on
-// mobile (no hover-only actions), compact two-column-ish rows on sm+.
-function AllModelsTestResultsView({ results }) {
-  if (results.error && !results.providers) {
-    return (
-      <div className="text-center py-6">
-        <span className="material-symbols-outlined text-red-500 text-[32px] mb-2 block">
-          error
-        </span>
-        <p className="text-sm text-red-400">{results.error}</p>
-      </div>
-    );
-  }
-
-  const { summary, providers } = results;
-  const tested = providers || [];
-
-  return (
-    <div className="flex min-w-0 flex-col gap-4">
-      {summary && (
-        <div className="flex flex-wrap items-center gap-2 text-xs sm:gap-3">
-          <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-medium">
-            {summary.passed} passed
-          </span>
-          {summary.failed > 0 && (
-            <span className="px-2 py-0.5 rounded bg-red-500/15 text-red-400 font-medium">
-              {summary.failed} failed
-            </span>
-          )}
-          <span className="text-text-muted sm:ml-auto">
-            {summary.total} models across {summary.providers} providers
-          </span>
-        </div>
-      )}
-      {tested.map((p) => (
-        <div key={p.connectionId || p.provider} className="min-w-0">
-          <div className="mb-1.5 flex items-center justify-between gap-2">
-            <span className="truncate text-xs font-semibold">{p.provider}</span>
-            <span className="shrink-0 text-[10px] text-text-muted font-mono tabular-nums">
-              {p.summary.passed}/{p.summary.total}
-            </span>
-          </div>
-          <div className="flex flex-col gap-1">
-            {p.results.map((r) => (
-              <div
-                key={r.modelId}
-                className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 rounded-lg bg-black/[0.03] px-2.5 py-1.5 text-xs dark:bg-white/[0.03]"
-              >
-                <span
-                  className={`material-symbols-outlined shrink-0 text-[15px] ${r.ok ? "text-emerald-500" : "text-red-500"}`}
-                  title={r.error || undefined}
-                >
-                  {r.ok ? "check_circle" : "error"}
-                </span>
-                <code className="min-w-0 max-w-[60vw] truncate font-mono text-text-muted sm:max-w-[280px]">
-                  {r.modelId}
-                </code>
-                {r.latencyMs > 0 && (
-                  <span className="ml-auto shrink-0 text-text-muted font-mono tabular-nums text-[10px]">
-                    {r.latencyMs}ms
-                  </span>
-                )}
-                {!r.ok && r.error && (
-                  <span className="w-full truncate text-[10px] text-red-400/80" title={r.error}>
-                    {r.error}
-                  </span>
-                )}
-              </div>
-            ))}
-            {p.results.length === 0 && (
-              <div className="rounded-lg border border-dashed border-border px-2.5 py-1.5 text-[10px] text-text-muted">
-                No models
-              </div>
-            )}
-          </div>
-        </div>
-      ))}
-      {tested.length === 0 && (
-        <div className="text-center py-4 text-text-muted text-sm">
-          No active provider connections.
-        </div>
-      )}
-    </div>
-  );
-}
-
-AllModelsTestResultsView.propTypes = {
-  results: PropTypes.shape({
-    providers: PropTypes.arrayOf(PropTypes.shape({
-      provider: PropTypes.string,
-      connectionId: PropTypes.string,
-      results: PropTypes.array,
-      summary: PropTypes.shape({
-        total: PropTypes.number,
-        passed: PropTypes.number,
-        failed: PropTypes.number,
-      }),
-    })),
-    summary: PropTypes.shape({
-      total: PropTypes.number,
-      passed: PropTypes.number,
-      failed: PropTypes.number,
-      providers: PropTypes.number,
     }),
     error: PropTypes.string,
   }).isRequired,

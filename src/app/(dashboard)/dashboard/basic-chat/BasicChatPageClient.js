@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge, Button } from "@/shared/components";
 import { getModelsByProviderId } from "@/shared/constants/models";
-import { isAnthropicCompatibleProvider, isOpenAICompatibleProvider } from "@/shared/constants/providers";
+import { isAnthropicCompatibleProvider, isOpenAICompatibleProvider, FREE_PROVIDERS } from "@/shared/constants/providers";
 
 const STORAGE_KEYS = {
   sessions: "basic-chat.sessions",
@@ -224,7 +224,14 @@ export default function BasicChatPageClient() {
           ? providersData.connections.filter((connection) => connection?.isActive !== false)
           : [];
 
-        if (connections.length === 0) {
+        // noAuth providers (OpenCode Free, …) route fine with no connection record.
+        const connProviders = new Set(connections.map((c) => c.provider));
+        const noAuthConnections = Object.entries(FREE_PROVIDERS)
+          .filter(([id, info]) => info.noAuth && !connProviders.has(id))
+          .map(([id, info]) => ({ provider: id, name: info.name, noAuth: true, isActive: true }));
+        const allConnections = [...connections, ...noAuthConnections];
+
+        if (allConnections.length === 0) {
           if (!cancelled) {
             setProviderGroups([]);
             setLoadError("No providers connected yet.");
@@ -234,7 +241,7 @@ export default function BasicChatPageClient() {
 
         const providerMap = new Map();
 
-        for (const connection of connections) {
+        for (const connection of allConnections) {
           const providerId = connection.provider || connection.id;
           const providerName = getProviderLabel(connection);
           const providerType = isOpenAICompatibleProvider(providerId)

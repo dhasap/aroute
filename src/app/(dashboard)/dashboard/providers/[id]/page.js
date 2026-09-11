@@ -12,6 +12,7 @@ import { getThinkingLevels } from "open-sse/providers/thinkingLevels.js";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
 import { useModelCaps } from "@/shared/hooks/useModelCaps";
 import { translate } from "@/i18n/runtime";
+import { useNotificationStore } from "@/store/notificationStore";
 import { fetchSuggestedModels } from "@/shared/utils/providerModelsFetcher";
 import { getProviderCustomModelRows } from "@/shared/utils/providerCustomModels";
 import ModelRow from "./ModelRow";
@@ -42,6 +43,7 @@ export default function ProviderDetailPage() {
   const { getCaps } = useModelCaps();
   const [connections, setConnections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const notify = useNotificationStore();
   const [providerNode, setProviderNode] = useState(null);
   const [proxyPools, setProxyPools] = useState([]);
   const [showOAuthModal, setShowOAuthModal] = useState(false);
@@ -1126,6 +1128,56 @@ export default function ProviderDetailPage() {
     }
   };
 
+  // Test All: ping every visible model of this provider sequentially (protects
+  // upstream rate limits), marking each row as it resolves. Same probe as the
+  // per-model button, just batched. ponytail: sequential is O(n) slow for big
+  // catalogs — add a small concurrency pool if providers ship 50+ models.
+  const [testingAllProviderModels, setTestingAllProviderModels] = useState(false);
+  const customModelRows = getProviderCustomModelRows({
+    customModels,
+    modelAliases,
+    providerAlias: providerStorageAlias,
+    builtInModels: models,
+    type: "llm",
+  });
+
+  const handleTestAllProviderModels = useCallback(async () => {
+    if (testingAllProviderModels) return;
+    setTestingAllProviderModels(true);
+    setModelsTestError("");
+    const ids = [
+      ...customModelRows.map((m) => m.id),
+      ...models.filter((m) => { const k = getModelKind(m); return !k || k === "llm"; }).map((m) => m.id),
+      ...kiloFreeModels.filter((fm) => !models.some((m) => m.id === fm.id)).map((m) => m.id),
+    ];
+    let failed = 0;
+    for (const id of ids) {
+      setTestingModelIds((prev) => new Set(prev).add(id));
+      let ok = false;
+      try {
+        const res = await fetch("/api/models/test", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: `${providerStorageAlias}/${id}` }),
+        });
+        const data = await res.json();
+        ok = !!data.ok;
+        if (!ok) failed += 1;
+        setModelTestResults((prev) => ({ ...prev, [id]: ok ? "ok" : "error" }));
+      } catch {
+        ok = false;
+        failed += 1;
+        setModelTestResults((prev) => ({ ...prev, [id]: "error" }));
+      } finally {
+        setTestingModelIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
+      }
+    }
+    setTestingAllProviderModels(false);
+    if (ids.length === 0) setModelsTestError("No models to test");
+    else if (failed === 0) notify.success(`All ${ids.length} model tests passed`);
+    else notify.warning(`${ids.length - failed}/${ids.length} model tests passed`);
+  }, [testingAllProviderModels, customModelRows, models, kiloFreeModels, providerStorageAlias, testingModelIds, notify]);
+
   const renderModelsSection = () => {
     if (isCompatible) {
       return (
@@ -1154,13 +1206,6 @@ export default function ProviderDetailPage() {
     const disabledSet = new Set(disabledModelIds);
     const displayModels = allModels.filter((m) => !disabledSet.has(m.id));
     const disabledDisplayModels = allModels.filter((m) => disabledSet.has(m.id));
-    const customModelRows = getProviderCustomModelRows({
-      customModels,
-      modelAliases,
-      providerAlias: providerStorageAlias,
-      builtInModels: models,
-      type: "llm",
-    });
 
     return (
       <div className="flex flex-wrap gap-3">
@@ -1729,6 +1774,26 @@ export default function ProviderDetailPage() {
             <h2 className="text-lg font-semibold">
               {"Available Models"}
             </h2>
+            {(connections.length > 0 || isFreeNoAuth) && (
+              <button
+                onClick={handleTestAllProviderModels}
+                disabled={testingAllProviderModels}
+                className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  testingAllProviderModels
+                    ? "bg-primary/20 border-primary/40 text-primary animate-pulse"
+                    : "bg-bg border-border text-text-muted hover:text-text-main hover:border-primary/40"
+                } disabled:opacity-50`}
+                title={`Ping every model of this provider`}
+                aria-label="Test all models of this provider"
+              >
+                <span
+                  className={`material-symbols-outlined text-[14px]${testingAllProviderModels ? " animate-spin" : ""}`}
+                >
+                  {testingAllProviderModels ? "progress_activity" : "science"}
+                </span>
+                {testingAllProviderModels ? "Testing..." : "Test All"}
+              </button>
+            )}
             {providerThinkingLevels && (
               <select
                 value={thinkingMode}
