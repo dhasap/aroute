@@ -14,6 +14,9 @@ RUN npm install --registry=https://registry.npmmirror.com
 
 COPY . ./
 ENV NEXT_TELEMETRY_DISABLED=1
+# Low-memory build hosts (4GB cgroup): cap Next build workers, else OOM in "Collecting page data".
+# No-op on beefy hosts — next.config.mjs only applies it when set.
+ENV NEXT_BUILD_CPUS=2
 RUN npm run build
 
 FROM ${NODE_IMAGE} AS runner
@@ -31,6 +34,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/custom-server.js ./custom-server.js
+# custom-server.js line 1 requires this before anything else; tracing does not see it.
+COPY --from=builder /app/scripts/legacy-env-compat.cjs ./scripts/legacy-env-compat.cjs
 COPY --from=builder /app/open-sse ./open-sse
 # Next file tracing can omit sibling files; MITM runs server.js as a separate process.
 COPY --from=builder /app/src/mitm ./src/mitm
