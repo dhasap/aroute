@@ -237,6 +237,6 @@ export const DOCS_CONFIG = {
   description: "Smart AI model router - Maximize subscriptions, minimize costs",
   logo: "ARoute",
   appUrl: "https://9router.com",
-  githubUrl: "https://github.com/decolua/aroute",
+  githubUrl: "https://github.com/dhasap/aroute",
   navigation: getNavigation(DEFAULT_LANG)
 };
