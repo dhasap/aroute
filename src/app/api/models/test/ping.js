@@ -6,6 +6,14 @@ import { getConsistentMachineId } from "@/shared/utils/machineId";
 
 const CLI_TOKEN_SALT = "9r-cli-auth";
 
+// Upstream reasoning models can be slow to emit their first token (observed
+// ~15-35s end-to-end for deep-reasoning models on a trivial "hi" probe). The
+// old 15s budget aborted those pings with "The operation was aborted due to
+// timeout" and marked healthy models as unreachable. 90s matches the default
+// request timeout used by the chat path, so a ping fails only when the
+// upstream is genuinely down.
+const PING_TIMEOUT_MS = Number(process.env.MODEL_PING_TIMEOUT_MS || 90000);
+
 function createSilentWavFile() {
   const sampleRate = 16000;
   const channels = 1;
@@ -61,7 +69,7 @@ export async function pingModelByKind(model, kind, baseUrl = `http://127.0.0.1:$
       method: "POST",
       headers,
       body: JSON.stringify({ model, input: "test" }),
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(PING_TIMEOUT_MS),
     });
     const latencyMs = Date.now() - start;
     const rawText = await res.text().catch(() => "");
@@ -84,7 +92,7 @@ export async function pingModelByKind(model, kind, baseUrl = `http://127.0.0.1:$
       method: "POST",
       headers,
       body: JSON.stringify({ model, prompt: "test" }),
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(PING_TIMEOUT_MS),
     });
     const latencyMs = Date.now() - start;
     const rawText = await res.text().catch(() => "");
@@ -113,7 +121,7 @@ export async function pingModelByKind(model, kind, baseUrl = `http://127.0.0.1:$
       method: "POST",
       headers: Object.fromEntries(Object.entries(headers).filter(([key]) => key.toLowerCase() !== "content-type")),
       body: form,
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(PING_TIMEOUT_MS),
     });
     const latencyMs = Date.now() - start;
     const rawText = await res.text().catch(() => "");
@@ -145,7 +153,7 @@ export async function pingModelByKind(model, kind, baseUrl = `http://127.0.0.1:$
       stream: false,
       messages: [{ role: "user", content: "hi" }],
     }),
-    signal: AbortSignal.timeout(15000),
+    signal: AbortSignal.timeout(PING_TIMEOUT_MS),
   });
   const latencyMs = Date.now() - start;
 
