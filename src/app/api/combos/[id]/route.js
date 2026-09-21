@@ -40,6 +40,14 @@ export async function PUT(request, { params }) {
         return NextResponse.json({ error: "Combo name already exists" }, { status: 400 });
       }
     }
+
+    // Validate context window if provided (null/"" = back to auto)
+    if (body.contextWindow !== null && body.contextWindow !== undefined && body.contextWindow !== "") {
+      const n = Number(body.contextWindow);
+      if (!Number.isFinite(n) || n <= 0 || !Number.isInteger(n)) {
+        return NextResponse.json({ error: "Context window must be a positive whole number" }, { status: 400 });
+      }
+    }
     
     // Capture previous name to invalidate rotation state on rename
     const prev = await getComboById(id);

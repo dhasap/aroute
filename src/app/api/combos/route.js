@@ -21,7 +21,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { name, models, kind } = body;
+    const { name, models, kind, contextWindow } = body;
 
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -32,13 +32,21 @@ export async function POST(request) {
       return NextResponse.json({ error: "Name can only contain letters, numbers, -, _ and ." }, { status: 400 });
     }
 
+    // Validate context window if provided (null/undefined = auto)
+    if (contextWindow !== null && contextWindow !== undefined && contextWindow !== "") {
+      const n = Number(contextWindow);
+      if (!Number.isFinite(n) || n <= 0 || !Number.isInteger(n)) {
+        return NextResponse.json({ error: "Context window must be a positive whole number" }, { status: 400 });
+      }
+    }
+
     // Check if name already exists
     const existing = await getComboByName(name);
     if (existing) {
       return NextResponse.json({ error: "Combo name already exists" }, { status: 400 });
     }
 
-    const combo = await createCombo({ name, models: models || [], kind: kind || null });
+    const combo = await createCombo({ name, models: models || [], kind: kind || null, contextWindow });
 
     return NextResponse.json(combo, { status: 201 });
   } catch (error) {

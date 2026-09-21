@@ -325,6 +325,24 @@ function ComboCard({ combo, getCaps, activeProviders = [], copied, onCopy, onEdi
                 <span className="text-[10px] text-text-muted">+{combo.models.length - 3} more</span>
               )}
             </div>
+            {/* Combo context window: explicit override beats member max */}
+            {(() => {
+              const memberCtx = (combo.models || [])
+                .map((m) => getCaps?.(m)?.contextWindow)
+                .filter((v) => Number.isFinite(v));
+              const effective = Number.isFinite(Number(combo.contextWindow))
+                ? Number(combo.contextWindow)
+                : (memberCtx.length ? Math.max(...memberCtx) : null);
+              if (!Number.isFinite(effective)) return null;
+              return (
+                <div className="mt-1.5 inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5">
+                  <span className="material-symbols-outlined text-primary text-[12px]">contextual_token</span>
+                  <span className="text-[10px] font-medium text-primary">
+                    {(effective / 1000).toLocaleString()}K context{Number.isFinite(Number(combo.contextWindow)) ? " (override)" : ""}
+                  </span>
+                </div>
+              );
+            })()}
             {/* Fusion: judge picker (Auto = first model) */}
             {isFusion && (
               <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1.5">
@@ -660,6 +678,11 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders, kindF
   const [saving, setSaving] = useState(false);
   const [nameError, setNameError] = useState("");
   const [modelAliases, setModelAliases] = useState({});
+  // Context window override. "" = auto (max over members).
+  const [contextWindow, setContextWindow] = useState(
+    combo?.contextWindow != null ? String(combo.contextWindow) : ""
+  );
+  const [contextError, setContextError] = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -745,8 +768,16 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders, kindF
 
   const handleSave = async () => {
     if (!validateName(name)) return;
+    // Empty → auto (null). Positive integer → override.
+    const trimmed = contextWindow.trim();
+    const parsed = trimmed === "" ? null : Number(trimmed);
+    if (parsed !== null && (!Number.isFinite(parsed) || parsed <= 0 || !Number.isInteger(parsed))) {
+      setContextError("Must be a whole number greater than 0 (e.g. 1000000)");
+      return;
+    }
+    setContextError("");
     setSaving(true);
-    await onSave({ name: name.trim(), models });
+    await onSave({ name: name.trim(), models, contextWindow: parsed });
     setSaving(false);
   };
 
@@ -818,6 +849,21 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders, kindF
               <span className="material-symbols-outlined text-[16px]">add</span>
               Add Model
             </button>
+          </div>
+
+          {/* Context Window (optional) */}
+          <div>
+            <Input
+              label="Context Window (tokens)"
+              type="number"
+              value={contextWindow}
+              onChange={(e) => { setContextWindow(e.target.value); if (contextError) setContextError(""); }}
+              placeholder="auto (max of members)"
+              error={contextError}
+            />
+            <p className="text-[10px] text-text-muted mt-0.5">
+              Leave empty for auto (max of member models). Set a number to override — e.g. 1000000 for 1M, 2000000 for 2M.
+            </p>
           </div>
 
           {/* Actions */}

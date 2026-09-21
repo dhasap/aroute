@@ -4,7 +4,7 @@ import { parseJson, stringifyJson } from "../helpers/jsonCol.js";
 
 function rowToCombo(row) {
   if (!row) return null;
-  return {
+  const combo = {
     id: row.id,
     name: row.name,
     kind: row.kind,
@@ -12,6 +12,9 @@ function rowToCombo(row) {
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
+  // Optional context-window override; NULL = auto (max over member models).
+  if (row.contextWindow != null) combo.contextWindow = Number(row.contextWindow);
+  return combo;
 }
 
 export async function getCombos() {
@@ -43,9 +46,12 @@ export async function createCombo(data) {
     createdAt: now,
     updatedAt: now,
   };
+  // Explicit context window (optional). null/undefined → auto.
+  const cw = Number(data.contextWindow);
+  if (Number.isFinite(cw) && cw > 0) combo.contextWindow = Math.floor(cw);
   db.run(
-    `INSERT INTO combos(id, name, kind, models, createdAt, updatedAt) VALUES(?, ?, ?, ?, ?, ?)`,
-    [combo.id, combo.name, combo.kind, stringifyJson(combo.models), combo.createdAt, combo.updatedAt]
+    `INSERT INTO combos(id, name, kind, models, contextWindow, createdAt, updatedAt) VALUES(?, ?, ?, ?, ?, ?, ?)`,
+    [combo.id, combo.name, combo.kind, stringifyJson(combo.models), combo.contextWindow ?? null, combo.createdAt, combo.updatedAt]
   );
   return combo;
 }
@@ -57,9 +63,17 @@ export async function updateCombo(id, data) {
     const row = db.get(`SELECT * FROM combos WHERE id = ?`, [id]);
     if (!row) return;
     const merged = { ...rowToCombo(row), ...data, updatedAt: new Date().toISOString() };
+    // contextWindow: explicit number overrides; null/"auto" clears it back to auto.
+    let cw = merged.contextWindow;
+    if (cw !== null && cw !== undefined) {
+      const n = Number(cw);
+      cw = Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+    } else {
+      cw = null;
+    }
     db.run(
-      `UPDATE combos SET name = ?, kind = ?, models = ?, updatedAt = ? WHERE id = ?`,
-      [merged.name, merged.kind, stringifyJson(merged.models || []), merged.updatedAt, id]
+      `UPDATE combos SET name = ?, kind = ?, models = ?, contextWindow = ?, updatedAt = ? WHERE id = ?`,
+      [merged.name, merged.kind, stringifyJson(merged.models || []), cw, merged.updatedAt, id]
     );
     result = merged;
   });

@@ -381,7 +381,11 @@ export async function POST(request) {
             "xiaomi-tokenplan": `${resolveXiaomiTokenplanBaseUrl({ providerSpecificData })}/models`,
           };
           const headers = {};
-          if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
+          if (apiKey) {
+            // Atria accepts only x-api-key (Bearer gets 401 invalid_api_key).
+            if (provider === "atria") headers["x-api-key"] = apiKey;
+            else headers["Authorization"] = `Bearer ${apiKey}`;
+          }
           const res = await fetch(endpoints[provider], { headers, signal: AbortSignal.timeout(8000) });
           // xai returns 400 for bad key, 403 for valid-but-no-credit. Other providers use 401.
           if (provider === "xai") {

@@ -327,13 +327,18 @@ export async function buildModelsList(kindFilter, options = {}) {
     // nested, same as provider models above). Without it, clients reading
     // context_length find nothing, fall back to a default (e.g. 256K), and
     // compact far too early even though a 1M member can absorb the request.
+    // An explicit combo.contextWindow override wins over the member max.
     if (comboMatchesKinds(combo, [LLM_KIND])) {
       const memberCaps = (combo.models || [])
         .map((m) => getCapabilitiesForModel(...splitProviderModel(m)))
         .filter((c) => Number.isFinite(c?.contextWindow));
-      const contextWindow = memberCaps.length
+      const memberContext = memberCaps.length
         ? Math.max(...memberCaps.map((c) => c.contextWindow))
         : null;
+      const override = Number(combo.contextWindow);
+      const contextWindow = Number.isFinite(override) && override > 0
+        ? override
+        : memberContext;
       const maxOutput = memberCaps.length
         ? Math.max(...memberCaps.map((c) => c.maxOutput).filter(Number.isFinite))
         : null;

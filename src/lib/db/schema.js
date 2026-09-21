@@ -92,6 +92,8 @@ export const TABLES = {
       name: "TEXT UNIQUE NOT NULL",
       kind: "TEXT",
       models: "TEXT NOT NULL",
+      // NULL = auto (max over member models); explicit override wins when set.
+      contextWindow: "INTEGER",
       createdAt: "TEXT NOT NULL",
       updatedAt: "TEXT NOT NULL",
     },

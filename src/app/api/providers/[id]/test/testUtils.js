@@ -816,6 +816,14 @@ case "llm7": {
         }, effectiveProxy);
         return { valid: res.ok, error: res.ok ? null : "Invalid API key", refreshed: false };
       }
+      case "atria": {
+        // x-api-key only — Bearer is rejected with 401 invalid_api_key.
+        const cfg = PROVIDERS[connection.provider];
+        const res = await fetchWithConnectionProxy(cfg.validateUrl, {
+          headers: { "x-api-key": connection.apiKey },
+        }, effectiveProxy);
+        return { valid: res.ok, error: res.ok ? null : "Invalid API key", refreshed: false };
+      }
       default:
         return { valid: false, error: "Provider test not supported" };
     }
