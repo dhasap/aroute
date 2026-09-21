@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { PROVIDER_MODELS, PROVIDER_ID_TO_ALIAS, getModelKind } from "@/shared/constants/models";
 import {
   AI_PROVIDERS,
@@ -591,6 +593,7 @@ export async function OPTIONS() {
     },
   });
 }
+
 
 /**
  * GET /v1/models - OpenAI compatible models list (LLM/chat models only by default).

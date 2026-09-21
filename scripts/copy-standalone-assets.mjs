@@ -37,6 +37,15 @@ export function copyStandaloneAssets({ projectRoot = process.cwd(), distDir = pr
     cpSync(serverWrapperSource, serverWrapperDestination, { force: true });
     console.log(`[standalone-assets] Copied custom-server.js to ${serverWrapperDestination}`);
   }
+
+  // custom-server.js requires this at module scope (legacy .env compat). Missing
+  // it makes the standalone build crash on boot with MODULE_NOT_FOUND.
+  const legacyEnvSource = resolve(projectRoot, "scripts", "legacy-env-compat.cjs");
+  const legacyEnvDestination = resolve(standaloneDir, "scripts", "legacy-env-compat.cjs");
+  if (existsSync(legacyEnvSource)) {
+    cpSync(legacyEnvSource, legacyEnvDestination, { force: true });
+    console.log(`[standalone-assets] Copied legacy-env-compat.cjs to ${legacyEnvDestination}`);
+  }
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(dirname(fileURLToPath(import.meta.url)), "copy-standalone-assets.mjs")) {

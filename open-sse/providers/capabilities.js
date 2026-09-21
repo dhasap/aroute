@@ -144,6 +144,12 @@ const CODEX_GPT_56_DEFAULT_CAPS = { vision: true, reasoning: true, search: true,
  * Provider-specific capability overrides. Keyed by provider alias/id.
  */
 export const PROVIDER_CAPABILITIES = {
+  // Atria AI — Atria-Dawn-Preview: text-only reasoning model with a 1M token
+  // context window (upstream /models advertises it; models.dev also lists it).
+  // Reasoning is OpenAI-style reasoning_effort.
+  "atria": {
+    "Atria-Dawn-Preview": { reasoning: true, thinkingFormat: "openai", contextWindow: 1000000, maxOutput: 131072 },
+  },
   // NVIDIA NIM is OpenAI-compatible → rejects MiniMax/GLM native `thinking` field.
   // Force openai reasoning_effort format for its reasoning models. #issue
   "nvidia": {
