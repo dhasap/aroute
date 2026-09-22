@@ -9,11 +9,11 @@
   
   [![npm](https://img.shields.io/npm/v/aroute.svg)](https://www.npmjs.com/package/aroute)
   [![Downloads](https://img.shields.io/npm/dm/aroute.svg)](https://www.npmjs.com/package/aroute)
-  [![Docker Pulls](https://img.shields.io/docker/pulls/decolua/aroute.svg?logo=docker&label=Docker%20pulls)](https://hub.docker.com/r/decolua/aroute)
-  [![GHCR](https://img.shields.io/badge/GHCR-decolua%2Faroute-blue?logo=github)](https://github.com/decolua/aroute/pkgs/container/aroute)
-  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/decolua/aroute/blob/main/LICENSE)
+  [![Docker Pulls](https://img.shields.io/docker/pulls/dhasap/aroute.svg?logo=docker&label=Docker%20pulls)](https://hub.docker.com/r/dhasap/aroute)
+  [![GHCR](https://img.shields.io/badge/GHCR-dhasap%2Faroute-blue?logo=github)](https://github.com/dhasap/aroute/pkgs/container/aroute)
+  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/dhasap/aroute/blob/main/LICENSE)
 
-<a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="decolua%2Faroute | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="dhasap%2Faroute | ARoute" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
 [🚀 شروع سریع](#-شروع-سریع) • [💡 ویژگی‌ها](#-ویژگی‌های-کلیدی) • [📖 راه‌اندازی](#-راهنمای-راه‌اندازی) • [🌐 وب‌سایت](https://aroute.com)
 
@@ -213,7 +213,7 @@ PORT=20128 HOSTNAME=0.0.0.0 NEXT_PUBLIC_BASE_URL=http://localhost:20128 npm run 
 
 </div>
 
-> 🎬 **درباره ARoute ویدیو ساخته‌اید؟** یک [درخواست Pull](https://github.com/decolua/aroute/pulls) برای افزودن ویدیوی خود به این بخش ارسال کنید — ما آن را ادغام خواهیم کرد!
+> 🎬 **درباره ARoute ویدیو ساخته‌اید؟** یک [درخواست Pull](https://github.com/dhasap/aroute/pulls) برای افزودن ویدیوی خود به این بخش ارسال کنید — ما آن را ادغام خواهیم کرد!
 
 ---
 
@@ -1125,7 +1125,7 @@ codex "your prompt"
 
 ```bash
 # کلون و نصب
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute
 npm install
 npm run build
@@ -1156,8 +1156,8 @@ pm2 startup
 
 تصاویر منتشر شده (چند پلتفرم `linux/amd64` + `linux/arm64`):
 
-- Docker Hub: [`decolua/aroute`](https://hub.docker.com/r/decolua/aroute)
-- GHCR: [`ghcr.io/decolua/aroute`](https://github.com/decolua/aroute/pkgs/container/aroute)
+- Docker Hub: [`dhasap/aroute`](https://hub.docker.com/r/dhasap/aroute)
+- GHCR: [`ghcr.io/dhasap/aroute`](https://github.com/dhasap/aroute/pkgs/container/aroute)
 
 **شروع سریع (استفاده از تصویر منتشر شده):**
 
@@ -1167,7 +1167,7 @@ docker run -d \
   -p 20128:20128 \
   -v "$HOME/.aroute:/app/data" \
   -e DATA_DIR=/app/data \
-  decolua/aroute:latest
+  dhasap/aroute:latest
 ```
 
 → باز کردن http://localhost:20128
@@ -1175,7 +1175,7 @@ docker run -d \
 **ساخت از سورس (توسعه):**
 
 ```bash
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute/app
 docker build -t aroute .
 docker run -d --name aroute -p 20128:20128 \
@@ -1193,7 +1193,7 @@ docker run -d --name aroute -p 20128:20128 \
 docker logs -f aroute
 docker restart aroute
 docker stop aroute && docker rm aroute
-docker pull decolua/aroute:latest   # به‌روزرسانی به آخرین نسخه
+docker pull dhasap/aroute:latest   # به‌روزرسانی به آخرین نسخه
 ```
 
 **ماندگاری داده:** `$HOME/.aroute/db/data.sqlite` در میزبان ↔ `/app/data/db/data.sqlite` در کانتینر.
@@ -1395,8 +1395,8 @@ Authorization: Bearer your-api-key
 ## 📧 پشتیبانی
 
 - **وب‌سایت**: [aroute.com](https://aroute.com)
-- **GitHub**: [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **مسائل**: [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **GitHub**: [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **مسائل**: [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 
 ---
 
@@ -1404,13 +1404,13 @@ Authorization: Bearer your-api-key
 
 با تشکر از همه مشارکت‌کنندگانی که به بهتر شدن ARoute کمک کردند!
 
-[![Contributors](https://contrib.rocks/image?repo=decolua/aroute&max=150&columns=15&anon=1&v=20260309)](https://github.com/decolua/aroute/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=dhasap/aroute&max=150&columns=15&anon=1&v=20260309)](https://github.com/dhasap/aroute/graphs/contributors)
 
 ---
 
 ## 📊 نمودار ستاره
 
-[![Star Chart](https://starchart.cc/decolua/aroute.svg?variant=adaptive)](https://starchart.cc/decolua/aroute)
+[![Star Chart](https://starchart.cc/dhasap/aroute.svg?variant=adaptive)](https://starchart.cc/dhasap/aroute)
 
 ## 🔀 فورک‌ها
 

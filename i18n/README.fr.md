@@ -9,11 +9,11 @@
   
   [![npm](https://img.shields.io/npm/v/aroute.svg)](https://www.npmjs.com/package/aroute)
   [![Downloads](https://img.shields.io/npm/dm/aroute.svg)](https://www.npmjs.com/package/aroute)
-  [![Docker Pulls](https://img.shields.io/docker/pulls/decolua/aroute.svg?logo=docker&label=Docker%20pulls)](https://hub.docker.com/r/decolua/aroute)
-  [![GHCR](https://img.shields.io/badge/GHCR-decolua%2Faroute-blue?logo=github)](https://github.com/decolua/aroute/pkgs/container/aroute)
-  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/decolua/aroute/blob/main/LICENSE)
+  [![Docker Pulls](https://img.shields.io/docker/pulls/dhasap/aroute.svg?logo=docker&label=Docker%20pulls)](https://hub.docker.com/r/dhasap/aroute)
+  [![GHCR](https://img.shields.io/badge/GHCR-dhasap%2Faroute-blue?logo=github)](https://github.com/dhasap/aroute/pkgs/container/aroute)
+  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/dhasap/aroute/blob/main/LICENSE)
 
-<a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="decolua%2Faroute | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="dhasap%2Faroute | ARoute" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
 [🚀 Démarrage rapide](#-démarrage-rapide) • [💡 Fonctionnalités](#-fonctionnalités-clés) • [📖 Configuration](#-guide-dinstallation) • [🌐 Site web](https://aroute.com)
 
@@ -213,7 +213,7 @@ URL par défaut :
 
 </div>
 
-> 🎬 **Vous avez réalisé une vidéo sur ARoute ?** Envoyez une [Pull Request](https://github.com/decolua/aroute/pulls) en ajoutant votre vidéo à cette section — nous la fusionnerons !
+> 🎬 **Vous avez réalisé une vidéo sur ARoute ?** Envoyez une [Pull Request](https://github.com/dhasap/aroute/pulls) en ajoutant votre vidéo à cette section — nous la fusionnerons !
 
 ---
 
@@ -1127,7 +1127,7 @@ Model : cc/claude-opus-4-7
 
 ```bash
 # Clonez et installez
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute
 npm install
 npm run build
@@ -1158,8 +1158,8 @@ pm2 startup
 
 Images publiées (multi-plateformes `linux/amd64` + `linux/arm64`) :
 
-- Docker Hub : [`decolua/aroute`](https://hub.docker.com/r/decolua/aroute)
-- GHCR : [`ghcr.io/decolua/aroute`](https://github.com/decolua/aroute/pkgs/container/aroute)
+- Docker Hub : [`dhasap/aroute`](https://hub.docker.com/r/dhasap/aroute)
+- GHCR : [`ghcr.io/dhasap/aroute`](https://github.com/dhasap/aroute/pkgs/container/aroute)
 
 **Démarrage rapide (utilisez l'image publiée) :**
 
@@ -1169,7 +1169,7 @@ docker run -d \
   -p 20128:20128 \
   -v "$HOME/.aroute:/app/data" \
   -e DATA_DIR=/app/data \
-  decolua/aroute:latest
+  dhasap/aroute:latest
 ```
 
 → Ouvrez http://localhost:20128
@@ -1177,7 +1177,7 @@ docker run -d \
 **Compiler depuis le code source (dev) :**
 
 ```bash
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute/app
 docker build -t aroute .
 docker run -d --name aroute -p 20128:20128 \
@@ -1195,7 +1195,7 @@ docker run -d --name aroute -p 20128:20128 \
 docker logs -f aroute
 docker restart aroute
 docker stop aroute && docker rm aroute
-docker pull decolua/aroute:latest   # mise à jour vers la dernière version
+docker pull dhasap/aroute:latest   # mise à jour vers la dernière version
 ```
 
 **Persistance des données :** `$HOME/.aroute/db/data.sqlite` sur l'hôte ↔ `/app/data/db/data.sqlite` dans le conteneur.
@@ -1397,8 +1397,8 @@ Authorization: Bearer votre-clé-api
 ## 📧 Support
 
 - **Site web** : [aroute.com](https://aroute.com)
-- **GitHub** : [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **Problèmes** : [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **GitHub** : [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Problèmes** : [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 
 ---
 
@@ -1406,13 +1406,13 @@ Authorization: Bearer votre-clé-api
 
 Merci à tous les contributeurs qui ont contribué à améliorer ARoute !
 
-[![Contributors](https://contrib.rocks/image?repo=decolua/aroute&max=150&columns=15&anon=1&v=20260309)](https://github.com/decolua/aroute/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=dhasap/aroute&max=150&columns=15&anon=1&v=20260309)](https://github.com/dhasap/aroute/graphs/contributors)
 
 ---
 
 ## 📊 Graphique d'étoiles
 
-[![Star Chart](https://starchart.cc/decolua/aroute.svg?variant=adaptive)](https://starchart.cc/decolua/aroute)
+[![Star Chart](https://starchart.cc/dhasap/aroute.svg?variant=adaptive)](https://starchart.cc/dhasap/aroute)
 
 ## 🔀 Forks
 

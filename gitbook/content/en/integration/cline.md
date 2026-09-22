@@ -34,7 +34,7 @@ http://localhost:20128/v1
 
 **For Cloud ARoute:**
 ```
-https://9router.com
+https://github.com/dhasap/aroute
 ```
 
 **Steps:**
@@ -150,7 +150,7 @@ You can use any model configured in your ARoute dashboard. Common examples:
 
 To use ARoute cloud endpoint instead of localhost:
 
-1. In Cline settings, set Base URL to: `https://9router.com`
+1. In Cline settings, set Base URL to: `https://github.com/dhasap/aroute`
 2. Make sure you have configured your API key in the ARoute cloud dashboard
 3. Ensure your cloud endpoint is active and accessible
 

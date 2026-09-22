@@ -6,7 +6,7 @@ Integrate ARoute with Continue extension to bring AI assistance directly into Vi
 
 - Visual Studio Code installed
 - Continue extension installed from VSCode marketplace
-- ARoute API key from [dashboard](https://9router.com/dashboard)
+- ARoute API key from [dashboard](https://github.com/dhasap/aroute/dashboard)
 - ARoute running (local or cloud)
 
 ## Configuration Steps
@@ -76,7 +76,7 @@ Add the following configuration to your `config.json`:
 **For Cloud ARoute:**
 Replace `apiBase` with:
 ```json
-"apiBase": "https://9router.com/v1"
+"apiBase": "https://github.com/dhasap/aroute/v1"
 ```
 
 ### 3. Save and Reload

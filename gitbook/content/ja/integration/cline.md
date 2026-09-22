@@ -34,7 +34,7 @@ http://localhost:20128/v1
 
 **クラウドARoute用:**
 ```
-https://9router.com
+https://github.com/dhasap/aroute
 ```
 
 **手順:**
@@ -150,7 +150,7 @@ ARouteダッシュボードで設定されたモデルを使用できます。�
 
 localhostの代わりにARouteクラウドエンドポイントを使用:
 
-1. Cline設定で、Base URLを設定: `https://9router.com`
+1. Cline設定で、Base URLを設定: `https://github.com/dhasap/aroute`
 2. ARouteクラウドダッシュボードでAPIキーが設定されていることを確認
 3. クラウドエンドポイントがアクティブでアクセス可能か確認
 

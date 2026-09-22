@@ -6,7 +6,7 @@ Tích hợp ARoute với extension Continue để mang trợ lý AI trực tiế
 
 - Visual Studio Code đã cài đặt
 - Extension Continue đã cài đặt từ VSCode marketplace
-- ARoute API key từ [dashboard](https://9router.com/dashboard)
+- ARoute API key từ [dashboard](https://github.com/dhasap/aroute/dashboard)
 - ARoute đang chạy (cục bộ hoặc cloud)
 
 ## Các bước Cấu hình
@@ -76,7 +76,7 @@ Thêm cấu hình sau vào `config.json`:
 **Cho Cloud ARoute:**
 Thay `apiBase` bằng:
 ```json
-"apiBase": "https://9router.com/v1"
+"apiBase": "https://github.com/dhasap/aroute/v1"
 ```
 
 ### 3. Lưu và Reload

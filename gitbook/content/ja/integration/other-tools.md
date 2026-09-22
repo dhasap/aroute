@@ -24,7 +24,7 @@ Model: 任意のARouteモデル (cc/*, cx/*, glm/*など)
 
 **クラウドARoute:**
 ```
-Base URL: https://9router.com/v1
+Base URL: https://github.com/dhasap/aroute/v1
 API Key: your-api-key-from-dashboard
 Model: 任意のARouteモデル (cc/*, cx/*, glm/*など)
 ```

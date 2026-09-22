@@ -24,7 +24,7 @@ Model: cualquier modelo de ARoute (cc/*, cx/*, glm/*, etc.)
 
 **ARoute en la nube:**
 ```
-Base URL: https://9router.com/v1
+Base URL: https://github.com/dhasap/aroute/v1
 API Key: your-api-key-from-dashboard
 Model: cualquier modelo de ARoute (cc/*, cx/*, glm/*, etc.)
 ```

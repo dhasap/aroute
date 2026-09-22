@@ -1,4 +1,4 @@
-// Back-compat shim: map legacy 9Router env vars to their AROUTE_ names.
+// Back-compat shim: map legacy ARoute (legacy 9Router) env vars to their AROUTE_ names.
 // Delete after one major release once users have migrated.
 const LEGACY_ENV_MAP = {
   NINEROUTER_URL: "AROUTE_URL",

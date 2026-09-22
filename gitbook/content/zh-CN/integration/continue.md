@@ -6,7 +6,7 @@
 
 - 已安装 Visual Studio Code
 - 从 VSCode 市场安装了 Continue 扩展
-- 来自 [仪表盘](https://9router.com/dashboard) 的 ARoute API key
+- 来自 [仪表盘](https://github.com/dhasap/aroute/dashboard) 的 ARoute API key
 - ARoute 正在运行(本地或云端)
 
 ## 配置步骤
@@ -76,7 +76,7 @@
 **云端 ARoute:**
 将 `apiBase` 替换为:
 ```json
-"apiBase": "https://9router.com/v1"
+"apiBase": "https://github.com/dhasap/aroute/v1"
 ```
 
 ### 3. 保存并重新加载

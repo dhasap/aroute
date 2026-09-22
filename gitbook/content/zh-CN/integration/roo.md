@@ -5,7 +5,7 @@
 ## 前置要求
 
 - 已安装 Roo AI 助手
-- 来自 [仪表盘](https://9router.com/dashboard) 的 ARoute API key
+- 来自 [仪表盘](https://github.com/dhasap/aroute/dashboard) 的 ARoute API key
 - ARoute 正在运行(本地或云端)
 
 ## 配置步骤
@@ -28,7 +28,7 @@ API Key: your-api-key-from-dashboard
 
 **云端 ARoute:**
 ```
-Base URL: https://9router.com/v1
+Base URL: https://github.com/dhasap/aroute/v1
 API Key: your-api-key-from-dashboard
 ```
 

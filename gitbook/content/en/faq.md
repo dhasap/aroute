@@ -164,7 +164,7 @@ See [quota tracking documentation](features/quota-tracking.md) for details.
 
 ```
 Cursor Settings → Models → Advanced:
-  OpenAI API Base URL: https://9router.com/v1
+  OpenAI API Base URL: https://github.com/dhasap/aroute/v1
   OpenAI API Key: [from dashboard]
   Model: cc/claude-opus-4-5-20251101
 ```

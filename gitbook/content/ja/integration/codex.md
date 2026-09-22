@@ -113,7 +113,7 @@ codex --model cx/gpt-5.1-codex-max "Explain what this code does: $(cat myfile.js
 localhostの代わりにARouteクラウドエンドポイントを使用するには:
 
 ```bash
-export OPENAI_BASE_URL="https://9router.com"
+export OPENAI_BASE_URL="https://github.com/dhasap/aroute"
 ```
 
 ARouteクラウドダッシュボードでAPIキーが設定されていることを確認してください。

@@ -9,7 +9,7 @@
 
   [![npm](https://img.shields.io/npm/v/aroute.svg)](https://www.npmjs.com/package/aroute)
   [![Downloads](https://img.shields.io/npm/dm/aroute.svg)](https://www.npmjs.com/package/aroute)
-  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/decolua/aroute/blob/main/LICENSE)
+  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/dhasap/aroute/blob/main/LICENSE)
 
   [🚀 クイックスタート](#-クイックスタート) • [💡 機能](#-主な機能) • [📖 セットアップ](#-セットアップガイド) • [🌐 ウェブサイト](https://aroute.com)
 
@@ -945,7 +945,7 @@ Model: cc/claude-opus-4-6
 
 ```bash
 # クローンとインストール
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute
 npm install
 npm run build
@@ -1167,8 +1167,8 @@ Authorization: Bearer your-api-key
 ## 📧 サポート
 
 - **ウェブサイト**: [aroute.com](https://aroute.com)
-- **GitHub**: [github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **Issues**: [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **GitHub**: [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Issues**: [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 
 ---
 
@@ -1176,13 +1176,13 @@ Authorization: Bearer your-api-key
 
 ARouteの改善に貢献してくださったすべてのコントリビューターに感謝します！
 
-[![Contributors](https://contrib.rocks/image?repo=decolua/aroute&max=150&columns=15&anon=1&v=20260309)](https://github.com/decolua/aroute/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=dhasap/aroute&max=150&columns=15&anon=1&v=20260309)](https://github.com/dhasap/aroute/graphs/contributors)
 
 ---
 
 ## 📊 スターチャート
 
-[![Star Chart](https://starchart.cc/decolua/aroute.svg?variant=adaptive)](https://starchart.cc/decolua/aroute)
+[![Star Chart](https://starchart.cc/dhasap/aroute.svg?variant=adaptive)](https://starchart.cc/dhasap/aroute)
 
 
 

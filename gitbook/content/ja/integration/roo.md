@@ -5,7 +5,7 @@ ARouteをRoo AIアシスタントと統合し、統一インターフェイス�
 ## 前提条件
 
 - Roo AIアシスタントがインストール済み
-- [ダッシュボード](https://9router.com/dashboard)からのARoute APIキー
+- [ダッシュボード](https://github.com/dhasap/aroute/dashboard)からのARoute APIキー
 - ARouteが動作中 (ローカルまたはクラウド)
 
 ## 設定手順
@@ -28,7 +28,7 @@ API Key: your-api-key-from-dashboard
 
 **クラウドARoute用:**
 ```
-Base URL: https://9router.com/v1
+Base URL: https://github.com/dhasap/aroute/v1
 API Key: your-api-key-from-dashboard
 ```
 

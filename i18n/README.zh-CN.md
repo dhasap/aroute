@@ -13,7 +13,7 @@
   
   [![npm](https://img.shields.io/npm/v/aroute.svg)](https://www.npmjs.com/package/aroute)
   [![Downloads](https://img.shields.io/npm/dm/aroute.svg)](https://www.npmjs.com/package/aroute)
-  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/decolua/aroute/blob/main/LICENSE)
+  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/dhasap/aroute/blob/main/LICENSE)
   
   [🚀 快速开始](#-quick-start) • [💡 特性](#-key-features) • [📖 设置](#-setup) • [🌐 网站](https://aroute.com)
 </div>
@@ -946,7 +946,7 @@ Model: cc/claudeus-4-6
 
 ```bash
 # Clone and install
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute
 npm install
 npm run build
@@ -1255,8 +1255,8 @@ OPENAI_API_KEY="your-cloud-key" bash tester/security/test-cloud-openai-compatibl
 ## 📧 支持
 
 - **网站**：[aroute.com](https://aroute.com)
-- **GitHub**：[github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **问题**：[github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **GitHub**：[github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **问题**：[github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 
 ---
 
@@ -1264,13 +1264,13 @@ OPENAI_API_KEY="your-cloud-key" bash tester/security/test-cloud-openai-compatibl
 
 感谢所有帮助让 ARoute 变得更好的贡献者！
 
-[![Contributors](https://contrib.rocks/image?repo=decolua/aroute&max=100&columns=20&anon=1)](https://github.com/decolua/aroute/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=dhasap/aroute&max=100&columns=20&anon=1)](https://github.com/dhasap/aroute/graphs/contributors)
 
 ---
 
 ## 📊 Star 图表
 
-[![Star Chart](https://starchart.cc/decolua/aroute.svg?variant=adaptive)](https://starchart.cc/decolua/aroute)
+[![Star Chart](https://starchart.cc/dhasap/aroute.svg?variant=adaptive)](https://starchart.cc/dhasap/aroute)
 
 ### 如何贡献
 
@@ -1280,7 +1280,7 @@ OPENAI_API_KEY="your-cloud-key" bash tester/security/test-cloud-openai-compatibl
 4 推送到分支（`git push origin feature/amazing-feature`）
 5. 打开 Pull Request
 
-详细指南请参阅 [Pull Requests](https://github.com/decolua/aroute/pulls)。
+详细指南请参阅 [Pull Requests](https://github.com/dhasap/aroute/pulls)。
 
 ---
 

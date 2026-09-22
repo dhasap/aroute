@@ -9,7 +9,7 @@
 
   [![npm](https://img.shields.io/npm/v/aroute.svg)](https://www.npmjs.com/package/aroute)
   [![Downloads](https://img.shields.io/npm/dm/aroute.svg)](https://www.npmjs.com/package/aroute)
-  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/decolua/aroute/blob/main/LICENSE)
+  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/dhasap/aroute/blob/main/LICENSE)
 
   [🚀 Mulai Cepat](#-mulai-cepat) • [💡 Fitur](#-fitur-utama) • [📖 Setup](#-panduan-setup) • [🌐 Website](https://aroute.com)
 
@@ -876,7 +876,7 @@ docker run -d \
   -v aroute-data:/app/data \
   -e PORT=20128 \
   -e BASE_URL=http://localhost:20128 \
-  ghcr.io/decolua/aroute:latest
+  ghcr.io/dhasap/aroute:latest
 ```
 
 Dashboard: `http://localhost:20128/dashboard`
@@ -938,14 +938,14 @@ Kontribusi sangat diterima!
 
 ## 📄 Lisensi
 
-MIT License — lihat [LICENSE](https://github.com/decolua/aroute/blob/main/LICENSE) untuk detailnya.
+MIT License — lihat [LICENSE](https://github.com/dhasap/aroute/blob/main/LICENSE) untuk detailnya.
 
 ---
 
 <div align="center">
 
-**Kalau ARoute membantumu, kasih ⭐ di [GitHub](https://github.com/decolua/aroute)!**
+**Kalau ARoute membantumu, kasih ⭐ di [GitHub](https://github.com/dhasap/aroute)!**
 
-[🌐 Website](https://aroute.com) • [📦 npm](https://www.npmjs.com/package/aroute) • [🐛 Laporkan Bug](https://github.com/decolua/aroute/issues)
+[🌐 Website](https://aroute.com) • [📦 npm](https://www.npmjs.com/package/aroute) • [🐛 Laporkan Bug](https://github.com/dhasap/aroute/issues)
 
 </div>

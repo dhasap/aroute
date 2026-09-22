@@ -164,7 +164,7 @@ Các vấn đề và giải pháp phổ biến khi dùng ARoute.
 4. **Dùng cloud endpoint:**
    Nếu localhost không hoạt động (ví dụ: Cursor IDE):
    ```
-   Endpoint: https://9router.com/v1
+   Endpoint: https://github.com/dhasap/aroute/v1
    ```
 
 ---

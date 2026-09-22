@@ -1,6 +1,6 @@
 # Docker
 
-Run ARoute in a container. Published image: [`decolua/aroute`](https://hub.docker.com/r/decolua/aroute) — multi-platform `linux/amd64` + `linux/arm64`.
+Run ARoute in a container. Published image: [`dhasap/aroute`](https://hub.docker.com/r/dhasap/aroute) — multi-platform `linux/amd64` + `linux/arm64`.
 
 ---
 
@@ -14,7 +14,7 @@ docker run -d \
   -v "$HOME/.aroute:/app/data" \
   -e DATA_DIR=/app/data \
   --name aroute \
-  decolua/aroute:latest
+  dhasap/aroute:latest
 ```
 
 App listens on port `20128`. Open: http://localhost:20128
@@ -61,7 +61,7 @@ docker run -d \
   -e HOSTNAME=0.0.0.0 \
   -e DEBUG=true \
   --name aroute \
-  decolua/aroute:latest
+  dhasap/aroute:latest
 ```
 
 ## Optional Headroom sidecar
@@ -71,7 +71,7 @@ The ARoute image does not bundle Python or Headroom. To use Headroom in Docker, 
 ```yaml
 services:
   aroute:
-    image: decolua/aroute:latest
+    image: dhasap/aroute:latest
     ports:
       - "20128:20128"
     volumes:
@@ -95,7 +95,7 @@ If Headroom runs on the Docker host instead of as a sidecar, use `http://host.do
 ## Update to latest
 
 ```bash
-docker pull decolua/aroute:latest
+docker pull dhasap/aroute:latest
 docker rm -f aroute
 # re-run the quick start command
 ```
@@ -118,8 +118,8 @@ docker run --rm -p 20128:20128 \
 ## Publish (automatic via CI)
 
 Push a git tag `v*` → GitHub Actions builds multi-platform (amd64+arm64) and pushes to:
-- `ghcr.io/decolua/aroute:v{version}` + `:latest`
-- `decolua/aroute:v{version}` + `:latest`
+- `ghcr.io/dhasap/aroute:v{version}` + `:latest`
+- `dhasap/aroute:v{version}` + `:latest`
 
 ```bash
 # Use scripts/release.js (recommended)

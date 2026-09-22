@@ -103,7 +103,7 @@ Nếu gặp lỗi "model not found":
 Để dùng ARoute cloud endpoint thay vì localhost:
 
 ```bash
-export ANTHROPIC_BASE_URL="https://9router.com"
+export ANTHROPIC_BASE_URL="https://github.com/dhasap/aroute"
 ```
 
 Đảm bảo bạn đã cấu hình API key trong ARoute cloud dashboard.

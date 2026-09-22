@@ -7,15 +7,15 @@
 ## Fixes
 - **Combo context window on `/v1/models`**: LLM combos now advertise `context_length` = max context over members (e.g. a combo with a 1M member reports 1M instead of nothing, which clients guessed as 256K and compacted early), plus `max_completion_tokens`; web combos unchanged.
 
-# Migration: 9Router → ARoute (refactor)
+# Migration: ARoute (legacy 9Router) → ARoute (refactor)
 
-This repository is now **ARoute**, an independent product line renamed from 9Router. What changed:
+This repository is now **ARoute**, an independent product line renamed from ARoute (legacy 9Router). What changed:
 
 - **Naming**: every internal identifier is `aroute`/`ARoute` — packages (`aroute-app`, CLI bin `aroute`), env vars (`NINEROUTER_*`/`NINE_ROUTER_*` → `AROUTE_*`), config file keys, log prefixes, DB folder, UI copy, docs.
 - **Data dir**: state moved `~/.9router` → `~/.aroute` with a one-time automatic migration (skipped when `DATA_DIR` is set or a new dir already exists).
 - **Env compat**: legacy `NINEROUTER_*` / `NINE_ROUTER_*` variables are still honored via an alias shim (`src/lib/legacyEnv.js`) and mapped to their `AROUTE_*` names at boot; set the new names and drop the old ones at your convenience.
 - **Context windows**: no universal hardcoded 200K any more on the combo path — model/combo selectors render each model's capability-derived context (e.g. `200K`, `1M`) via `ContextBadge`, resolved from the existing capabilities registry (models.dev sync + per-model overrides).
-- **Docs**: README/gitbook rewritten as ARoute-native; upstream links (Docker images `decolua/9router`, cloud endpoint `9router.com`, VS Code marketplace) intentionally remain pointed at the original services because they still live there.
+- **Docs**: README/gitbook rewritten as ARoute-native; upstream links (Docker images `dhasap/aroute`, cloud endpoint `github.com/dhasap/aroute`, VS Code marketplace) intentionally remain pointed at the original services because they still live there.
 - **Intentional leftovers** (not dead): docker image refs to the upstream published images, the legacy env map, the upstream changelog fetch URL, and the VS Code marketplace extension id.
 
 # v0.5.75 (2026-09-10)
@@ -515,12 +515,12 @@ This repository is now **ARoute**, an independent product line renamed from 9Rou
 ## Features
 - **Usage**: track cached tokens + correct input/output/cache cost (#2209) — hodtien
 - **Codex**: show reset credit expiry details (#2290) — Rafli Ahmad Zulfikar
-- **NVIDIA**: add new models and capabilities — decolua
+- **NVIDIA**: add new models and capabilities — dhasap
 - **ClinePass**: add provider support — sternelee
 
 ## Fixes
 - **Usage**: dedupe streaming request-details log entries — Qin Li
-- **Claude**: drop foreign thinking signatures in passthrough — decolua
+- **Claude**: drop foreign thinking signatures in passthrough — dhasap
 - Prevent non-SSE stream pipe crash and cross-IdP account overwrites (#2244) — KunN-21
 - **Kiro**: route IdC auth to regional CodeWhisperer surface (#2297) — Volodymyr Saakian
 - **Kiro**: add Claude Sonnet 5 model support (#2264) — Edison42
@@ -536,13 +536,13 @@ This repository is now **ARoute**, an independent product line renamed from 9Rou
 
 ## Features
 - Add Kimchi OAuth provider — Nant361
-- Refine Qwen vision/video + thinking model patterns — decolua
+- Refine Qwen vision/video + thinking model patterns — dhasap
 - Opt-in Codex auto-ping quota keep-alive — Emirhan
 
 ## Fixes
 - **Responses**: handle response.done terminal events (#2142) — rifuki
 - **Headroom**: skip unsafe responses tool history (#2132) — Sutarto Jordan Chrisfivo
-- **Translator**: map mid-conversation system message to user (claude→openai) — decolua
+- **Translator**: map mid-conversation system message to user (claude→openai) — dhasap
 - **Gemini**: normalize contents to prevent 400 invalid_argument (#2192) — warelik
 - **Gemini**: backfill thoughtSignature + suppress stream done sentinel — WARELIK
 - **Alicode**: preserve cache_control for DashScope providers (#2069) — Rex
@@ -551,12 +551,12 @@ This repository is now **ARoute**, an independent product line renamed from 9Rou
 - **Kiro**: strip leaked <thinking> tags from content stream (#2158) — hamsa0x7
 - **Tray**: make Windows context menu DPI-aware — Emirhan
 - **Kilocode**: expose full gateway catalog in combo model picker — jellylarper
-- **OpenCode**: fix Go GLM — decolua
+- **OpenCode**: fix Go GLM — dhasap
 
 # v0.5.12 (2026-06-26)
 
 ## Features
-- Add token-saver dashboard page — decolua
+- Add token-saver dashboard page — dhasap
 - Add bulk delete for provider connections — teddytkz
 - Resolve GitHub Copilot model catalog from upstream — caiqinzhou
 - Add Venice AI provider — Brokenc0de
@@ -565,7 +565,7 @@ This repository is now **ARoute**, an independent product line renamed from 9Rou
 
 ## Fixes
 - Provider thinking compatibility (DeepSeek/Gemini) — Mink Nguyen
-- Stop double-counting streaming usage at source — decolua
+- Stop double-counting streaming usage at source — dhasap
 - Usage logging dedupe to reduce stats churn — Mink Nguyen
 - Prevent non-JSON SSE lines / duplicate [DONE] from breaking clients (PR #2046) — qianze
 - Resolve Gemini TTS models from catalog — nguyenha935
@@ -584,7 +584,7 @@ This repository is now **ARoute**, an independent product line renamed from 9Rou
 - Avoid stale redirects after auth changes (#2100) — Emirhan
 - Mark Claude Opus 4.7 (dashed id) as 1M context — Brokenc0de
 - Preserve reasoning effort through Codex translations — ntdung6868
-- Token-saver: full width card layout — decolua
+- Token-saver: full width card layout — dhasap
 - Antigravity: retry transient upstream failures — Sutarto Jordan Chrisfivo
 - Param-support: handle strip rules without match/drop (#1960) — Joseph Yaksich
 - Translator: resolve custom provider prefix in debug endpoint (#1083) — hamsa0x7

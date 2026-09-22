@@ -10,9 +10,9 @@
   
   [![npm](https://img.shields.io/npm/v/aroute.svg)](https://www.npmjs.com/package/aroute)
   [![Downloads](https://img.shields.io/npm/dm/aroute.svg)](https://www.npmjs.com/package/aroute)
-  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/decolua/aroute/blob/main/LICENSE)
+  [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/dhasap/aroute/blob/main/LICENSE)
 
-  <a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="decolua%2Faroute | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+  <a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="dhasap%2Faroute | ARoute" style="width: 250px; height: 55px;" width="250" height="55"/></a>
   
   [🚀 快速开始](#-快速开始) • [💡 功能特点](#-主要功能) • [📖 设置指南](#-设置指南) • [🌐 网站](https://aroute.com)
 
@@ -173,7 +173,7 @@ PORT=20128 HOSTNAME=0.0.0.0 NEXT_PUBLIC_BASE_URL=http://localhost:20128 npm run 
 
 </div>
 
-> 🎬 **制作了关于 ARoute 的视频？** 提交 [Pull Request](https://github.com/decolua/aroute/pulls)，将你的视频添加到此部分 — 我们会合并它！
+> 🎬 **制作了关于 ARoute 的视频？** 提交 [Pull Request](https://github.com/dhasap/aroute/pulls)，将你的视频添加到此部分 — 我们会合并它！
 
 ---
 
@@ -1022,7 +1022,7 @@ Model：cc/claude-opus-4-7
 
 ```bash
 # 克隆并安装
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute
 npm install
 npm run build
@@ -1267,8 +1267,8 @@ Authorization: Bearer your-api-key
 ## 📧 支持
 
 - **网站**：[aroute.com](https://aroute.com)
-- **GitHub**：[github.com/decolua/aroute](https://github.com/decolua/aroute)
-- **问题**：[github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **GitHub**：[github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **问题**：[github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 
 ---
 
@@ -1276,13 +1276,13 @@ Authorization: Bearer your-api-key
 
 感谢所有帮助改进 ARoute 的贡献者！
 
-[![Contributors](https://contrib.rocks/image?repo=decolua/aroute&max=150&columns=15&anon=1&v=20260309)](https://github.com/decolua/aroute/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=dhasap/aroute&max=150&columns=15&anon=1&v=20260309)](https://github.com/dhasap/aroute/graphs/contributors)
 
 ---
 
 ## 📊 Star 图表
 
-[![Star Chart](https://starchart.cc/decolua/aroute.svg?variant=adaptive)](https://starchart.cc/decolua/aroute)
+[![Star Chart](https://starchart.cc/dhasap/aroute.svg?variant=adaptive)](https://starchart.cc/dhasap/aroute)
 
 
 

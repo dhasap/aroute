@@ -6,11 +6,11 @@
 
 [![npm](https://img.shields.io/npm/v/aroute.svg)](https://www.npmjs.com/package/aroute)
 [![Downloads](https://img.shields.io/npm/dm/aroute.svg)](https://www.npmjs.com/package/aroute)
-[![Docker Pulls](https://img.shields.io/docker/pulls/decolua/aroute.svg?logo=docker&label=Docker%20pulls)](https://hub.docker.com/r/decolua/aroute)
-[![GHCR](https://img.shields.io/badge/GHCR-decolua%2Faroute-blue?logo=github)](https://github.com/dhasap/aroute/pkgs/container/aroute)
+[![Docker Pulls](https://img.shields.io/docker/pulls/dhasap/aroute.svg?logo=docker&label=Docker%20pulls)](https://hub.docker.com/r/dhasap/aroute)
+[![GHCR](https://img.shields.io/badge/GHCR-dhasap%2Faroute-blue?logo=github)](https://github.com/dhasap/aroute/pkgs/container/aroute)
 [![License](https://img.shields.io/npm/l/aroute.svg)](https://github.com/dhasap/aroute/blob/main/LICENSE)
 
-<a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="decolua%2Faroute | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="dhasap%2Faroute | ARoute" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
  • [📖 Full Docs](https://github.com/dhasap/aroute)
 
@@ -52,10 +52,10 @@ npx aroute
 ```bash
 docker run -d --name aroute -p 20128:20128 \
   -v "$HOME/.aroute:/app/data" -e DATA_DIR=/app/data \
-  decolua/aroute:latest
+  dhasap/aroute:latest
 ```
 
-Published images: [Docker Hub](https://hub.docker.com/r/decolua/aroute) • [GHCR](https://github.com/dhasap/aroute/pkgs/container/aroute) (multi-platform amd64/arm64).
+Published images: [Docker Hub](https://hub.docker.com/r/dhasap/aroute) • [GHCR](https://github.com/dhasap/aroute/pkgs/container/aroute) (multi-platform amd64/arm64).
 
 🎉 Dashboard opens at `http://localhost:20128`
 
@@ -112,7 +112,7 @@ Full docs, advanced setup, video tutorials & development guide:
 
 - **GitHub**: https://github.com/dhasap/aroute
 - **Full README**: https://github.com/dhasap/aroute/blob/main/app/README.md
-- **Website**: https://9router.com
+- **Website**: https://github.com/dhasap/aroute
 
 ---
 

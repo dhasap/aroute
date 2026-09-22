@@ -34,7 +34,7 @@ http://localhost:20128/v1
 
 **云端 ARoute:**
 ```
-https://9router.com
+https://github.com/dhasap/aroute
 ```
 
 **步骤:**
@@ -150,7 +150,7 @@ Model: gpt-4
 
 使用 ARoute 云端 endpoint 而非 localhost:
 
-1. 在 Cline 设置中将 Base URL 设为:`https://9router.com`
+1. 在 Cline 设置中将 Base URL 设为:`https://github.com/dhasap/aroute`
 2. 确保已在 ARoute 云端仪表盘中配置 API key
 3. 确保云端 endpoint 已激活且可访问
 

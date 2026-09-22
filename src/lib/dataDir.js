@@ -15,7 +15,8 @@ function defaultDir() {
 const LEGACY_APP_NAME = "9router";
 
 function migrateLegacyDir(newDir) {
-  // one-time move from ~/.9router -> ~/.aroute when the new dir does not exist yet
+  // one-time move from the legacy ~/.9router -> ~/.aroute when the new dir does not exist yet
+  // (9router is the pre-rename product name; kept for existing installs only)
   try {
     const legacy = process.platform === "win32"
       ? path.join(process.env.APPDATA || path.join(os.homedir(), "AppData", "Roaming"), LEGACY_APP_NAME)

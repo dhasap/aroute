@@ -11,7 +11,7 @@ Integrate ARoute with Cursor IDE to route your AI requests through ARoute's inte
 
 ## ⚠️ Important Notes
 
-> **Cloud Endpoint Required**: Cursor routes requests through its own server and does not support localhost endpoints. You must use the ARoute cloud endpoint: `https://9router.com`
+> **Cloud Endpoint Required**: Cursor routes requests through its own server and does not support localhost endpoints. You must use the ARoute cloud endpoint: `https://github.com/dhasap/aroute`
 
 > **Cursor Pro Required**: This feature requires a Cursor Pro account to use custom API endpoints.
 
@@ -33,12 +33,12 @@ Integrate ARoute with Cursor IDE to route your AI requests through ARoute's inte
 Set the base URL to ARoute cloud endpoint:
 
 ```
-https://9router.com
+https://github.com/dhasap/aroute
 ```
 
 **Steps:**
 1. In the Models settings, locate the **Base URL** field
-2. Enter: `https://9router.com`
+2. Enter: `https://github.com/dhasap/aroute`
 3. Click **Save**
 
 ### 4. Add API Key
@@ -66,7 +66,7 @@ Your Cursor settings should look like this:
 
 ```
 OpenAI API: ✓ Enabled
-Base URL: https://9router.com
+Base URL: https://github.com/dhasap/aroute
 API Key: sk-aroute-xxxxxxxxxxxxx
 Custom Models: gpt-4, claude-opus-4-5, gemini-2.0-flash
 ```
@@ -123,14 +123,14 @@ You can use any model configured in your ARoute dashboard. Common examples:
 
 ### Connection Issues
 
-1. Verify you are using the cloud endpoint: `https://9router.com`
+1. Verify you are using the cloud endpoint: `https://github.com/dhasap/aroute`
 2. Check your internet connection
 3. Ensure ARoute cloud service is operational
 4. Try disabling VPN or proxy if enabled
 
 ### Localhost Not Working
 
-> **Remember**: Cursor does not support localhost endpoints. You must use the cloud endpoint `https://9router.com`. If you need to use a local ARoute instance, consider using a tunneling service like ngrok to expose your local endpoint.
+> **Remember**: Cursor does not support localhost endpoints. You must use the cloud endpoint `https://github.com/dhasap/aroute`. If you need to use a local ARoute instance, consider using a tunneling service like ngrok to expose your local endpoint.
 
 ## Cloud Endpoint Setup
 

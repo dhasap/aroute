@@ -1,4 +1,4 @@
-// Back-compat: legacy 9Router env vars -> AROUTE_ names (CommonJS twin of src/lib/legacyEnv.js)
+// Back-compat: legacy ARoute (legacy 9Router) env vars -> AROUTE_ names (CommonJS twin of src/lib/legacyEnv.js)
 const LEGACY_ENV_MAP = {
   NINEROUTER_URL: "AROUTE_URL",
   NINEROUTER_KEY: "AROUTE_KEY",

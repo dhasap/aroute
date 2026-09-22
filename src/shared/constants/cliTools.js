@@ -121,7 +121,7 @@ export const CLI_TOOLS = {
     color: "#1F6FEB",
     description: "GitHub Copilot in VS Code via ARoute extension",
     configType: "guide",
-    docsUrl: "https://marketplace.visualstudio.com/items?itemName=hotrungnhan.9router-for-github-copilot",
+    docsUrl: "https://marketplace.visualstudio.com/items?itemName=hotrungnhan.aroute-for-github-copilot",
     guideSteps: [
       {
         step: 1,

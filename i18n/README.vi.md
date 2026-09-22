@@ -9,7 +9,7 @@
   
   [![npm](https://img.shields.io/npm/v/aroute.svg)](https://www.npmjs.com/package/aroute)
   [![Downloads](https://img.shields.io/npm/dm/aroute.svg)](https://www.npmjs.com/package/aroute)
-  [![License](https://github.com/decolua/aroute/blob/main/LICENSE)](https://github.com/decolua/aroute/blob/main/LICENSE)
+  [![License](https://github.com/dhasap/aroute/blob/main/LICENSE)](https://github.com/dhasap/aroute/blob/main/LICENSE)
   
   [🚀 Bắt đầu nhanh](#-quick-start) • [💡 Tính năng](#-key-features) • [📖 Cài đặt](#-setup-guide) • [🌐 Website](https://aroute.com)
 </div>
@@ -945,7 +945,7 @@ Model: cc/claude-opus-4-6
 
 ```bash
 # Clone và cài đặt
-git clone https://github.com/decolua/aroute.git
+git clone https://github.com/dhasap/aroute.git
 cd aroute
 npm install
 npm run build
@@ -1256,8 +1256,8 @@ Tài liệu tham khảo kiến trúc đầy đủ: [`docs/ARCHITECTURE.md`](../d
 ## 📧 Hỗ trợ
 
 - **Website**: [aroute.com](https://aroute.com)
-- **GitHub**: [github.com/decolua/9](https://github.com/decolua/aroute)
-- **Issues**: [github.com/decolua/aroute/issues](https://github.com/decolua/aroute/issues)
+- **GitHub**: [github.com/dhasap/aroute](https://github.com/dhasap/aroute)
+- **Issues**: [github.com/dhasap/aroute/issues](https://github.com/dhasap/aroute/issues)
 
 ---
 
@@ -1265,13 +1265,13 @@ Tài liệu tham khảo kiến trúc đầy đủ: [`docs/ARCHITECTURE.md`](../d
 
 Cảm ơn tất cả những người đã đóng góp giúp ARoute tốt hơn!
 
-[![Contributors](https://contrib.rocks/image?repo=decolua/aroute&max=100&columns=20&anon=1)](https://github.com/decolua/aroute/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=dhasap/aroute&max=100&columns=20&anon=1)](https://github.com/dhasap/aroute/graphs/contributors)
 
 ---
 
 ## 📊 Star Chart
 
-[![ Chart](https://starchart.cc/decolua/aroute.svg?variant=adaptive)](https://starchart.cc/decolua/aroute)
+[![ Chart](https://starchart.cc/dhasap/aroute.svg?variant=adaptive)](https://starchart.cc/dhasap/aroute)
 
 ### Cách Đóng góp
 
@@ -1281,7 +1281,7 @@ Cảm ơn tất cả những người đã đóng góp giúp ARoute tốt hơn!
 4. Push lên nhánh (`git push origin feature/amazing-feature`)
 5. Mở một Pull Request
 
-Xem [Pull Requests](https://github.com/decolua/aroute/pulls) để biết hướng dẫn chi tiết.
+Xem [Pull Requests](https://github.com/dhasap/aroute/pulls) để biết hướng dẫn chi tiết.
 
 ---
 

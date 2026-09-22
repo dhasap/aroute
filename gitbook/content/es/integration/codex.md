@@ -113,7 +113,7 @@ Si obtienes errores de "modelo no disponible":
 Para usar el endpoint en la nube de ARoute en lugar de localhost:
 
 ```bash
-export OPENAI_BASE_URL="https://9router.com"
+export OPENAI_BASE_URL="https://github.com/dhasap/aroute"
 ```
 
 Asegúrate de haber configurado tu API key en el dashboard en la nube de ARoute.
