@@ -16,6 +16,7 @@ import github from "./github.js";
 import kiro from "./kiro.js";
 import cursor from "./cursor.js";
 import kimi from "./kimi.js";
+import nous from "./nous.js";
 import kilocode from "./kilocode.js";
 import cline from "./cline.js";
 import clinepass from "./clinepass.js";
@@ -41,6 +42,7 @@ const PROVIDERS = {
   kiro,
   cursor,
   kimi,
+  nous,
   kilocode,
   cline,
   clinepass,

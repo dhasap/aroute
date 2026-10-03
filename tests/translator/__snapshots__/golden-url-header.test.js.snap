@@ -145,6 +145,25 @@ exports[`GOLDEN buildHeaders (default executor providers) > assemblyai → heade
 }
 `;
 
+exports[`GOLDEN buildHeaders (default executor providers) > atria → headers (apiKey / oauth) 1`] = `
+{
+  "apiKey": {
+    "Accept": "text/event-stream",
+    "Content-Type": "application/json",
+    "x-api-key": "<CRED>",
+  },
+  "nonStream": {
+    "Content-Type": "application/json",
+    "x-api-key": "<CRED>",
+  },
+  "oauth": {
+    "Accept": "text/event-stream",
+    "Content-Type": "application/json",
+    "x-api-key": "<CRED>",
+  },
+}
+`;
+
 exports[`GOLDEN buildHeaders (default executor providers) > baidu → headers (apiKey / oauth) 1`] = `
 {
   "apiKey": {
@@ -1031,6 +1050,25 @@ exports[`GOLDEN buildHeaders (default executor providers) > nebius → headers (
 }
 `;
 
+exports[`GOLDEN buildHeaders (default executor providers) > nous → headers (apiKey / oauth) 1`] = `
+{
+  "apiKey": {
+    "Accept": "text/event-stream",
+    "Authorization": "Bearer <TOK>",
+    "Content-Type": "application/json",
+  },
+  "nonStream": {
+    "Authorization": "Bearer <TOK>",
+    "Content-Type": "application/json",
+  },
+  "oauth": {
+    "Accept": "text/event-stream",
+    "Authorization": "Bearer <TOK>",
+    "Content-Type": "application/json",
+  },
+}
+`;
+
 exports[`GOLDEN buildHeaders (default executor providers) > nvidia → headers (apiKey / oauth) 1`] = `
 {
   "apiKey": {
@@ -1431,6 +1469,13 @@ exports[`GOLDEN buildUrl (default executor providers) > assemblyai → url (stre
 }
 `;
 
+exports[`GOLDEN buildUrl (default executor providers) > atria → url (stream + non-stream) 1`] = `
+{
+  "nonStream": "https://api.atria-asi.ai/v1/chat/completions",
+  "stream": "https://api.atria-asi.ai/v1/chat/completions",
+}
+`;
+
 exports[`GOLDEN buildUrl (default executor providers) > baidu → url (stream + non-stream) 1`] = `
 {
   "nonStream": "https://qianfan.baidubce.com/v2/chat/completions",
@@ -1687,6 +1732,13 @@ exports[`GOLDEN buildUrl (default executor providers) > nebius → url (stream +
 {
   "nonStream": "https://api.studio.nebius.ai/v1/chat/completions",
   "stream": "https://api.studio.nebius.ai/v1/chat/completions",
+}
+`;
+
+exports[`GOLDEN buildUrl (default executor providers) > nous → url (stream + non-stream) 1`] = `
+{
+  "nonStream": "https://inference-api.nousresearch.com/v1/chat/completions",
+  "stream": "https://inference-api.nousresearch.com/v1/chat/completions",
 }
 `;
 

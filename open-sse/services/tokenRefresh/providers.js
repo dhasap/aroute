@@ -56,6 +56,14 @@ const REFRESH_PROFILES = {
     dedupKey: "kimi",
     extraHeaders: (creds) => buildKimiHeaders(creds?.providerSpecificData?.deviceId),
   },
+  // Nous Portal: the (SINGLE-USE, rotating) refresh token rides the
+  // x-nous-refresh-token header — never the body. Redeeming it anywhere else
+  // (e.g. an external health check) revokes the session as a theft signal.
+  nous: {
+    dedupKey: "nous",
+    omitRefreshTokenBody: true,
+    extraHeaders: (_creds, _cfg, refreshToken) => ({ "x-nous-refresh-token": refreshToken }),
+  },
 };
 
 function resolveRefreshUrl(provider, config, profile) {
@@ -74,7 +82,7 @@ function buildRefreshBody(profile, config, refreshToken) {
       : profile.includeClientSecret;
   const payload = {
     grant_type: "refresh_token",
-    refresh_token: refreshToken,
+    ...(profile?.omitRefreshTokenBody ? {} : { refresh_token: refreshToken }),
     client_id: config.clientId,
   };
   if (includeSecret && config.clientSecret) payload.client_secret = config.clientSecret;
@@ -105,7 +113,7 @@ export async function refreshAccessToken(provider, refreshToken, credentials, lo
     const headers = {
       "Content-Type": bodyFormat === "json" ? "application/json" : "application/x-www-form-urlencoded",
       Accept: "application/json",
-      ...(profile.extraHeaders ? (profile.extraHeaders(credentials, config) || {}) : {}),
+      ...(profile.extraHeaders ? (profile.extraHeaders(credentials, config, refreshToken) || {}) : {}),
     };
     const response = await fetch(url, { method: "POST", headers, body });
 

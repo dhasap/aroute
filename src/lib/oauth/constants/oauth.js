@@ -99,6 +99,9 @@ export const KIMI_CONFIG = {
 // Back-compat alias for any remaining KIMI_CODING_CONFIG imports
 export const KIMI_CODING_CONFIG = KIMI_CONFIG;
 
+// Nous Portal OAuth (Device Code Flow) — dual auth with API key (registry id `nous`)
+export const NOUS_CONFIG = { ...PROVIDER_OAUTH["nous"] };
+
 // KiloCode OAuth Configuration (Custom Device Auth Flow)
 export const KILOCODE_CONFIG = { ...PROVIDER_OAUTH["kilocode"] };
 

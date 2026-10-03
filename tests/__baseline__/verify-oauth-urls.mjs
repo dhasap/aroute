@@ -22,6 +22,8 @@ const resolved = {
     "grok-cli": PROVIDERS["grok-cli"]?.tokenUrl,
     cline: PROVIDERS.cline?.tokenUrl,
     kimi: PROVIDERS.kimi?.tokenUrl,
+    // Injected from registry `oauth` via OAUTH_INJECT_FIELDS
+    nous: PROVIDERS.nous?.tokenUrl,
   },
   authUrls: {
     iflow: PROVIDERS.iflow?.authUrl,
@@ -32,6 +34,8 @@ const resolved = {
     kimi: PROVIDERS.kimi?.refreshUrl,
     xai: PROVIDERS.xai?.refreshUrl,
     "grok-cli": PROVIDERS["grok-cli"]?.tokenUrl,
+    // nous: resolveRefreshUrl falls back to PROVIDER_OAUTH.nous.tokenUrl
+    nous: PROVIDERS.nous?.refreshUrl || PROVIDERS.nous?.tokenUrl,
   },
   clientIds: {
     claude: PROVIDERS.claude?.clientId,

@@ -3,6 +3,7 @@
 ## Features
 - **Model health sweep**: "Test All Models" on the Providers page pings every model of every active connection through the internal `/v1` path (per-kind probe, per-provider warm-up + parallel), grouped results in a modal. API: `POST /api/models/test-all`.
 - **Mobile**: model-row actions (test/copy/delete) no longer hover-only on touch — visible below `sm`.
+- **Nous Research provider**: new `nous` provider (aliases `nousresearch`, `nous-portal`) on the OpenAI-compatible Nous Portal inference API (`inference-api.nousresearch.com/v1`) — 46 seeded chat models (3 free-tier defaults + hermes' curated catalog), `modelsFetcher` refreshes the full 400+ list, `passthroughModels` accepts any other id. Dual auth: **OAuth device-code login** (`hermes-cli` public client, scope `inference:invoke`, same flow as `hermes auth add nous` — refresh rides the single-use `x-nous-refresh-token` header) **and** API-key (Portal `sk-` key / `NOUS_API_KEY`).
 
 ## Fixes
 - **Combo context window on `/v1/models`**: LLM combos now advertise `context_length` = max context over members (e.g. a combo with a 1M member reports 1M instead of nothing, which clients guessed as 256K and compacted early), plus `max_completion_tokens`; web combos unchanged.
