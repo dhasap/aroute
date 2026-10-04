@@ -13,7 +13,7 @@ export const CATALOG_FILE = path.join(DATA_DIR, "model-catalog.json");
 // Trimmed upstream catalog, read by the add-models skill (not by the router).
 export const CATALOG_RAW_FILE = path.join(DATA_DIR, "model-catalog-raw.json");
 
-const EMPTY = { models: {}, providers: {} };
+const EMPTY = { models: {}, providers: {}, pricing: {} };
 let cache = EMPTY;
 let cachedMtime = -1;
 
@@ -38,7 +38,7 @@ function load() {
   cachedMtime = mtime;
   try {
     const parsed = JSON.parse(fs.readFileSync(CATALOG_FILE, "utf8"));
-    cache = { models: parsed?.models || {}, providers: parsed?.providers || {} };
+    cache = { models: parsed?.models || {}, providers: parsed?.providers || {}, pricing: parsed?.pricing || {} };
   } catch {
     cache = EMPTY;
   }
@@ -59,14 +59,27 @@ export function getCatalogLimits(provider, model) {
   return byProvider[model] || byProvider[baseId(model)] || null;
 }
 
+// List price for a model from models.dev, or null when it is unknown (or
+// listed as free by every gateway). Keyed like the modality map — by model id
+// alone — because what a model costs is a property of the model, not of the
+// gateway reselling it.
+export function getCatalogPricing(model) {
+  return load().pricing[baseId(model)] || null;
+}
+
 // Force a re-read on the next lookup (called right after a sync writes the file).
 export function invalidateCatalog() {
   cachedMtime = -1;
 }
 
-// Hand the reader to capabilities.js. That module is bundled into the browser
-// too, so it cannot import this file directly — the server pushes it in.
+// Hand the reader to capabilities.js and pricing.js. Those modules are bundled
+// into the browser too, so neither can import this file directly — the server
+// pushes it in.
 export async function installCatalogSource() {
-  const { setCatalogSource } = await import("./capabilities.js");
+  const [{ setCatalogSource }, { setCatalogPricingSource }] = await Promise.all([
+    import("./capabilities.js"),
+    import("./pricing.js"),
+  ]);
   setCatalogSource({ getModalities: getCatalogModalities, getLimits: getCatalogLimits });
+  setCatalogPricingSource(getCatalogPricing);
 }

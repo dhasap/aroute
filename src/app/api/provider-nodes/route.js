@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createProviderNode, getProviderNodes } from "@/models";
+import { getRetiredProviderNames } from "@/lib/db/repos/nodesRepo.js";
 import { OPENAI_COMPATIBLE_PREFIX, ANTHROPIC_COMPATIBLE_PREFIX, CUSTOM_EMBEDDING_PREFIX } from "@/shared/constants/providers";
 import { generateId } from "@/shared/utils";
 
@@ -21,7 +22,14 @@ const CUSTOM_EMBEDDING_DEFAULTS = {
 export async function GET() {
   try {
     const nodes = await getProviderNodes();
-    return NextResponse.json({ nodes });
+    // Nodes that were deleted still appear in usage history; their names ride
+    // along so the Details tab can label those rows instead of showing an id.
+    let retired = [];
+    try {
+      const names = await getRetiredProviderNames();
+      retired = Object.entries(names).map(([id, name]) => ({ id, name }));
+    } catch {}
+    return NextResponse.json({ nodes, retired });
   } catch (error) {
     console.log("Error fetching provider nodes:", error);
     return NextResponse.json({ error: "Failed to fetch provider nodes" }, { status: 500 });

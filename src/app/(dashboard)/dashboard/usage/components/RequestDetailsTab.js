@@ -24,6 +24,10 @@ async function fetchProviderNames() {
   for (const node of nodes) {
     providerNodesCache[node.id] = node.name;
   }
+  // Deleted nodes keep their label so history rows don't fall back to the id.
+  for (const node of nodesData.retired || []) {
+    if (node?.id && node?.name) providerNodesCache[node.id] = node.name;
+  }
 
   providerNameCache = {
     ...AI_PROVIDERS,

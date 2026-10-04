@@ -113,6 +113,17 @@ function sortData(dataMap, pendingMap = {}, sortBy, sortOrder) {
     });
 }
 
+// Distinct providers a grouped row spans, in first-seen order. A model served
+// by several gateways shows them all; one provider shows just its name.
+function providerList(group) {
+  const seen = [];
+  for (const item of group?.items || []) {
+    const name = item.provider || "";
+    if (name && !seen.includes(name)) seen.push(name);
+  }
+  return seen.join(", ");
+}
+
 function getGroupKey(item, keyField) {
   switch (keyField) {
     case "rawModel": return item.rawModel || "Unknown Model";
@@ -329,7 +340,9 @@ export default function UsageStats({ period: periodProp, setPeriod: setPeriodPro
           emptyMessage: "No usage recorded yet.",
           renderSummaryCells: (group) => (
             <>
-              <td className="px-6 py-3 text-text-muted">—</td>
+              <td className="px-6 py-3 text-text-muted truncate max-w-[220px]" title={providerList(group)}>
+                {providerList(group) || "—"}
+              </td>
               <td className="px-6 py-3 text-right">{fmt(group.summary.requests)}</td>
               <td className="px-6 py-3 text-right text-text-muted whitespace-nowrap">{fmtTime(group.summary.lastUsed)}</td>
             </>

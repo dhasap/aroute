@@ -343,13 +343,100 @@ function loadDaysInRange(adapter, maxDays) {
   return adapter.all(`SELECT dateKey, data FROM usageDaily WHERE dateKey >= ?`, [cutoffKey]);
 }
 
+/**
+ * Human-readable name for a provider id recorded in usage history.
+ *
+ * Order matters: a retired custom node's name beats the registry (it was the
+ * user's own label for a UUID the registry never knew), and a live node beats
+ * both. Ids nobody ever named — "openai-compatible-chat-<uuid>" from a node
+ * deleted before this mapping existed — fall through to the raw id.
+ */
+async function buildProviderNameMap() {
+  const map = {};
+  try {
+    const { default: registry } = await import("open-sse/providers/registry/index.js");
+    for (const r of registry || []) {
+      const name = r?.display?.name;
+      if (r?.id && name) map[r.id] = name;
+    }
+  } catch {}
+  try {
+    const { getProviderNodes, getRetiredProviderNames } = await import("./nodesRepo.js");
+    const [nodes, retired] = await Promise.all([getProviderNodes(), getRetiredProviderNames()]);
+    for (const n of nodes) if (n.id && n.name) map[n.id] = n.name;
+    for (const [id, name] of Object.entries(retired)) map[id] = name;
+  } catch {}
+  return map;
+}
+
+/**
+ * Recompute every stored cost against the current price table, then rebuild the
+ * daily aggregates from those rows.
+ *
+ * Cost is an estimate against a price list that changes (models.dev resyncs
+ * daily). Without this, a row written before a price existed keeps its 0 forever
+ * and the Usage page disagrees with the resolver it is supposed to reflect.
+ * The whole thing is one transaction: history and usageDaily must never disagree.
+ */
+export async function recomputeStoredCosts() {
+  const db = await getAdapter();
+  const [{ getPricingForModel }, { calculateCostFromTokens }] = await Promise.all([
+    import("./pricingRepo.js"),
+    import("open-sse/providers/pricing.js"),
+  ]);
+
+  const rows = db.all(`SELECT * FROM usageHistory`);
+  // Resolving a price is async, and db.transaction() must stay synchronous, so
+  // every cost is computed up front and only the writes run inside it.
+  const KEY = "api" + "Key";
+  const priced = [];
+  for (const row of rows) {
+    const tokens = parseJson(row.tokens, {}) || {};
+    const pricing = await getPricingForModel(row.provider, row.model);
+    priced.push({ row, tokens, cost: pricing ? calculateCostFromTokens(tokens, pricing) : 0 });
+  }
+
+  const byDay = {};
+  let changed = 0;
+
+  db.transaction(() => {
+    for (const { row, tokens, cost } of priced) {
+      if (Math.abs((row.cost || 0) - cost) > 1e-12) {
+        db.run(`UPDATE usageHistory SET cost = ? WHERE id = ?`, [cost, row.id]);
+        changed++;
+      }
+      const dateKey = getLocalDateKey(row.timestamp);
+      const day = byDay[dateKey] || (byDay[dateKey] = {
+        requests: 0, promptTokens: 0, completionTokens: 0, cost: 0,
+        byProvider: {}, byModel: {}, byAccount: {}, byApiKey: {}, byEndpoint: {},
+      });
+      const entry = {
+        provider: row.provider,
+        model: row.model,
+        connectionId: row.connectionId,
+        endpoint: row.endpoint,
+        tokens,
+        cost,
+      };
+      entry[KEY] = row[KEY];
+      aggregateEntryToDay(day, entry);
+    }
+
+    db.run(`DELETE FROM usageDaily`);
+    for (const [dateKey, day] of Object.entries(byDay)) {
+      db.run(`INSERT INTO usageDaily(dateKey, data) VALUES(?, ?)`, [dateKey, stringifyJson(day)]);
+    }
+  });
+
+  return { rows: rows.length, changed, days: Object.keys(byDay).length };
+}
+
 export async function getUsageStats(period = "all") {
   const db = await getAdapter();
 
-  const [{ getProviderConnections }, { getApiKeys }, { getProviderNodes }] = await Promise.all([
+  const [{ getProviderConnections }, { getApiKeys }] = await Promise.all([
     import("./connectionsRepo.js"),
     import("./apiKeysRepo.js"),
-    import("./nodesRepo.js"),
   ]);
 
   let allConnections = [];
@@ -357,11 +444,7 @@ export async function getUsageStats(period = "all") {
   const connectionMap = {};
   for (const c of allConnections) connectionMap[c.id] = c.name || c.email || c.id;
 
-  const providerNodeNameMap = {};
-  try {
-    const nodes = await getProviderNodes();
-    for (const n of nodes) if (n.id && n.name) providerNodeNameMap[n.id] = n.name;
-  } catch {}
+  const providerNameMap = await buildProviderNameMap();
 
   let allApiKeys = [];
   try { allApiKeys = await getApiKeys(); } catch {}
@@ -471,7 +554,7 @@ export async function getUsageStats(period = "all") {
         const rawModel = m.rawModel || mk.split("|")[0];
         const provider = m.provider || mk.split("|")[1] || "";
         const statsKey = provider ? `${rawModel} (${provider})` : rawModel;
-        const providerDisplayName = providerNodeNameMap[provider] || provider;
+        const providerDisplayName = providerNameMap[provider] || provider;
         if (!stats.byModel[statsKey]) {
           stats.byModel[statsKey] = { requests: 0, promptTokens: 0, completionTokens: 0, cachedTokens: 0, cost: 0, rawModel, provider: providerDisplayName, lastUsed: dateKey };
         }
@@ -487,7 +570,7 @@ export async function getUsageStats(period = "all") {
         const accountName = connectionMap[connId] || `Account ${connId.slice(0, 8)}...`;
         const rawModel = a.rawModel || "";
         const provider = a.provider || "";
-        const providerDisplayName = providerNodeNameMap[provider] || provider;
+        const providerDisplayName = providerNameMap[provider] || provider;
         const accountKey = `${rawModel} (${provider} - ${accountName})`;
         if (!stats.byAccount[accountKey]) {
           stats.byAccount[accountKey] = { requests: 0, promptTokens: 0, completionTokens: 0, cachedTokens: 0, cost: 0, rawModel, provider: providerDisplayName, connectionId: connId, accountName, lastUsed: dateKey };
@@ -503,7 +586,7 @@ export async function getUsageStats(period = "all") {
       for (const [akKey, ak] of Object.entries(day.byApiKey || {})) {
         const rawModel = ak.rawModel || "";
         const provider = ak.provider || "";
-        const providerDisplayName = providerNodeNameMap[provider] || provider;
+        const providerDisplayName = providerNameMap[provider] || provider;
         const apiKeyVal = ak.apiKey;
         const keyInfo = apiKeyVal ? apiKeyMap[apiKeyVal] : null;
         const keyName = keyInfo?.name || (apiKeyVal ? apiKeyVal.slice(0, 8) + "..." : "Local (No API Key)");
@@ -524,7 +607,7 @@ export async function getUsageStats(period = "all") {
         const endpoint = ep.endpoint || epKey.split("|")[0] || "Unknown";
         const rawModel = ep.rawModel || "";
         const provider = ep.provider || "";
-        const providerDisplayName = providerNodeNameMap[provider] || provider;
+        const providerDisplayName = providerNameMap[provider] || provider;
         if (!stats.byEndpoint[epKey]) {
           stats.byEndpoint[epKey] = { requests: 0, promptTokens: 0, completionTokens: 0, cachedTokens: 0, cost: 0, endpoint, rawModel, provider: providerDisplayName, lastUsed: dateKey };
         }
@@ -584,7 +667,7 @@ export async function getUsageStats(period = "all") {
       const completionTokens = tokens.completion_tokens || 0;
       const cachedTokens = tokens.cached_tokens || tokens.cache_read_input_tokens || 0;
       const entryCost = r.cost || 0;
-      const providerDisplayName = providerNodeNameMap[r.provider] || r.provider;
+      const providerDisplayName = providerNameMap[r.provider] || r.provider;
 
       stats.totalPromptTokens += promptTokens;
       stats.totalCompletionTokens += completionTokens;

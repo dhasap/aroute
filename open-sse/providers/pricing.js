@@ -358,11 +358,20 @@ export function matchPattern(pattern, model) {
   return regex.test(model);
 }
 
+// List prices from the models.dev catalog, pushed in by catalogOverride.js.
+// pricing.js ships to the browser too, so it cannot read that file itself.
+let catalogPricingSource = null;
+
+export function setCatalogPricingSource(fn) {
+  catalogPricingSource = typeof fn === "function" ? fn : null;
+}
+
 /**
- * Resolve pricing for a model using the 3-step fallback chain:
+ * Resolve pricing for a model using the 4-step fallback chain:
  *   1. PROVIDER_PRICING[provider][model]
  *   2. MODEL_PRICING[model]
- *   3. PATTERN_PRICING (glob match)
+ *   3. models.dev catalog list price (exact per-model, beats a glob guess)
+ *   4. PATTERN_PRICING (glob match)
  *
  * @param {string} provider
  * @param {string} model
@@ -381,7 +390,13 @@ export function getPricingForModel(provider, model) {
   if (MODEL_PRICING[baseModel]) return MODEL_PRICING[baseModel];
   if (MODEL_PRICING[model]) return MODEL_PRICING[model];
 
-  // 3. Pattern match
+  // 3. Upstream list price — an exact match from models.dev outranks a pattern.
+  if (catalogPricingSource) {
+    const fromCatalog = catalogPricingSource(model);
+    if (fromCatalog) return fromCatalog;
+  }
+
+  // 4. Pattern match
   for (const { pattern, pricing } of PATTERN_PRICING) {
     if (matchPattern(pattern, baseModel) || matchPattern(pattern, model)) {
       return pricing;

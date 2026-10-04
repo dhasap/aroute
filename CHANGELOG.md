@@ -6,6 +6,13 @@
 - **Nous Research provider**: new `nous` provider (aliases `nousresearch`, `nous-portal`) on the OpenAI-compatible Nous Portal inference API (`inference-api.nousresearch.com/v1`) — official NOUS logo (`/providers/nous.png`), 50 seeded chat models led by all 7 live-verified free-tier models (probed 200; dead zero-price entries excluded), `modelsFetcher` refreshes the full 400+ list, `passthroughModels` accepts any other id. Dual auth: **OAuth device-code login** (`hermes-cli` public client, scope `inference:invoke`, same flow as `hermes auth add nous` — refresh rides the single-use `x-nous-refresh-token` header) **and** API-key (Portal `sk-` key / `NOUS_API_KEY`).
 - **Providers detail page — auto-updating model catalog**: the `nous-free` / `nous` suggested-models filters return the live Nous catalog with per-model `free` flags (zero-priced or `:free`, minus probed-dead ids and `:batch`); the page refetches on load and every 10 min while open, so ids that appear/expire every few days track without a reseed. With `mergeIntoList` the fetched catalog feeds the main model list (cursor-style live list), free models carry `isFree` → green FREE badge, and quick-add suggestions only ever offer free models.
 - **Providers detail page — "Free only" toggle**: filter the model list down to free models (count shown); appears only when the provider has free models, and the checked state persists across page refreshes (localStorage `providers_free_only`). The toggle is part of the models API request itself: checked sends `freeOnly=1` (backend narrows every filter type to free models), unchecked fetches the full catalog — each scope cached and auto-refreshed separately.
+- **Usage & Analytics — list-price cost estimates**: every model now resolves a price. The daily
+  models.dev sync also extracts each model's `cost` (non-zero rates win, so a free gateway listing $0
+  can't hide what the model costs) into the catalog, and `getPricingForModel` consults it after the
+  hand-written tables and before the glob fallback — an exact match outranks a pattern guess. A sync
+  that lands new rates then **recomputes the stored costs** and rebuilds the daily aggregates, so
+  history is priced against today's list instead of the 0 it was written under. Free models stay
+  genuinely $0.
 
 ## Fixes
 - **Provider page — "Test All" on KiosAPI no longer reports `No free models to test`**: the sweep's free
@@ -21,6 +28,12 @@
   `computeFreeOnlyGate` and keyed it off the unfiltered rows.
 - **Nous "no credits" errors are no longer a bare 404**: upstream `insufficient_credits_for_paid_model` (HTTP 404 used for a *billing* problem) is reworded everywhere it surfaces — chat/error responses and `/api/models/test` pings now say the account has no credits, point at free (`:free`) models and the Portal top-up link, and keep the upstream detail. Status codes are untouched, so account fallback/lock behaviour is unchanged. Provider-detail **Test All also honours the "Free only" toggle** (sweeps only free models when checked, and shows the first failure reason instead of just a pass/fail count).
 - **Combo context window on `/v1/models`**: LLM combos now advertise `context_length` = max context over members (e.g. a combo with a 1M member reports 1M instead of nothing, which clients guessed as 256K and compacted early), plus `max_completion_tokens`; web combos unchanged.
+- **Usage & Analytics — provider column showed raw ids**: a custom node's id
+  (`openai-compatible-chat-<uuid>`) was printed verbatim once that node was deleted, because the name
+  only ever lived in `providerNodes`. Deleting a node now records its name, known providers render
+  their display name (`Kios API`, `Nous Research`, `Atria AI`), and `/api/provider-nodes` serves the
+  retired names so the Details tab can label old rows too. The "Usage by Model" summary row lists the
+  providers a model was served by instead of `—`.
 
 # Migration: ARoute (legacy 9Router) → ARoute (refactor)
 

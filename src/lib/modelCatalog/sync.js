@@ -42,6 +42,9 @@ const PROVIDER_ALIASES = {
 
 let state = { running: false, lastSync: null, lastError: null, lastResult: null, etag: null };
 let timer = null;
+// Set when a sync landed new rates; the recompute has to wait for
+// installCatalogSource() below or it would price against the old table.
+let recomputePending = false;
 
 export function getSyncState() {
   return { ...state, file: CATALOG_FILE, url: CATALOG_URL, intervalMs: SYNC_INTERVAL_MS };
@@ -76,6 +79,41 @@ function slim(catalog) {
     out[providerId] = models;
   }
   return out;
+}
+
+// models.dev prices each model per provider, and a free gateway listing $0
+// must not mask what the model actually costs — so only non-zero rates vote
+// and the most common one wins (a single reseller's markup loses to the crowd).
+// Returns { [modelId]: { input, output, cached, cache_creation } } in $/1M.
+function collectPricing(catalog) {
+  const votes = {};
+  for (const provider of Object.values(catalog)) {
+    for (const [modelId, model] of Object.entries(provider?.models || {})) {
+      const cost = model?.cost;
+      if (!cost) continue;
+      const input = Number(cost.input) || 0;
+      const output = Number(cost.output) || 0;
+      if (input <= 0 && output <= 0) continue;
+      const cacheRead = Number(cost.cache_read) || 0;
+      const cacheWrite = Number(cost.cache_write) || 0;
+      const bucket = votes[baseId(modelId)] || (votes[baseId(modelId)] = {});
+      const key = `${input}|${output}|${cacheRead}`;
+      const hit = bucket[key] || (bucket[key] = { count: 0, input, output, cacheRead, cacheWrite });
+      hit.count++;
+    }
+  }
+  const pricing = {};
+  for (const [id, bucket] of Object.entries(votes)) {
+    const best = Object.values(bucket)
+      .sort((a, b) => b.count - a.count || b.input - a.input)[0];
+    pricing[id] = {
+      input: best.input,
+      output: best.output,
+      cached: best.cacheRead,
+      cache_creation: best.cacheWrite,
+    };
+  }
+  return pricing;
 }
 
 function build(catalog, entries) {
@@ -187,13 +225,15 @@ export async function syncModelCatalog() {
       const etag = response.headers.get("etag") || null;
       const entries = await collectEntries();
       const { models, providers } = build(catalog, entries);
-      const serialized = JSON.stringify({ v: 1, etag, syncedAt: Date.now(), models, providers });
+      const pricing = collectPricing(catalog);
+      const serialized = JSON.stringify({ v: 1, etag, syncedAt: Date.now(), models, providers, pricing });
 
       writeAtomic(CATALOG_FILE, serialized);
       writeAtomic(CATALOG_RAW_FILE, JSON.stringify(slim(catalog)));
 
       state.etag = etag;
       invalidateCatalog();
+      recomputePending = true;
       result = {
         status: "updated",
         etag,
@@ -215,6 +255,19 @@ export async function syncModelCatalog() {
   } finally {
     // collectEntries() detaches the reader; put it back whatever happened.
     await installCatalogSource().catch(() => {});
+    if (recomputePending) {
+      recomputePending = false;
+      try {
+        const { recomputeStoredCosts } = await import("@/lib/db/repos/usageRepo.js");
+        state.lastRecompute = await recomputeStoredCosts();
+        console.log(
+          `[modelCatalog] recomputed ${state.lastRecompute.changed}/${state.lastRecompute.rows} stored costs`
+        );
+      } catch (error) {
+        state.lastRecompute = null;
+        console.log(`[modelCatalog] cost recompute failed: ${error?.message || error}`);
+      }
+    }
     state.running = false;
   }
 }
