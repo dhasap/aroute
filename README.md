@@ -73,7 +73,26 @@ Result: Never stop coding, minimal cost + 20-40% token savings via RTK
 
 ## ⚡ Quick Start
 
-**1. Install (private fork — run from source):**
+**1. Install — pick one:**
+
+**Option A · Prebuilt bundle (fastest — no `npm install`, no build):**
+
+Grab the artifact from [Releases](https://github.com/dhasap/aroute/releases), then:
+
+```bash
+mkdir aroute && tar -xzf aroute-v0.5.75-standalone.tar.gz -C aroute
+cd aroute
+node custom-server.js --port 20128
+```
+
+The bundle already ships the built server, static assets, `public/` and a pruned
+`node_modules`, so **nothing gets compiled**. It was built with Node `v22.22.2`;
+on a non-Linux platform `better-sqlite3` simply fails to load and the DB driver
+falls back to `node:sqlite` (Node ≥ 22.5) and then `sql.js` — all three are
+bundled, so no `node-gyp` either. Without a `.env` the initial dashboard
+password is `123456` — change it in Settings right after the first login.
+
+**Option B · Run from source:**
 
 ```bash
 git clone https://github.com/dhasap/aroute.git
@@ -100,9 +119,7 @@ Claude Code/Codex/OpenClaw/Cursor/Cline Settings:
 
 **That's it!** Start coding with FREE AI models.
 
-**Alternative: run from source (this repository):**
-
-`aroute-app` is private — source/Docker is the only distribution path (no npm/Docker Hub image under this name).
+**Alternative: development mode (hot reload):**
 
 ```bash
 cp .env.example .env
@@ -110,7 +127,7 @@ npm install
 PORT=20128 NEXT_PUBLIC_BASE_URL=http://localhost:20128 npm run dev
 ```
 
-Production mode:
+Production mode from source:
 
 ```bash
 npm run build
@@ -121,6 +138,9 @@ Default URLs:
 
 - Dashboard: `http://localhost:20128/dashboard`
 - OpenAI-compatible API: `http://localhost:20128/v1`
+
+> After changing source code you must `npm run build` **before** restarting — a
+> restart alone keeps serving the old bundle.
 
 ---
 

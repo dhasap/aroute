@@ -6,6 +6,13 @@
 - **Nous Research provider**: new `nous` provider (aliases `nousresearch`, `nous-portal`) on the OpenAI-compatible Nous Portal inference API (`inference-api.nousresearch.com/v1`) — official NOUS logo (`/providers/nous.png`), 50 seeded chat models led by all 7 live-verified free-tier models (probed 200; dead zero-price entries excluded), `modelsFetcher` refreshes the full 400+ list, `passthroughModels` accepts any other id. Dual auth: **OAuth device-code login** (`hermes-cli` public client, scope `inference:invoke`, same flow as `hermes auth add nous` — refresh rides the single-use `x-nous-refresh-token` header) **and** API-key (Portal `sk-` key / `NOUS_API_KEY`).
 - **Providers detail page — auto-updating model catalog**: the `nous-free` / `nous` suggested-models filters return the live Nous catalog with per-model `free` flags (zero-priced or `:free`, minus probed-dead ids and `:batch`); the page refetches on load and every 10 min while open, so ids that appear/expire every few days track without a reseed. With `mergeIntoList` the fetched catalog feeds the main model list (cursor-style live list), free models carry `isFree` → green FREE badge, and quick-add suggestions only ever offer free models.
 - **Providers detail page — "Free only" toggle**: filter the model list down to free models (count shown); appears only when the provider has free models, and the checked state persists across page refreshes (localStorage `providers_free_only`). The toggle is part of the models API request itself: checked sends `freeOnly=1` (backend narrows every filter type to free models), unchecked fetches the full catalog — each scope cached and auto-refreshed separately.
+- **Prebuilt release**: a self-contained standalone bundle is published under
+  [Releases](https://github.com/dhasap/aroute/releases) (`aroute-v0.5.75-prebuilt`, 23 MB) so a fresh
+  machine can run ARoute with `tar -xzf … && node custom-server.js --port 20128` — no `npm install`,
+  no `npm run build`, no compiler. It ships the built server, static assets, `public/` and a pruned
+  `node_modules` (all three SQLite drivers included, so non-Linux hosts fall back instead of failing to
+  build). Verified by extracting the artifact to a clean directory and booting it: health 307, login
+  and static assets 200, in ~1s. README's Quick Start now leads with it.
 - **Usage & Analytics — list-price cost estimates**: every model now resolves a price. The daily
   models.dev sync also extracts each model's `cost` (non-zero rates win, so a free gateway listing $0
   can't hide what the model costs) into the catalog, and `getPricingForModel` consults it after the
