@@ -34,6 +34,14 @@
   their display name (`Kios API`, `Nous Research`, `Atria AI`), and `/api/provider-nodes` serves the
   retired names so the Details tab can label old rows too. The "Usage by Model" summary row lists the
   providers a model was served by instead of `—`.
+- **Console Log menu showed nothing at all**: the page listened only to `EventSource`, and SSE never
+  delivers a body through the Cloudflare tunnel — cloudflared buffers `text/event-stream` (known
+  upstream issue), so every SSE endpoint on this app answered 200 with 0 bytes while the buffer held
+  148 lines. `es.onerror` only flipped state nothing rendered, so the page said "No console logs yet"
+  with no hint anything was wrong. The page now polls the existing GET as its source of truth
+  (`pollIntervalMs`, plus `force-dynamic` so Next can't serve a build-time snapshot) and keeps the
+  stream as a low-latency accelerator, with a `live` / `polling` indicator so a stalled stream is
+  visible instead of silent.
 
 # Migration: ARoute (legacy 9Router) → ARoute (refactor)
 

@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { clearConsoleLogs, getConsoleLogs, initConsoleLogCapture } from "@/lib/consoleLogBuffer";
 
+// The buffer is per-process and changes every second; never let Next bake a
+// snapshot of this into the build or the polling client reads stale logs.
+export const dynamic = "force-dynamic";
+
 initConsoleLogCapture();
 
 export async function GET() {

@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import { Card, Button } from "@/shared/components";
 import { CONSOLE_LOG_CONFIG } from "@/shared/constants/config";
 
+const ENDPOINT = "/api/translator/console-logs";
+const STREAM = `${ENDPOINT}/stream`;
+
 const LOG_LEVEL_COLORS = {
   LOG: "text-green-400",
   INFO: "text-blue-400",
@@ -19,29 +22,47 @@ function colorLine(line) {
   return <span className={color}>{line}</span>;
 }
 
+// The buffer only ever grows by append and only shrinks by eviction or clear,
+// so first + last + length is enough to tell "nothing changed" apart from
+// "server moved on" without diffing every line on every tick.
+function sameLines(a, b) {
+  if (a === b) return true;
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  if (a.length !== b.length) return false;
+  if (a.length === 0) return true;
+  return a[0] === b[0] && a[a.length - 1] === b[b.length - 1];
+}
+
 export default function ConsoleLogClient() {
   const [logs, setLogs] = useState([]);
-  const [connected, setConnected] = useState(false);
+  const [live, setLive] = useState(false);
   const logRef = useRef(null);
 
   const handleClear = async () => {
+    setLogs([]);
     try {
-      await fetch("/api/translator/console-logs", { method: "DELETE" });
-      // UI cleared via SSE "clear" event
+      await fetch(ENDPOINT, { method: "DELETE" });
     } catch (err) {
       console.error("Failed to clear console logs:", err);
     }
   };
 
+  // Server-sent events: instant lines while they actually arrive.
   useEffect(() => {
-    const es = new EventSource("/api/translator/console-logs/stream");
+    const es = new EventSource(STREAM);
 
-    es.onopen = () => setConnected(true);
-
+    es.onopen = () => setLive(true);
+    es.onerror = () => setLive(false);
     es.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
+      let msg;
+      try {
+        msg = JSON.parse(e.data);
+      } catch {
+        return;
+      }
       if (msg.type === "init") {
-        setLogs(msg.logs.slice(-CONSOLE_LOG_CONFIG.maxLines));
+        const next = msg.logs.slice(-CONSOLE_LOG_CONFIG.maxLines);
+        setLogs((prev) => (sameLines(prev, next) ? prev : next));
       } else if (msg.type === "line") {
         setLogs((prev) => {
           const next = [...prev, msg.line];
@@ -57,9 +78,37 @@ export default function ConsoleLogClient() {
       }
     };
 
-    es.onerror = () => setConnected(false);
-
     return () => es.close();
+  }, []);
+
+  // Snapshot polling — the source of truth. The stream cannot be the only
+  // path: anything that buffers the response (cloudflared does, so every
+  // SSE endpoint on this app returns 200 with an empty body through the
+  // tunnel) leaves the page showing nothing while the buffer is full.
+  // Polling keeps the page correct regardless, and the stream just makes
+  // lines land faster than the next tick.
+  useEffect(() => {
+    let alive = true;
+
+    const tick = async () => {
+      try {
+        const res = await fetch(ENDPOINT, { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!alive || !Array.isArray(data.logs)) return;
+        const next = data.logs.slice(-CONSOLE_LOG_CONFIG.maxLines);
+        setLogs((prev) => (sameLines(prev, next) ? prev : next));
+      } catch {
+        // Transient failure between ticks; keep the last lines we had.
+      }
+    };
+
+    tick();
+    const id = setInterval(tick, CONSOLE_LOG_CONFIG.pollIntervalMs);
+    return () => {
+      alive = false;
+      clearInterval(id);
+    };
   }, []);
 
   // Auto-scroll to bottom on new logs
@@ -71,7 +120,11 @@ export default function ConsoleLogClient() {
   return (
     <div className="">
       <Card>
-        <div className="flex items-center justify-end px-4 pt-3 pb-2">
+        <div className="flex items-center justify-between px-4 pt-3 pb-2">
+          <span className="text-xs text-text-muted">
+            {logs.length > 0 ? `${logs.length} baris` : ""}
+            {live ? " · live" : " · polling"}
+          </span>
           <Button size="sm" variant="outline" icon="delete" onClick={handleClear}>
             Clear
           </Button>
