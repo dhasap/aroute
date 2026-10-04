@@ -14,6 +14,8 @@ import { useModelCaps } from "@/shared/hooks/useModelCaps";
 import { translate } from "@/i18n/runtime";
 import { useNotificationStore } from "@/store/notificationStore";
 import { fetchSuggestedModels } from "@/shared/utils/providerModelsFetcher";
+import { readFreeOnlyPref, writeFreeOnlyPref } from "@/shared/utils/freeOnlyPref";
+import { computeFreeOnlyGate } from "@/shared/utils/freeOnlyGate";
 import { getProviderCustomModelRows } from "@/shared/utils/providerCustomModels";
 import ModelRow from "./ModelRow";
 import PassthroughModelsSection from "./PassthroughModelsSection";
@@ -34,6 +36,13 @@ const AUTO_PING_SETTINGS_KEYS = {
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// A model counts as free when flagged by the registry (live-verified free
+// tier), when the live catalog marks it `free`, or when its id carries the
+// ":free" suffix convention.
+function isFreeModel(model) {
+  return !!model?.isFree || model?.free === true || (typeof model?.id === "string" && model.id.endsWith(":free"));
 }
 
 export default function ProviderDetailPage() {
@@ -75,6 +84,7 @@ export default function ProviderDetailPage() {
   const [liveModels, setLiveModels] = useState([]);
   const [kiloFreeModels, setKiloFreeModels] = useState([]);
   const [disabledModelIds, setDisabledModelIds] = useState([]);
+  const [freeOnly, setFreeOnly] = useState(false);
   const [confirmState, setConfirmState] = useState(null);
   const [showAgRiskModal, setShowAgRiskModal] = useState(false);
   const [oneByOneRunning, setOneByOneRunning] = useState(false);
@@ -151,7 +161,15 @@ export default function ProviderDetailPage() {
       }
     : (OAUTH_PROVIDERS[providerId] || APIKEY_PROVIDERS[providerId] || FREE_PROVIDERS[providerId] || FREE_TIER_PROVIDERS[providerId] || WEB_COOKIE_PROVIDERS[providerId]);
   const authModes = providerInfo?.authModes || [];
-  const isOAuth = !!OAUTH_PROVIDERS[providerId] || !!FREE_PROVIDERS[providerId] || authModes.includes("oauth");
+  // OAuth-capable = the provider really has an OAuth flow. Checked against the
+  // registry `oauth` block (PROVIDER_OAUTH is built from exactly those) plus an
+  // explicit `oauth` auth mode. Deliberately NOT `FREE_PROVIDERS`: every
+  // `category: "free"` provider lands there, so a key-authenticated free
+  // provider (KiosAPI) would grow an OAuth button whose modal has no handler.
+  const isOAuth =
+    !!OAUTH_PROVIDERS[providerId] ||
+    !!providerInfo?.hasOAuth ||
+    authModes.includes("oauth");
   const supportsApiKeyAuth = !!APIKEY_PROVIDERS[providerId] || authModes.includes("apikey");
   const isFreeNoAuth = !!FREE_PROVIDERS[providerId]?.noAuth;
   const staticModels = getModelsByProviderId(providerId);
@@ -497,12 +515,43 @@ export default function ProviderDetailPage() {
     return () => { cancelled = true; };
   }, [providerId, connections]);
 
-  // Fetch suggested models from provider's public API (if configured)
+  // Fetch suggested models from provider's public API (if configured), then
+  // keep them fresh every 10 minutes while the page stays open — rotating
+  // free-tier catalogs (Nous drops/gets free ids every few days) stay current
+  // without a manual reload. fetchSuggestedModels itself caches for 10 min per
+  // scope: the "Free only" toggle is part of the request (freeOnly=1), so
+  // checking it refetches only free models and unchecking refetches the full
+  // catalog — and both scopes auto-update independently.
+  const modelsFetcher = providerInfo?.modelsFetcher;
   useEffect(() => {
-    const fetcher = (OAUTH_PROVIDERS[providerId] || APIKEY_PROVIDERS[providerId] || FREE_PROVIDERS[providerId] || FREE_TIER_PROVIDERS[providerId])?.modelsFetcher;
-    if (!fetcher) return;
-    fetchSuggestedModels(fetcher).then(setSuggestedModels);
-  }, [providerId]);
+    if (!modelsFetcher) return undefined;
+    let cancelled = false;
+    const load = () =>
+      fetchSuggestedModels(modelsFetcher, { freeOnly }).then((list) => {
+        if (!cancelled) setSuggestedModels(list);
+      });
+    load();
+    const timer = setInterval(load, 10 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [modelsFetcher, freeOnly]);
+
+  // Restore the saved "Free only" preference after mount. localStorage is
+  // unavailable during SSR and setState may not run synchronously inside an
+  // effect (react-hooks/set-state-in-effect), so apply the saved pref in a
+  // microtask: the first client render stays identical to the server render
+  // (no hydration mismatch), then the checkbox flips if it was left checked.
+  useEffect(() => {
+    let cancelled = false;
+    Promise.resolve().then(() => {
+      if (!cancelled && readFreeOnlyPref()) setFreeOnly(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSetAlias = async (modelId, alias, providerAliasOverride = providerAlias) => {
     const fullModel = `${providerAliasOverride}/${modelId}`;
@@ -1145,12 +1194,42 @@ export default function ProviderDetailPage() {
     if (testingAllProviderModels) return;
     setTestingAllProviderModels(true);
     setModelsTestError("");
-    const ids = [
+    // With "Free only" checked, sweep just the free models — probing every paid
+    // model on a credit-less account only floods the log with billing 404s.
+    // Live free entries win over registry flags; flags are the offline fallback.
+    const liveFreeSet = suggestedModels.length > 0
+      ? new Set(suggestedModels.filter((m) => isFreeModel(m)).map((m) => m.id))
+      : null;
+    // The registry free flag lives on the MODEL OBJECT. Building a lookup keeps
+    // it: `isFreeModel({ id })` only sees the ":free" suffix, so providers whose
+    // free ids use another convention (KiosAPI: `mimo-v2.6-flash`) were filtered
+    // down to nothing and the sweep reported "No free models to test".
+    const modelById = new Map();
+    for (const m of [...models, ...customModelRows, ...kiloFreeModels]) {
+      if (!modelById.has(m.id)) modelById.set(m.id, m);
+    }
+    const isFreeNow = (id) => {
+      if (liveFreeSet) return liveFreeSet.has(id);
+      const m = modelById.get(id);
+      return m ? isFreeModel(m) : isFreeModel({ id });
+    };
+    const candidates = [
       ...customModelRows.map((m) => m.id),
       ...models.filter((m) => { const k = getModelKind(m); return !k || k === "llm"; }).map((m) => m.id),
       ...kiloFreeModels.filter((fm) => !models.some((m) => m.id === fm.id)).map((m) => m.id),
     ];
+    // Same gate as the render: only narrow when the catalog really mixes free
+    // and paid. Otherwise a saved "Free only" whose toggle isn't even rendered
+    // would empty the sweep with no way for the user to un-check it.
+    const { effectiveFreeOnly: applyFreeFilter } = computeFreeOnlyGate({
+      freeCount: candidates.filter((id) => isFreeNow(id)).length,
+      paidCount: candidates.filter((id) => !isFreeNow(id)).length,
+      customCount: customModelRows.length,
+      freeOnly,
+    });
+    const ids = applyFreeFilter ? candidates.filter((id) => isFreeNow(id)) : candidates;
     let failed = 0;
+    let firstError = "";
     for (const id of ids) {
       setTestingModelIds((prev) => new Set(prev).add(id));
       let ok = false;
@@ -1163,6 +1242,7 @@ export default function ProviderDetailPage() {
         const data = await res.json();
         ok = !!data.ok;
         if (!ok) failed += 1;
+        if (!ok && !firstError && data.error) firstError = String(data.error);
         setModelTestResults((prev) => ({ ...prev, [id]: ok ? "ok" : "error" }));
       } catch {
         ok = false;
@@ -1173,10 +1253,20 @@ export default function ProviderDetailPage() {
       }
     }
     setTestingAllProviderModels(false);
-    if (ids.length === 0) setModelsTestError("No models to test");
+    // `applyFreeFilter` only engages when free models exist, so an empty sweep
+    // means the catalog itself is empty — keep the free wording as a fallback
+    // for the case where the gate and this check ever disagree again.
+    if (ids.length === 0) {
+      setModelsTestError(freeOnly && candidates.length > 0 ? "No free models to test" : "No models to test");
+    }
     else if (failed === 0) notify.success(`All ${ids.length} model tests passed`);
-    else notify.warning(`${ids.length - failed}/${ids.length} model tests passed`);
-  }, [testingAllProviderModels, customModelRows, models, kiloFreeModels, providerStorageAlias, testingModelIds, notify]);
+    else {
+      notify.warning(`${ids.length - failed}/${ids.length} model tests passed`);
+      // Surface the first failure reason (e.g. the friendly no-credits hint)
+      // instead of leaving only the pass/fail count.
+      if (firstError) setModelsTestError(firstError);
+    }
+  }, [testingAllProviderModels, customModelRows, models, kiloFreeModels, providerStorageAlias, testingModelIds, notify, freeOnly, suggestedModels]);
 
   const renderModelsSection = () => {
     if (isCompatible) {
@@ -1197,20 +1287,78 @@ export default function ProviderDetailPage() {
         />
       );
     }
-    // Combine hardcoded models with Kilo free models (deduplicated)
+    // Merge the live catalog (modelsFetcher with mergeIntoList) into the seed
+    // list so every model tracks the API — free or not, new or retired — the
+    // same way cursor's per-account live catalog does. Seed rows win on id
+    // collisions; fetched-only rows appear as soon as the fetch lands.
+    const liveCatalogRows = modelsFetcher?.mergeIntoList && suggestedModels.length > 0
+      ? suggestedModels.filter((m) => !models.some((s) => s.id === m.id))
+      : [];
+    // Combine hardcoded models with the live catalog and Kilo free models (deduplicated)
     // Exclude non-llm models (embedding, tts, etc.) — they have dedicated pages under media-providers
     const allModels = [
       ...models,
+      ...liveCatalogRows,
       ...kiloFreeModels.filter((fm) => !models.some((m) => m.id === fm.id)),
     ].filter((m) => { const k = getModelKind(m); return !k || k === "llm"; });
+    // FREE truth prefers the live free entries (refreshed every 10 min) over
+    // the registry flag: a seeded free id that Nous retired stops claiming free
+    // on the next refresh; fall back to the flag while the fetch is
+    // pending/failed. With the full catalog fetched (Free-only off) only the
+    // entries marked free qualify — paid models never do.
+    const liveFreeEntries = suggestedModels.filter((m) => isFreeModel(m));
+    const liveFreeIds = liveFreeEntries.length > 0 ? new Set(liveFreeEntries.map((m) => m.id)) : null;
+    const freePredicate = (m) => (liveFreeIds ? liveFreeIds.has(m.id) : isFreeModel(m));
     const disabledSet = new Set(disabledModelIds);
-    const displayModels = allModels.filter((m) => !disabledSet.has(m.id));
+    const freeList = allModels.filter((m) => !disabledSet.has(m.id) && freePredicate(m));
+    const paidList = allModels.filter((m) => !disabledSet.has(m.id) && !freePredicate(m));
+    // Single source of truth for the toggle (see computeFreeOnlyGate). Keyed off
+    // the UNFILTERED `customModelRows`: the filtered `customRows` is declared
+    // further down and depends on `effectiveFreeOnly`, which depends on this —
+    // reading it here was a TDZ cycle that threw while rendering.
+    const { hasFreeModels, effectiveFreeOnly } = computeFreeOnlyGate({
+      freeCount: freeList.length,
+      paidCount: paidList.length,
+      customCount: customModelRows.length,
+      freeOnly,
+    });
+    const displayModels = allModels.filter((m) => !disabledSet.has(m.id) && (!effectiveFreeOnly || freePredicate(m)));
     const disabledDisplayModels = allModels.filter((m) => disabledSet.has(m.id));
+    const customRows = customModelRows.filter((m) => !effectiveFreeOnly || freePredicate(m));
+    const freeShownCount = displayModels.filter(freePredicate).length + customRows.length;
 
     return (
       <div className="flex flex-wrap gap-3">
+        {/* Free-only filter — shown only when the provider actually has free models */}
+        {hasFreeModels && (
+          <div className="flex w-full items-center justify-between gap-2">
+            <button
+              onClick={() => {
+                const next = !freeOnly;
+                setFreeOnly(next);
+                writeFreeOnlyPref(next);
+              }}
+              className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition-colors ${
+                freeOnly
+                  ? "border-green-500/50 bg-green-500/10 text-green-600 dark:text-green-400"
+                  : "border-border text-text-muted hover:text-text-main hover:bg-sidebar/50"
+              }`}
+              title={freeOnly ? "Show all models" : "Show only free models"}
+            >
+              <span className="material-symbols-outlined text-sm">
+                {freeOnly ? "check_box" : "check_box_outline_blank"}
+              </span>
+              Free only
+            </button>
+            {freeOnly && (
+              <span className="text-[11px] text-text-muted">
+                {freeShownCount} free model{freeShownCount === 1 ? "" : "s"} shown
+              </span>
+            )}
+          </div>
+        )}
         {/* Custom models first */}
-        {customModelRows.map((model) => (
+        {customRows.map((model) => (
           <ModelRow
             key={`${model.source}-${model.fullModel}`}
             model={{ id: model.id, name: model.name }}
@@ -1255,7 +1403,7 @@ export default function ProviderDetailPage() {
               testStatus={modelTestResults[model.id]}
               onTest={connections.length > 0 || isFreeNoAuth ? () => handleTestModel(model.id) : undefined}
               isTesting={testingModelIds.has(model.id)}
-              isFree={model.isFree}
+              isFree={freePredicate(model)}
               onDisable={() => handleDisableModel(model.id)}
               caps={getCaps(`${providerId}/${model.id}`)}
               thinkingSuffix={resolveThinkingSuffix(model.id)}
@@ -1307,13 +1455,20 @@ export default function ProviderDetailPage() {
             ...customModelRows.map((model) => model.fullModel),
           ]);
           const hardcodedIds = new Set(models.map((m) => m.id));
-          const notAdded = suggestedModels.filter(
-            (m) => !addedFullModels.has(`${providerStorageAlias}/${m.id}`) && !hardcodedIds.has(m.id)
-          );
+          // Quick-add suggestions are free-by-design: with the full catalog
+          // fetched (Free-only off), only free entries are offered here — paid
+          // models still reach the main list via the live merge above.
+          const notAdded = suggestedModels
+            .filter((m) => isFreeModel(m))
+            .filter((m) => !addedFullModels.has(`${providerStorageAlias}/${m.id}`) && !hardcodedIds.has(m.id));
           if (notAdded.length === 0) return null;
           return (
             <div className="w-full mt-2">
-              <p className="text-xs text-text-muted mb-2">Suggested free models (≥200k context):</p>
+              <p className="text-xs text-text-muted mb-2">
+              {modelsFetcher?.type === "nous-free"
+                ? "Free models on Nous Portal right now — auto-updated (refreshes every ~10 min):"
+                : "Suggested free models (≥200k context):"}
+            </p>
               <div className="flex flex-wrap gap-2">
                 {notAdded.map((m) => (
                   <button
@@ -1322,7 +1477,7 @@ export default function ProviderDetailPage() {
                       await handleAddCustomModel(m.id, "llm", providerStorageAlias);
                     }}
                     className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-black/10 dark:border-white/10 text-xs text-text-muted hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-colors"
-                    title={`${m.name} · ${(m.contextLength / 1000).toFixed(0)}k ctx`}
+                    title={m.contextLength ? `${m.name} · ${(m.contextLength / 1000).toFixed(0)}k ctx` : m.name}
                   >
                     <span className="material-symbols-outlined text-[13px]">add</span>
                     {m.id.split("/").pop()}

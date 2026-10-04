@@ -15,6 +15,10 @@ export default {
     deprecationNotice: "RISK_NOTICE",
   },
   category: "free",
+  // OAuth-only upstream (registry `oauth` block below); declaring it lets the
+  // dashboard render the OAuth connect form instead of an API-key one.
+  hasOAuth: true,
+  authModes: ["oauth"],
   transport: {
     baseUrl: "https://runtime.us-east-1.kiro.dev/generateAssistantResponse",
     baseUrls: [

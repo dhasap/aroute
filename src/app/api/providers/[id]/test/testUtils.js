@@ -63,6 +63,30 @@ const OAUTH_TEST_CONFIG = {
     noAuth: true,
   },
   kiro: { checkExpiry: true, refreshable: true },
+  nous: {
+    // Nous Portal has no userinfo endpoint, and GET /v1/models answers 200 even
+    // for a bogus token — so neither can prove auth. The chat endpoint does
+    // discriminate (401 for a bad token), so probe it with a tiny free model.
+    url: "https://inference-api.nousresearch.com/v1/chat/completions",
+    method: "POST",
+    authHeader: "Authorization",
+    authPrefix: "Bearer ",
+    extraHeaders: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "stepfun/step-3.7-flash:free",
+      messages: [{ role: "user", content: "ping" }],
+      max_tokens: 1,
+      stream: false,
+    }),
+    refreshable: true,
+    // Nous returns 404 with code insufficient_credits_for_paid_model when the
+    // account has no credits, and 404 for other upstream route misses — auth is
+    // still fine, so treat those as connected-with-warning, not a failure.
+    acceptStatuses: [404],
+    softFailMessage: {
+      404: "Connected, but Nous has no credits for paid models. Use a free model (id ending :free) or add credits at https://portal.nousresearch.com.",
+    },
+  },
   qoder: {
     // Test by hitting Qoder's userinfo endpoint with the device token.
     // refreshable: false because the device-flow refresh endpoint returns
@@ -824,8 +848,40 @@ case "llm7": {
         }, effectiveProxy);
         return { valid: res.ok, error: res.ok ? null : "Invalid API key", refreshed: false };
       }
-      default:
-        return { valid: false, error: "Provider test not supported" };
+      default: {
+        // Generic fallback so a new OpenAI-compatible registry provider is never
+        // reported as "Provider test not supported" for lacking a hardcoded case.
+        // 1) registry validateUrl (cheap GET /models when the provider offers one)
+        const cfg = PROVIDERS[connection.provider];
+        if (cfg?.validateUrl) {
+          const res = await fetchWithConnectionProxy(cfg.validateUrl, {
+            headers: { Authorization: `Bearer ${connection.apiKey}` },
+          }, effectiveProxy);
+          return { valid: res.ok, error: res.ok ? null : "Invalid API key", refreshed: false };
+        }
+        // 2) no catalog endpoint (KiosAPI 403s /v1/models on its Free group) →
+        //    probe the chat endpoint itself; only 401/403 means the key is bad.
+        const chatUrl = typeof cfg?.baseUrl === "string" && cfg.baseUrl.includes("/chat/completions")
+          ? cfg.baseUrl
+          : typeof cfg?.baseUrl === "string"
+            ? `${cfg.baseUrl.replace(/\/$/, "")}/chat/completions`
+            : null;
+        if (chatUrl) {
+          const res = await fetchWithConnectionProxy(chatUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${connection.apiKey}` },
+            body: JSON.stringify({
+              model: getDefaultModel(connection.provider),
+              messages: [{ role: "user", content: "ping" }],
+              max_tokens: 1,
+              stream: false,
+            }),
+          }, effectiveProxy);
+          const valid = res.status !== 401 && res.status !== 403;
+          return { valid, error: valid ? null : "Invalid API key", refreshed: false };
+        }
+        return { valid: false, error: "Provider test not supported", refreshed: false };
+      }
     }
   } catch (err) {
     return { valid: false, error: err.message };
