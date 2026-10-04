@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { FILTERS } from "./filters.js";
+import { FILTERS, onlyFree } from "./filters.js";
 
 export const dynamic = "force-dynamic";
 
@@ -7,6 +7,9 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const url = searchParams.get("url");
   const type = searchParams.get("type");
+  // freeOnly=1 narrows the filtered result to free models only (the detail
+  // page sends it while the "Free only" toggle is checked).
+  const freeOnly = searchParams.get("freeOnly") === "1";
 
   if (!url || !type) {
     return NextResponse.json({ error: "Missing url or type" }, { status: 400 });
@@ -24,7 +27,8 @@ export async function GET(request) {
     }
     const json = await res.json();
     const raw = json.data ?? json.models ?? json;
-    const data = filter(Array.isArray(raw) ? raw : []);
+    let data = filter(Array.isArray(raw) ? raw : []);
+    if (freeOnly) data = onlyFree(data);
     return NextResponse.json({ data });
   } catch {
     return NextResponse.json({ data: [] });

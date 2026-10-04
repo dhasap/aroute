@@ -40,13 +40,19 @@ export default {
     // Access tokens live 1h; refresh 2 min before expiry (Portal skew used by hermes).
     refreshLeadMs: 120000,
   },
-  // Seed snapshot from hermes' curated Nous catalog. The latest catalogue is
-  // fetched via modelsFetcher; other ids (400+ live: :batch, :free, ~aliases)
-  // are still accepted via passthroughModels.
+  // Seed snapshot: ALL live-verified free-tier models first (zero-priced; probed
+  // 200 on chat/completions — 2 more catalog zero-price entries are dead and
+  // excluded: inclusionai/ling-3.0-flash-fin:free, meituan/longcat-2.0:free),
+  // then hermes' curated paid catalog. Latest catalogue comes via modelsFetcher;
+  // other ids (400+ live: :batch, ~aliases) are accepted via passthroughModels.
   models: [
-    { id: "stepfun/step-3.7-flash:free", name: "Step 3.7 Flash (free)" },
-    { id: "poolside/laguna-s-2.1:free", name: "Laguna S 2.1 (free)" },
-    { id: "poolside/laguna-xs-2.1:free", name: "Laguna XS 2.1 (free)" },
+    { id: "stepfun/step-3.7-flash:free", isFree: true, name: "Step 3.7 Flash (free)" },
+    { id: "inclusionai/ling-3.1-flash", isFree: true, name: "Ling 3.1 Flash (free)" },
+    { id: "inclusionai/ling-3.0-flash-sante:free", isFree: true, name: "Ling 3.0 Flash Sante (free)" },
+    { id: "meituan/longcat-2.5-preview:free", isFree: true, name: "LongCat 2.5 Preview (free)" },
+    { id: "poolside/laguna-s-2.1:free", isFree: true, name: "Laguna S 2.1 (free)" },
+    { id: "poolside/laguna-xs-2.1:free", isFree: true, name: "Laguna XS 2.1 (free)" },
+    { id: "stealth/space-bunny-alpha", isFree: true, name: "Space Bunny Alpha (free)" },
     { id: "anthropic/claude-fable-5.1", name: "Claude Fable 5.1" },
     { id: "anthropic/claude-fable-5", name: "Claude Fable 5" },
     { id: "anthropic/claude-opus-5", name: "Claude Opus 5" },
@@ -92,6 +98,9 @@ export default {
     { id: "sakana/fugu-ultra", name: "Fugu Ultra" },
   ],
   serviceKinds: ["llm"],
-  modelsFetcher: { url: "https://inference-api.nousresearch.com/v1/models", type: "openai" },
+  // type "nous" = full live catalog; the detail page narrows to free via the
+  // freeOnly=1 route param when "Free only" is on. mergeIntoList makes the
+  // fetched catalog feed the page's main model list (cursor-style live list).
+  modelsFetcher: { url: "https://inference-api.nousresearch.com/v1/models", type: "nous", mergeIntoList: true },
   passthroughModels: true,
 };

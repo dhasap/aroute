@@ -49,6 +49,26 @@ export async function writeStreamError(writer, statusCode, message) {
   await writer.write(encoder.encode(`data: ${JSON.stringify(errorBody)}\n\n`));
 }
 
+// Nous Portal reports a *billing* problem as HTTP 404 with this code — surface
+// it as what it is instead of a bare 404 (status stays untouched so account
+// fallback/lock behaviour is unchanged).
+const NOUS_CREDITS_CODE = "insufficient_credits_for_paid_model";
+const NOUS_CREDITS_HINT =
+  "Nous account has no credits — paid models are blocked. Use a free model (id ending :free) or add credits at https://portal.nousresearch.com.";
+
+/**
+ * Enrich an upstream error message when the provider signals a known,
+ * misleading condition. Returns the original message for everything else.
+ * @param {string} message - Parsed upstream error message
+ * @param {string} [code] - Upstream error code (json.code / json.error.code)
+ * @returns {string}
+ */
+export function friendlyUpstreamMessage(message = "", code = "") {
+  if (code !== NOUS_CREDITS_CODE) return message;
+  const original = String(message || "").slice(0, 160);
+  return `${NOUS_CREDITS_HINT}${original ? ` — upstream: ${original}` : ""} [${NOUS_CREDITS_CODE}]`;
+}
+
 /**
  * Parse upstream provider error response
  * @param {Response} response - Fetch response from provider
@@ -75,15 +95,18 @@ export async function parseUpstreamError(response, executor = null) {
   }
 
   let message = "";
+  let code = "";
   try {
     const json = JSON.parse(bodyText);
     message = json.error?.message || json.message || json.error || bodyText;
+    code = (typeof json.code === "string" && json.code) || (typeof json.error?.code === "string" && json.error.code) || "";
   } catch {
     message = bodyText;
   }
 
   const messageStr = typeof message === "string" ? message : JSON.stringify(message);
-  const finalMessage = messageStr || DEFAULT_ERROR_MESSAGES[response.status] || `Upstream error: ${response.status}`;
+  const baseMessage = messageStr || DEFAULT_ERROR_MESSAGES[response.status] || `Upstream error: ${response.status}`;
+  const finalMessage = friendlyUpstreamMessage(baseMessage, code);
 
   return { statusCode: response.status, message: finalMessage };
 }
