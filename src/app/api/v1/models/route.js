@@ -7,7 +7,7 @@ import {
   isAnthropicCompatibleProvider,
   isOpenAICompatibleProvider,
 } from "@/shared/constants/providers";
-import { getProviderConnections, getCombos, getCustomModels, getModelAliases } from "@/lib/localDb";
+import { getProviderConnections, getCombos, getCustomModels, getModelAliases, getSettings } from "@/lib/localDb";
 import { getDisabledModels } from "@/lib/disabledModelsDb";
 import { resolveKiroModels } from "open-sse/services/kiroModels.js";
 import { resolveKimchiModels } from "open-sse/services/kimchiModels.js";
@@ -20,6 +20,8 @@ import { resolveZedModels } from "open-sse/shared/zedAuth.js";
 import { updateProviderCredentials } from "@/sse/services/tokenRefresh";
 import { resolveConnectionProxyConfig } from "@/lib/network/connectionProxy";
 import { capabilitiesFromServiceKind, getCapabilitiesForModel } from "open-sse/providers/capabilities.js";
+import { resolveComboContextWindow } from "@/shared/utils/comboContext.js";
+import { isFreeModel } from "@/shared/utils/isFreeModel.js";
 
 // Per-provider live model resolvers. Each receives a connection record and
 // returns { models: [{ id, name? }, ...] } | null on failure.
@@ -302,6 +304,19 @@ export async function buildModelsList(kindFilter, options = {}) {
   }
   const isDisabled = (alias, modelId) => Array.isArray(disabledByAlias[alias]) && disabledByAlias[alias].includes(modelId);
 
+  // Providers whose "Free only" toggle is on. Written by the provider detail
+  // page; without this the dashboard hid paid models while /v1/models kept
+  // handing them to every client.
+  let freeOnlyProviders = new Set();
+  try {
+    const settings = await getSettings();
+    if (Array.isArray(settings?.freeOnlyProviders)) {
+      freeOnlyProviders = new Set(settings.freeOnlyProviders);
+    }
+  } catch (e) {
+    console.log("Could not read free-only settings, serving full model lists");
+  }
+
   const activeConnectionByProvider = new Map();
   for (const conn of connections) {
     if (!activeConnectionByProvider.has(conn.provider)) {
@@ -332,13 +347,14 @@ export async function buildModelsList(kindFilter, options = {}) {
       const memberCaps = (combo.models || [])
         .map((m) => getCapabilitiesForModel(...splitProviderModel(m)))
         .filter((c) => Number.isFinite(c?.contextWindow));
-      const memberContext = memberCaps.length
-        ? Math.max(...memberCaps.map((c) => c.contextWindow))
-        : null;
-      const override = Number(combo.contextWindow);
-      const contextWindow = Number.isFinite(override) && override > 0
-        ? override
-        : memberContext;
+      // One rule shared with the combos dashboard (comboContext.js). This used
+      // to be a second, subtly different copy: it rejected non-positive
+      // overrides while the dashboard accepted them, so an override of 0 showed
+      // as "0K context" on screen but as the member maximum over the API.
+      const contextWindow = resolveComboContextWindow(
+        combo,
+        memberCaps.map((c) => c.contextWindow),
+      );
       const maxOutput = memberCaps.length
         ? Math.max(...memberCaps.map((c) => c.maxOutput).filter(Number.isFinite))
         : null;
@@ -507,6 +523,12 @@ export async function buildModelsList(kindFilter, options = {}) {
 
       const mergedModelIds = Array.from(new Set([...modelIds, ...customModelIds, ...aliasModelIds]));
 
+      // "Free only" on this provider narrows the API list to match what the
+      // dashboard renders. The registry entry carries `isFree`; ids the
+      // registry doesn't know still qualify through the `:free` convention.
+      const freeOnlyThisProvider = freeOnlyProviders.has(providerId);
+      const staticById = new Map(providerModels.map((m) => [m.id, m]));
+
       for (const modelId of mergedModelIds) {
         // Resolve kind: prefer custom/live metadata, then static, then ID heuristics.
         const customKind = customModelKindById.get(modelId);
@@ -516,6 +538,7 @@ export async function buildModelsList(kindFilter, options = {}) {
         const allowAsLlm = kind === "imageToText" && kindFilter.includes(LLM_KIND);
         if (!kindFilter.includes(kind) && !allowAsLlm) continue;
         if (isDisabled(outputAlias, modelId) || isDisabled(staticAlias, modelId)) continue;
+        if (freeOnlyThisProvider && !isFreeModel(staticById.get(modelId) || { id: modelId })) continue;
 
         const model = {
           id: `${outputAlias}/${modelId}`,

@@ -6,6 +6,7 @@ import kios from "../../open-sse/providers/registry/kios.js";
 import { PROVIDER_MODELS } from "../../open-sse/config/providerModels.js";
 import { getModelKind } from "../../src/shared/constants/models.js";
 import { computeFreeOnlyGate } from "../../src/shared/utils/freeOnlyGate.js";
+import { isFreeModel } from "../../src/shared/utils/isFreeModel.js";
 
 // Guards two real bugs on the provider detail page, both by EXECUTING the
 // statements lifted from the page source (never by re-deriving them — a
@@ -32,7 +33,6 @@ function slice(startRe, endRe) {
   return src.slice(start, lineEnd + 1);
 }
 
-const isFreeModelSrc = slice(/function isFreeModel\(model\) \{/, /^\}/m);
 const renderBlockSrc = slice(/const liveFreeEntries = /, /const freeShownCount = /);
 const testAllBlockSrc = slice(/const liveFreeSet = suggestedModels\.length > 0/, /const ids = applyFreeFilter/);
 
@@ -40,8 +40,8 @@ const testAllBlockSrc = slice(/const liveFreeSet = suggestedModels\.length > 0/,
 const factory = new Function(
   "computeFreeOnlyGate",
   "getModelKind",
+  "isFreeModel",
   `
-  ${isFreeModelSrc}
   const runRender = function (allModels, customModelRows, suggestedModels, disabledModelIds, freeOnly) {
     ${renderBlockSrc}
     return {
@@ -56,7 +56,7 @@ const factory = new Function(
   return { runRender, runTestAll };
   `,
 );
-const { runRender, runTestAll } = factory(computeFreeOnlyGate, getModelKind);
+const { runRender, runTestAll } = factory(computeFreeOnlyGate, getModelKind, isFreeModel);
 
 const runPageBlock = (opts) =>
   runRender(opts.allModels ?? [], opts.customModelRows ?? [], opts.suggestedModels ?? [], opts.disabledModelIds ?? [], opts.freeOnly ?? false);
@@ -97,7 +97,12 @@ describe("Test All selection — executes the real page statements", () => {
     expect(testAllBlockSrc).toContain("modelById");
     expect(testAllBlockSrc).toContain("isFreeNow");
     expect(testAllBlockSrc).toContain("applyFreeFilter");
-    expect(isFreeModelSrc).toContain("isFree");
+    // "free" is now one shared module (src/shared/utils/isFreeModel.js) used by
+    // this page AND /v1/models, so exercise the real import instead of slicing
+    // a local copy out of the page — the local copy no longer exists.
+    expect(isFreeModel({ id: "mimo-v2.6-flash", isFree: true })).toBe(true);
+    expect(isFreeModel({ id: "stepfun/step-3.7-flash:free" })).toBe(true);
+    expect(isFreeModel({ id: "anthropic/claude-opus-5" })).toBe(false);
   });
 
   it("BUG #2: KiosAPI with Free-only checked sweeps ALL 37 models, not none", () => {

@@ -15,7 +15,9 @@ import { translate } from "@/i18n/runtime";
 import { useNotificationStore } from "@/store/notificationStore";
 import { fetchSuggestedModels } from "@/shared/utils/providerModelsFetcher";
 import { readFreeOnlyPref, writeFreeOnlyPref } from "@/shared/utils/freeOnlyPref";
+import { loadFreeOnlyProviders, setFreeOnlyProvider } from "@/shared/utils/freeOnlySetting";
 import { computeFreeOnlyGate } from "@/shared/utils/freeOnlyGate";
+import { isFreeModel } from "@/shared/utils/isFreeModel";
 import { getProviderCustomModelRows } from "@/shared/utils/providerCustomModels";
 import ModelRow from "./ModelRow";
 import PassthroughModelsSection from "./PassthroughModelsSection";
@@ -38,12 +40,9 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// A model counts as free when flagged by the registry (live-verified free
-// tier), when the live catalog marks it `free`, or when its id carries the
-// ":free" suffix convention.
-function isFreeModel(model) {
-  return !!model?.isFree || model?.free === true || (typeof model?.id === "string" && model.id.endsWith(":free"));
-}
+// "Free" is one shared rule (shared/utils/isFreeModel) used by this page AND
+// the gateway's /v1/models, so the list the API serves and the list rendered
+// here can never disagree about which models are free.
 
 export default function ProviderDetailPage() {
   const params = useParams();
@@ -543,15 +542,26 @@ export default function ProviderDetailPage() {
   // effect (react-hooks/set-state-in-effect), so apply the saved pref in a
   // microtask: the first client render stays identical to the server render
   // (no hydration mismatch), then the checkbox flips if it was left checked.
+  //
+  // The SERVER copy wins when readable: /v1/models filters on it, so the list
+  // rendered here and the list a client fetches must come from the same state.
+  // localStorage remains the fallback when settings cannot be read.
   useEffect(() => {
     let cancelled = false;
-    Promise.resolve().then(() => {
-      if (!cancelled && readFreeOnlyPref()) setFreeOnly(true);
+    Promise.resolve().then(async () => {
+      const fromServer = await loadFreeOnlyProviders();
+      if (cancelled) return;
+      const enabled = fromServer === null
+        ? readFreeOnlyPref()
+        : fromServer.includes(providerId);
+      // React bails out when the value is unchanged, so this is safe to call
+      // unconditionally on both mount and provider change.
+      setFreeOnly(enabled);
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [providerId]);
 
   const handleSetAlias = async (modelId, alias, providerAliasOverride = providerAlias) => {
     const fullModel = `${providerAliasOverride}/${modelId}`;
@@ -1337,6 +1347,12 @@ export default function ProviderDetailPage() {
                 const next = !freeOnly;
                 setFreeOnly(next);
                 writeFreeOnlyPref(next);
+                // Persist server-side too: /v1/models reads this list, so a
+                // toggle that only reaches localStorage would leave the API
+                // serving paid models the dashboard just hid.
+                setFreeOnlyProvider(providerId, next).then((saved) => {
+                  if (!saved) notify.error("Free only could not be saved — the API keeps its previous setting");
+                });
               }}
               className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition-colors ${
                 freeOnly

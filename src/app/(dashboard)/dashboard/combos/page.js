@@ -9,6 +9,7 @@ import { Card, Button, Modal, Input, CardSkeleton, ModelSelectModal, ConfirmModa
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
 import { useModelCaps } from "@/shared/hooks/useModelCaps";
 import { isOpenAICompatibleProvider, isAnthropicCompatibleProvider } from "@/shared/constants/providers";
+import { resolveComboContextWindow, hasContextOverride } from "@/shared/utils/comboContext";
 
 // Validate combo name: only a-z, A-Z, 0-9, -, _
 const VALID_NAME_REGEX = /^[a-zA-Z0-9_.\-]+$/;
@@ -327,18 +328,20 @@ function ComboCard({ combo, getCaps, activeProviders = [], copied, onCopy, onEdi
             </div>
             {/* Combo context window: explicit override beats member max */}
             {(() => {
-              const memberCtx = (combo.models || [])
-                .map((m) => getCaps?.(m)?.contextWindow)
-                .filter((v) => Number.isFinite(v));
-              const effective = Number.isFinite(Number(combo.contextWindow))
-                ? Number(combo.contextWindow)
-                : (memberCtx.length ? Math.max(...memberCtx) : null);
-              if (!Number.isFinite(effective)) return null;
+              // Same rule as /v1/models (comboContext.js). The two used to be
+              // separate copies with different conditions, so the badge here
+              // and the window Hermes reads over the API could disagree.
+              const effective = resolveComboContextWindow(
+                combo,
+                (combo.models || []).map((m) => getCaps?.(m)?.contextWindow),
+              );
+              if (effective == null) return null;
+              const overridden = hasContextOverride(combo);
               return (
                 <div className="mt-1.5 inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5">
                   <span className="material-symbols-outlined text-primary text-[12px]">contextual_token</span>
                   <span className="text-[10px] font-medium text-primary">
-                    {(effective / 1000).toLocaleString()}K context{Number.isFinite(Number(combo.contextWindow)) ? " (override)" : ""}
+                    {(effective / 1000).toLocaleString()}K context{overridden ? " (override)" : ""}
                   </span>
                 </div>
               );

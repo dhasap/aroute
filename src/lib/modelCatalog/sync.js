@@ -82,21 +82,34 @@ function slim(catalog) {
 }
 
 // models.dev prices each model per provider, and a free gateway listing $0
-// must not mask what the model actually costs — so only non-zero rates vote
-// and the most common one wins (a single reseller's markup loses to the crowd).
+// must not mask what the model actually costs — so when a model has ANY
+// non-zero rate, only the non-zero rates vote and the most common one wins
+// (a single reseller's markup loses to the crowd).
+// A model that every gateway lists as $0 is genuinely free, and that used to
+// be dropped along with the rest, leaving the model with NO price at all: the
+// Usage page then could not tell "free" from "we have no idea", and a model
+// with usage but no catalog entry read as a suspicious $0. Recorded explicitly
+// instead.
 // Returns { [modelId]: { input, output, cached, cache_creation } } in $/1M.
-function collectPricing(catalog) {
+// Exported for tests: the free-vs-paid voting rule is the whole point of the
+// catalog price, and a silent regression here quietly zeroes every cost.
+export function collectPricing(catalog) {
   const votes = {};
+  const freeVotes = {};
   for (const provider of Object.values(catalog)) {
     for (const [modelId, model] of Object.entries(provider?.models || {})) {
       const cost = model?.cost;
       if (!cost) continue;
       const input = Number(cost.input) || 0;
       const output = Number(cost.output) || 0;
-      if (input <= 0 && output <= 0) continue;
+      const id = baseId(modelId);
+      if (input <= 0 && output <= 0) {
+        freeVotes[id] = (freeVotes[id] || 0) + 1;
+        continue;
+      }
       const cacheRead = Number(cost.cache_read) || 0;
       const cacheWrite = Number(cost.cache_write) || 0;
-      const bucket = votes[baseId(modelId)] || (votes[baseId(modelId)] = {});
+      const bucket = votes[id] || (votes[id] = {});
       const key = `${input}|${output}|${cacheRead}`;
       const hit = bucket[key] || (bucket[key] = { count: 0, input, output, cacheRead, cacheWrite });
       hit.count++;
@@ -112,6 +125,13 @@ function collectPricing(catalog) {
       cached: best.cacheRead,
       cache_creation: best.cacheWrite,
     };
+  }
+  // Free on every gateway that lists it: an explicit $0 beats no entry at all.
+  // A single non-zero vote anywhere already put the model in `pricing`, so this
+  // can never downgrade a paid model to free.
+  for (const [id, count] of Object.entries(freeVotes)) {
+    if (count === 0 || pricing[id]) continue;
+    pricing[id] = { input: 0, output: 0, cached: 0, cache_creation: 0 };
   }
   return pricing;
 }

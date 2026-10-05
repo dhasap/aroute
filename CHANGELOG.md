@@ -5,7 +5,8 @@
 - **Mobile**: model-row actions (test/copy/delete) no longer hover-only on touch — visible below `sm`.
 - **Nous Research provider**: new `nous` provider (aliases `nousresearch`, `nous-portal`) on the OpenAI-compatible Nous Portal inference API (`inference-api.nousresearch.com/v1`) — official NOUS logo (`/providers/nous.png`), 50 seeded chat models led by all 7 live-verified free-tier models (probed 200; dead zero-price entries excluded), `modelsFetcher` refreshes the full 400+ list, `passthroughModels` accepts any other id. Dual auth: **OAuth device-code login** (`hermes-cli` public client, scope `inference:invoke`, same flow as `hermes auth add nous` — refresh rides the single-use `x-nous-refresh-token` header) **and** API-key (Portal `sk-` key / `NOUS_API_KEY`).
 - **Providers detail page — auto-updating model catalog**: the `nous-free` / `nous` suggested-models filters return the live Nous catalog with per-model `free` flags (zero-priced or `:free`, minus probed-dead ids and `:batch`); the page refetches on load and every 10 min while open, so ids that appear/expire every few days track without a reseed. With `mergeIntoList` the fetched catalog feeds the main model list (cursor-style live list), free models carry `isFree` → green FREE badge, and quick-add suggestions only ever offer free models.
-- **Providers detail page — "Free only" toggle**: filter the model list down to free models (count shown); appears only when the provider has free models, and the checked state persists across page refreshes (localStorage `providers_free_only`). The toggle is part of the models API request itself: checked sends `freeOnly=1` (backend narrows every filter type to free models), unchecked fetches the full catalog — each scope cached and auto-refreshed separately.
+- **Providers detail page — "Free only" toggle**: filter the model list down to free models (count shown); appears only when the provider has free models, and the checked state persists across page refreshes (localStorage `providers_free_only`, mirrored to settings under `freeOnlyProviders` so the gateway sees it too). The toggle is part of the models API request itself: checked sends `freeOnly=1` (backend narrows every filter type to free models), unchecked fetches the full catalog — each scope cached and auto-refreshed separately.
+- **"Free only" now reaches the gateway**: toggling it on a provider page persists to settings, and `GET /v1/models` narrows that provider to its free models too — the list a client auto-detects matches what the dashboard renders (verified live: Nous goes 50 → 7 models, and only while that one provider is marked). "Free" is now one shared rule (`shared/utils/isFreeModel`, registry `isFree` flag + `:free` suffix) instead of a copy that existed only inside the provider page.
 - **Prebuilt release**: a self-contained standalone bundle is published under
   [Releases](https://github.com/dhasap/aroute/releases) (`aroute-v0.5.75-prebuilt`, 23 MB) so a fresh
   machine can run ARoute with `tar -xzf … && node custom-server.js --port 20128` — no `npm install`,
@@ -22,6 +23,19 @@
   genuinely $0.
 
 ## Fixes
+- **Combo context: one rule instead of two**: the combos dashboard and `/v1/models` each carried their
+  own copy of the effective-window calculation, and they disagreed on non-positive overrides — an
+  override of `0` rendered as "0K context" on screen while the API reported the member maximum. Both
+  now call `resolveComboContextWindow` (`shared/utils/comboContext.js`), which also treats `null`,
+  `""` and `"auto"` as *auto* rather than letting `Number("") === 0` become an override of zero, and
+  `hasContextOverride` is derived from the same conditions so the "(override)" label can't claim one.
+  Verified end-to-end against the live gateway: override `77777` → `context_length: 77777`; cleared →
+  member maximum; persisted combo rows now return what was actually written to the database.
+- **Usage — free models carry an explicit $0 price**: `collectPricing` skipped all-zero listings
+  entirely, so a model every gateway listed as free had *no* price at all and read as "unknown"
+  instead of free. All-zero models are now recorded as `{input: 0, output: 0}` (non-zero rates still
+  win the vote, so a free gateway can't mask a real price), which means every model with traffic now
+  resolves a price — 9 of them are genuinely free, none are missing.
 - **Provider page — "Test All" on KiosAPI no longer reports `No free models to test`**: the sweep's free
   check received only the model id (`isFreeModel({ id })`), which drops the registry `isFree` flag, so
   the `":free"` suffix became the only way to qualify — and KiosAPI's ids are plain (`mimo-v2.6-flash`).

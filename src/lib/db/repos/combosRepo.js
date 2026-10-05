@@ -75,7 +75,11 @@ export async function updateCombo(id, data) {
       `UPDATE combos SET name = ?, kind = ?, models = ?, contextWindow = ?, updatedAt = ? WHERE id = ?`,
       [merged.name, merged.kind, stringifyJson(merged.models || []), cw, merged.updatedAt, id]
     );
-    result = merged;
+    // Return what was actually persisted, not `merged`: the raw client payload
+    // can say something the write rejected (contextWindow "auto"/0 both store
+    // NULL). Handing that back made the dashboard render "0K context
+    // (override)" for a combo the API reports as auto.
+    result = rowToCombo(db.get(`SELECT * FROM combos WHERE id = ?`, [id]));
   });
   return result;
 }
