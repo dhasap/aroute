@@ -23,6 +23,15 @@
   genuinely $0.
 
 ## Fixes
+- **`.env.example` no longer carries live secrets**: it is a tracked file in a public repository, and it
+  held the running instance's real `JWT_SECRET`, `API_KEY_SECRET`, `MACHINE_ID_SALT`, `DATA_DIR` and
+  instance URLs — with `JWT_SECRET` unique to this install, anyone reading the repo could mint a valid
+  session cookie. All secret values are now empty placeholders plus a warning header, so the file is a
+  template again (`cp .env.example .env` then fill in your own). The prebuilt release bundle also
+  excluded `.env` — Next.js copies it into `.next/standalone`, so a tarball of that directory shipped
+  the whole file including `INITIAL_PASSWORD`; the bundle now builds with `--exclude=./.env` and is
+  verified to boot without one (first run generates its own `jwt-secret`, and remote access stays
+  blocked until the default password is changed).
 - **Combo context: one rule instead of two**: the combos dashboard and `/v1/models` each carried their
   own copy of the effective-window calculation, and they disagreed on non-positive overrides — an
   override of `0` rendered as "0K context" on screen while the API reported the member maximum. Both
