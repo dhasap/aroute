@@ -159,6 +159,22 @@ export const PROVIDER_CAPABILITIES = {
     "deepseek-ai/deepseek-v4-pro": { reasoning: true, thinkingFormat: "openai", contextWindow: 1000000, maxOutput: 65536 },
     "deepseek-ai/deepseek-v4-flash": { reasoning: true, thinkingFormat: "openai", contextWindow: 1000000, maxOutput: 65536 },
   },
+  // KiosAPI (kiosapi.com) — unified OpenAI-compatible relay: its /v1/chat/completions
+  // rejects vendor-native thinking params (`enable_thinking`, `thinking:{type}` → 400
+  // "Unsupported parameter(s)") even for the models those params belong to. Only
+  // OpenAI-style reasoning_effort is accepted (probed live: none/minimal/low/medium/
+  // high/xhigh/max all 200 on glm-5.3-free, deepseek-v4-flash-free). Force the openai
+  // wire format for GLM/DeepSeek ids here so the zai/deepseek pattern caps don't inject
+  // native params through this relay. Qwen ids are left alone: the qwen format's
+  // enable_thinking/budget IS accepted by kios (probed 200) and budgeted thinking
+  // (THINK:8k) is in daily use via combo mimotria.
+  "kios": {
+    "glm-5.3-free":                { reasoning: true, thinkingFormat: "openai", thinkingCanDisable: true, contextWindow: 200000, maxOutput: 128000 },
+    "glm-5.3-flash-free":          { reasoning: true, thinkingFormat: "openai", thinkingCanDisable: true, contextWindow: 200000, maxOutput: 128000 },
+    "deepseek-v4-flash-free":      { reasoning: true, thinkingFormat: "openai", thinkingCanDisable: true, contextWindow: 1000000, maxOutput: 384000 },
+    "deepseek-v4.1-flash-free":    { reasoning: true, thinkingFormat: "openai", thinkingCanDisable: true, contextWindow: 1000000, maxOutput: 128000 },
+    "deepseek-v4-flash-vision-exp-free": { vision: true, reasoning: true, thinkingFormat: "openai", thinkingCanDisable: true, contextWindow: 1000000, maxOutput: 384000 },
+  },
   "codex": {
     "gpt-6-astra":               { vision: true, reasoning: true, search: true, thinkingFormat: "openai", contextWindow: 272000, maxOutput: 128000 },
     "gpt-5.6-sol":               CODEX_GPT_56_SOL_CAPS,

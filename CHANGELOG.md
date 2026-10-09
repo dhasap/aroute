@@ -1,5 +1,15 @@
 # Unreleased
 
+## Fixes
+- **kios thinking params 400 fixed**: KiosAPI's relay rejects vendor-native thinking
+  parameters (`enable_thinking`, `thinking:{type}` → 400 "Unsupported parameter(s)") even for
+  the models they belong to; only OpenAI-style `reasoning_effort` is accepted. GLM/DeepSeek
+  ids on kios now force the `openai` thinking wire format via `PROVIDER_CAPABILITIES["kios"]`
+  (probed live: all 7 reasoning_effort levels 200 on glm-5.3-free & deepseek-v4-flash-free),
+  so requests with thinking disabled no longer burn 25–50 s on a doomed 400 before combo
+  fallback. Qwen ids keep the `qwen` format — kios accepts their `enable_thinking`/budget
+  (THINK:8k in daily use). Locked by `tests/unit/kios-thinking-format.test.js`.
+
 ## Features
 - **Model health sweep**: "Test All Models" on the Providers page pings every model of every active connection through the internal `/v1` path (per-kind probe, per-provider warm-up + parallel), grouped results in a modal. API: `POST /api/models/test-all`.
 - **Mobile**: model-row actions (test/copy/delete) no longer hover-only on touch — visible below `sm`.
