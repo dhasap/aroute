@@ -11,6 +11,7 @@ import { buildRequestDetail, extractRequestConfig, extractUsageFromResponse, sav
 import { appendRequestLog, saveRequestDetail } from "@/lib/usageDb.js";
 import { decloakToolNames } from "../../utils/claudeCloaking.js";
 import { ROLE, RESPONSES_ITEM } from "../../translator/schema/index.js";
+import { scrubResponseText } from "../../utils/leakedMarkup.js";
 
 function parseToolArguments(value) {
   if (!value) return {};
@@ -143,6 +144,10 @@ function openAICompletionToResponses(responseBody, customToolNames = null) {
  * Translate non-streaming response body from provider format → OpenAI format.
  */
 export function translateNonStreamingResponse(responseBody, targetFormat, sourceFormat, customToolNames = null) {
+  // Provider-side tool-call markup leaking into the text channel reaches every
+  // conversion below, so scrub the source body once here.
+  scrubResponseText(responseBody);
+
   if (targetFormat === sourceFormat) return responseBody;
   // Provider responded in OpenAI Chat Completions shape but the client speaks
   // Responses API — convert so tool_calls/text surface as Responses `output`.

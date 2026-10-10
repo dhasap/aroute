@@ -5,6 +5,7 @@ import { FORMATS } from "../../translator/formats.js";
 import { PROVIDERS } from "../../config/providers.js";
 import { buildRequestDetail, extractRequestConfig, saveUsageStats, formatDoneLine } from "./requestDetail.js";
 import { ROLE, RESPONSES_ITEM } from "../../translator/schema/index.js";
+import { scrubLeakedMarkup } from "../../utils/leakedMarkup.js";
 
 // Responses-API providers (e.g. codex) may emit SSE without content-type + use Responses output shape
 const isResponsesProvider = (p) => PROVIDERS[p]?.format === FORMATS.OPENAI_RESPONSES;
@@ -158,7 +159,10 @@ export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
     }
   }
 
-  const message = { role: "assistant", content: contentParts.join("") || (toolCallMap.size > 0 ? null : "") };
+  // Scrub the provider's leaked tool-call markup out of the text channel before
+  // the message is assembled (see utils/leakedMarkup.js).
+  const assistantText = scrubLeakedMarkup(contentParts.join(""));
+  const message = { role: "assistant", content: assistantText || (toolCallMap.size > 0 ? null : "") };
   if (reasoningParts.length > 0) message.reasoning_content = reasoningParts.join("");
   if (toolCallMap.size > 0) {
     message.tool_calls = [...toolCallMap.entries()].sort((a, b) => a[0] - b[0]).map(([, tc]) => tc);

@@ -3,6 +3,7 @@ import { FORMATS } from "../translator/formats.js";
 import { trackPendingRequest, appendRequestLog } from "@/lib/usageDb.js";
 import { extractUsage, mergeUsage, hasValidUsage, estimateUsage, logUsage, addBufferToUsage, filterUsageForFormat, COLORS } from "./usageTracking.js";
 import { parseSSELine, hasValuableContent, fixInvalidId, formatSSE } from "./streamHelpers.js";
+import { createLeakedMarkupScrubber, scrubChunkContent, scrubLeakedMarkupTail } from "./leakedMarkup.js";
 import { getOpenAIResponsesEventName, isOpenAIResponsesTerminalEvent, formatIncompleteOpenAIResponsesStreamFailure } from "./responsesStreamHelpers.js";
 import { dbg, isDebugEnabled } from "./debugLog.js";
 
@@ -55,6 +56,10 @@ export function createSSEStream(options = {}) {
 
   let buffer = "";
   let usage = null;
+
+  // Scrubs in-band tool-call markup (DeepSeek dsml) that upstreams leak into the
+  // text channel — stateful because the marker can be split across deltas.
+  const contentScrubber = createLeakedMarkupScrubber();
 
   // Per-stream decoder with stream:true to correctly handle multi-byte chars split across chunks
   const decoder = new TextDecoder("utf-8", { fatal: false });
@@ -178,7 +183,16 @@ export function createSSEStream(options = {}) {
                 }
               }
 
+              // In-band tool-call markup (DeepSeek dsml) leaks into the text
+              // channel while the calls themselves are extracted upstream —
+              // scrub it here so clients never render it as assistant prose.
+              const contentScrubbed = scrubChunkContent(parsed, contentScrubber, FORMATS.OPENAI);
+
               if (!hasValuableContent(parsed, FORMATS.OPENAI)) {
+                // A chunk whose only content was the leaked markup is empty now. If
+                // it also carried usage, that total must not be dropped with it.
+                const droppedUsage = contentScrubbed ? extractUsage(parsed) : null;
+                if (droppedUsage) usage = mergeUsage(usage, droppedUsage);
                 continue;
               }
 
@@ -213,7 +227,7 @@ export function createSSEStream(options = {}) {
                 parsed.usage = filterUsageForFormat(buffered, FORMATS.OPENAI);
                 output = `data: ${JSON.stringify(parsed)}\n`;
                 injectedUsage = true;
-              } else if (idFixed || fieldsInjected) {
+              } else if (idFixed || fieldsInjected || contentScrubbed) {
                 output = `data: ${JSON.stringify(parsed)}\n`;
                 injectedUsage = true;
               }
@@ -245,6 +259,10 @@ export function createSSEStream(options = {}) {
 
         const parsed = parseSSELine(trimmed, targetFormat);
         if (!parsed) continue;
+
+        // Same leak on translated routes: scrub the provider chunk's text channel
+        // before it is translated into the client's format.
+        scrubChunkContent(parsed, contentScrubber, targetFormat);
 
         // Responses API same-format passthrough: preserve event framing + track terminal state
         const isOpenAIResponsesStream = targetFormat === FORMATS.OPENAI_RESPONSES;
@@ -392,6 +410,22 @@ export function createSSEStream(options = {}) {
             controller.enqueue(sharedEncoder.encode(output));
           }
 
+          // Release a text tail the scrubber held back (it looked like the start
+          // of a leaked marker until the stream ended). Marker fragments come back
+          // empty; real text is forwarded in one closing content chunk.
+          const heldTail = scrubLeakedMarkupTail(contentScrubber.flush());
+          if (heldTail) {
+            const tailOutput = `data: ${JSON.stringify({
+              id: `chatcmpl-${Date.now()}`,
+              object: "chat.completion.chunk",
+              created: Math.floor(Date.now() / 1000),
+              model: model || "unknown",
+              choices: [{ index: 0, delta: { content: heldTail }, finish_reason: null }],
+            })}\n`;
+            reqLogger?.appendConvertedChunk?.(tailOutput);
+            controller.enqueue(sharedEncoder.encode(tailOutput));
+          }
+
           // IMPORTANT: In passthrough mode we still must terminate the SSE stream.
           // Some clients (e.g. OpenClaw) expect the OpenAI-style sentinel:
           //   data: [DONE]\n\n
@@ -419,6 +453,9 @@ export function createSSEStream(options = {}) {
           // counts — so it has to go through.
           const isDoneSentinel = parsed?.done && targetFormat !== FORMATS.OLLAMA;
           if (parsed && !isDoneSentinel) {
+            // Same provider-side markup leak, on the tail chunk of a translated stream.
+            scrubChunkContent(parsed, contentScrubber, targetFormat);
+
             // Same accumulation the transform loop does, so finalizeStream() can
             // log a tail chunk's tokens instead of falling back to null.
             const extracted = extractUsage(parsed);
@@ -445,6 +482,10 @@ export function createSSEStream(options = {}) {
         }
 
         const flushed = translateResponse(targetFormat, sourceFormat, null, state);
+
+        // Translated routes cannot inject a content chunk this late, so a held
+        // back tail is dropped rather than emitted (see leakedMarkup.js).
+        contentScrubber.flush();
 
         if (flushed?._openaiIntermediate) {
           for (const item of flushed._openaiIntermediate) {
