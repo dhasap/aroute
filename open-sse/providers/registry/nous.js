@@ -52,7 +52,6 @@ export default {
     { id: "meituan/longcat-2.5-preview:free", isFree: true, name: "LongCat 2.5 Preview (free)" },
     { id: "poolside/laguna-s-2.1:free", isFree: true, name: "Laguna S 2.1 (free)" },
     { id: "poolside/laguna-xs-2.1:free", isFree: true, name: "Laguna XS 2.1 (free)" },
-    { id: "stealth/space-bunny-alpha", isFree: true, name: "Space Bunny Alpha (free)" },
     { id: "anthropic/claude-fable-5.1", name: "Claude Fable 5.1" },
     { id: "anthropic/claude-fable-5", name: "Claude Fable 5" },
     { id: "anthropic/claude-opus-5", name: "Claude Opus 5" },

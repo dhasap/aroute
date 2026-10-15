@@ -1,8 +1,11 @@
 /**
  * Grok CLI / Grok Build (cli-chat-proxy.grok.com)
  *
- * Source of truth: wire capture of official @xai-official/grok 0.2.99
+ * Source of truth: wire capture of official @xai-official/grok CLI,
  * talking to https://cli-chat-proxy.grok.com (OpenAI Responses API).
+ * Client version/header contract bumped to 1.0.52 (2026-10) — older
+ * version headers are rejected upstream with HTTP 426/503
+ * ("Your Grok CLI version is outdated. Please update to version 1.0.13 or later").
  *
  * Distinct from:
  *  - `xai`      → api.x.ai (API key / xAI API OAuth PKCE)
@@ -73,6 +76,19 @@ export default {
       contextLength: 500000,
       maxOutputTokens: 64000,
     },
+    // Live catalog (2026-10, verified via GET /v1/models with CLI 1.0.52):
+    // grok-4.7 "SpaceXAI's latest frontier model", context_window 256000
+    // (context_windows [256000, 500000]), efforts xhigh/high/medium/low,
+    // default high. grok-4.6 confirmed working on the same /v1/responses route.
+    { id: "grok-4.7", name: "Grok 4.7", contextLength: 256000, maxOutputTokens: 64000 },
+    { id: "grok-4.7-xhigh", name: "Grok 4.7 (Extra High)", upstreamModelId: "grok-4.7" },
+    { id: "grok-4.7-high", name: "Grok 4.7 (High)", upstreamModelId: "grok-4.7" },
+    { id: "grok-4.7-medium", name: "Grok 4.7 (Medium)", upstreamModelId: "grok-4.7" },
+    { id: "grok-4.7-low", name: "Grok 4.7 (Low)", upstreamModelId: "grok-4.7" },
+    { id: "grok-4.6", name: "Grok 4.6" },
+    { id: "grok-4.6-high", name: "Grok 4.6 (High)", upstreamModelId: "grok-4.6" },
+    { id: "grok-4.6-medium", name: "Grok 4.6 (Medium)", upstreamModelId: "grok-4.6" },
+    { id: "grok-4.6-low", name: "Grok 4.6 (Low)", upstreamModelId: "grok-4.6" },
     { id: "grok-4.5", name: "Grok 4.5" },
     { id: "grok-4.5-high", name: "Grok 4.5 (High)", upstreamModelId: "grok-4.5" },
     { id: "grok-4.5-medium", name: "Grok 4.5 (Medium)", upstreamModelId: "grok-4.5" },

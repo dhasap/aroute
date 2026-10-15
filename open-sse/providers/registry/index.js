@@ -84,6 +84,7 @@ import p81 from "./searxng.js";
 import p82 from "./serper.js";
 import p83 from "./siliconflow.js";
 import p84 from "./stability-ai.js";
+import p127 from "./talknova.js";
 import p85 from "./tavily.js";
 import p86 from "./together.js";
 import p87 from "./topaz.js";
@@ -212,6 +213,7 @@ export default [
   p82,
   p83,
   p84,
+  p127,
   p85,
   p86,
   p87,
