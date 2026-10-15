@@ -136,6 +136,27 @@ const LIVE_MODEL_RESOLVERS = {
         })),
     };
   },
+  // KiosAPI rotates its free-group catalog quickly (ids appear/disappear within
+  // days), so prefer the live token-scoped list over the static seed. The
+  // Cloudflare-fronted endpoint rejects default runtime UAs with 1010, hence
+  // the browser UA. Any failure falls back to the seed via `return null`.
+  kios: async (conn) => {
+    if (!conn.apiKey) return null;
+    const res = await fetch("https://kiosapi.com/v1/models", {
+      headers: {
+        "Authorization": "Bearer" + " " + conn.apiKey,
+        "User-Agent":
+          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36",
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const models = (data?.data || [])
+      .filter((m) => typeof m?.id === "string" && m.id)
+      .map((m) => ({ id: m.id }));
+    return models.length ? { models } : null;
+  },
 };
 
 const parseOpenAIStyleModels = (data) => {

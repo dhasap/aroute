@@ -71,6 +71,7 @@ vi.mock("../../open-sse/rtk/index.js", () => ({
 vi.mock("../../open-sse/rtk/headroom.js", () => ({
   compressWithHeadroom: vi.fn(async () => null),
   formatHeadroomLog: vi.fn(() => ""),
+  formatHeadroomSizeLog: vi.fn(() => ""),
 }));
 
 vi.mock("../../open-sse/providers/capabilities.js", () => ({
@@ -149,5 +150,37 @@ describe("forceStream provider config", () => {
 
     expect(executeMock).toHaveBeenCalledTimes(1);
     expect(executeMock.mock.calls[0][0].stream).toBe(true);
+  });
+
+  it("syncs the resolved stream decision onto the outbound body when the client omits stream", async () => {
+    const { handleChatCore } = await import("../../open-sse/handlers/chatCore.js");
+
+    // Non-forceStream provider, no Accept preference, no body.stream:
+    // the run resolves to streaming, so the outbound body must carry
+    // stream:true — same-format requests skip every request translator,
+    // and an executor that only reads `stream` for headers would ship a
+    // spec-default non-streaming body to the upstream (solid JSON piped
+    // through the SSE path, with a trailing "data: [DONE]").
+    const opts = makeOptions(undefined);
+    opts.modelInfo = { provider: "deepseek", model: "deepseek-chat" };
+    delete opts.clientRawRequest.headers.accept;
+
+    await handleChatCore(opts);
+
+    expect(executeMock).toHaveBeenCalledTimes(1);
+    expect(executeMock.mock.calls[0][0].body.stream).toBe(true);
+  });
+
+  it("keeps an explicit client stream:false on the outbound body", async () => {
+    const { handleChatCore } = await import("../../open-sse/handlers/chatCore.js");
+
+    const opts = makeOptions(false);
+    opts.modelInfo = { provider: "deepseek", model: "deepseek-chat" };
+    delete opts.clientRawRequest.headers.accept;
+
+    await handleChatCore(opts);
+
+    expect(executeMock).toHaveBeenCalledTimes(1);
+    expect(executeMock.mock.calls[0][0].body.stream).toBe(false);
   });
 });

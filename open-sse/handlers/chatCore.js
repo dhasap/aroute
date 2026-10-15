@@ -214,6 +214,19 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
   // Covers both passthrough (source shape) and translated (target shape) flows
   const finalFormat = passthrough ? sourceFormat : targetFormat;
 
+  // Sync the resolved stream decision onto the outbound body. Same-format
+  // requests (e.g. OpenAI→OpenAI) and native passthrough never run a request
+  // translator, and executors only read `stream` for the Accept header/URL —
+  // so when the client omits the field, the upstream sees a body whose spec
+  // default is non-streaming, answers with solid JSON, and this handler (set
+  // up for SSE) pipes that JSON through verbatim plus a trailing
+  // "data: [DONE]" — a body that is neither valid JSON nor valid SSE.
+  // OpenAI- and Claude-format bodies both carry an explicit boolean `stream`.
+  if (translatedBody && typeof translatedBody === "object"
+      && (finalFormat === FORMATS.OPENAI || finalFormat === FORMATS.CLAUDE)) {
+    translatedBody.stream = stream;
+  }
+
   // Request line: one correlated summary (fmt + thinking + counts + account)
   if (log?.line) {
     const clientModel = clientRawRequest?.body?.model || `${provider}/${model}`;
