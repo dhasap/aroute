@@ -27,10 +27,10 @@ describe("kios — official KiosAPI free provider", () => {
   });
 
   it("seeds all live Free-group models, flagged free, proven combo model first", () => {
-    expect(kios.models).toHaveLength(37);
+    expect(kios.models).toHaveLength(40);
     expect(kios.models.every((m) => m.isFree === true)).toBe(true);
-    expect(new Set(kios.models.map((m) => m.id)).size).toBe(37);
-    expect(kios.models[0].id).toBe("mimo-v2.6-flash"); // combo mimotria member
+    expect(new Set(kios.models.map((m) => m.id)).size).toBe(40);
+    expect(kios.models[0].id).toBe("lfm-2.5-2.6b"); // first live-catalog id (2026-10)
     for (const m of kios.models) expect(m.name).toBeTruthy();
   });
 
@@ -44,7 +44,7 @@ describe("kios — official KiosAPI free provider", () => {
     expect(resolveProviderAlias("kios")).toBe("kios");
     expect(resolveProviderAlias("kiosapi")).toBe("kios");
     expect(resolveProviderAlias("kios-api")).toBe("kios");
-    expect(PROVIDER_MODELS.kios).toHaveLength(37);
+    expect(PROVIDER_MODELS.kios).toHaveLength(40);
     expect(PROVIDER_ID_TO_ALIAS.kios).toBe("kios");
   });
 });

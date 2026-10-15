@@ -7,7 +7,6 @@ import nous from "../../open-sse/providers/registry/nous.js";
 const CATALOG = [
   { id: "stepfun/step-3.7-flash:free", name: "StepFun: Step 3.7 Flash", context_length: 262144, pricing: { prompt: "0.0000000000", completion: "0.0000000000" } },
   { id: "inclusionai/ling-3.1-flash", name: "InclusionAI: Ling 3.1 Flash", context_length: 262144, pricing: { prompt: "0", completion: "0" } },
-  { id: "stealth/space-bunny-alpha", name: "Stealth: Space Bunny Alpha", context_length: 131072, pricing: { prompt: "0", completion: "0", input_cache_read: "0" } },
   { id: "meituan/longcat-2.5-preview:free", name: "Meituan: LongCat 2.5 Preview", context_length: 262144, pricing: { prompt: "0.0", completion: "0.0" } },
   // dead free ids — still zero-priced in the catalog, must be excluded
   { id: "inclusionai/ling-3.0-flash-fin:free", name: "dead fin", context_length: 131072, pricing: { prompt: "0", completion: "0" } },
@@ -27,7 +26,6 @@ describe("nous-free filter (auto-updating free model list)", () => {
     expect(result.map((m) => m.id)).toEqual([
       "inclusionai/ling-3.1-flash",
       "meituan/longcat-2.5-preview:free",
-      "stealth/space-bunny-alpha",
       "stepfun/step-3.7-flash:free",
     ]);
   });
@@ -64,7 +62,6 @@ describe("nous full-catalog filter (Free-only OFF) + onlyFree narrowing", () => 
       "inclusionai/ling-3.1-flash",
       "meituan/longcat-2.5-preview:free",
       "mystery/no-pricing",
-      "stealth/space-bunny-alpha",
       "stepfun/step-3.7-flash:free",
     ]);
   });
@@ -83,7 +80,7 @@ describe("nous full-catalog filter (Free-only OFF) + onlyFree narrowing", () => 
 
   it("onlyFree narrows any filter output the way freeOnly=1 does", () => {
     expect(onlyFree(full).every((m) => m.free === true)).toBe(true);
-    expect(onlyFree(full).length).toBe(4);
+    expect(onlyFree(full).length).toBe(3); // space-bunny-alpha dropped from live catalog
     expect(onlyFree([])).toEqual([]);
     expect(onlyFree(null)).toEqual([]);
   });
@@ -106,7 +103,6 @@ describe("nous registry wiring for the free-tier features", () => {
       "meituan/longcat-2.5-preview:free",
       "poolside/laguna-s-2.1:free",
       "poolside/laguna-xs-2.1:free",
-      "stealth/space-bunny-alpha",
       "stepfun/step-3.7-flash:free",
     ]);
   });
