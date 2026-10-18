@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./images/aroute.png?2" alt="ARoute Dashboard" width="800"/>
+  <img src="./images/aroute.png?3" alt="ARoute Dashboard" width="800"/>
   
   # ARoute - FREE AI Router & Token Saver
   
