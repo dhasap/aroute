@@ -121,7 +121,7 @@ export async function POST(request) {
         connectionProxyUrl: "",
         connectionNoProxy: "",
         sidecarPort: port,
-        baseUrl: `http://127.0.0.1:${port}/openai/v1/chat/completions`,
+        baseUrl: `http://127.0.0.1:${process.env.PORT || 20128}/geminiweb/${port}/openai/v1/chat/completions`,
       };
       const created = await createProviderConnection({
         provider: "geminiweb",
@@ -158,7 +158,7 @@ export async function POST(request) {
       providerSpecificData: {
         ...(conn.providerSpecificData || {}),
         sidecarPort: port,
-        baseUrl: `http://127.0.0.1:${port}/openai/v1/chat/completions`,
+        baseUrl: `http://127.0.0.1:${process.env.PORT || 20128}/geminiweb/${port}/openai/v1/chat/completions`,
       },
     });
 

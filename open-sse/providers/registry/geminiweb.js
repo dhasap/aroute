@@ -28,7 +28,7 @@ export default {
   authType: "apikey",
   authModes: ["apikey"],
   transport: {
-    baseUrl: "http://127.0.0.1:4981/openai/v1/chat/completions",
+    baseUrl: "http://127.0.0.1:20128/geminiweb/4981/openai/v1/chat/completions",
     validateUrl: "http://127.0.0.1:4981/openai/v1/models",
     thinkingFormat: "openai",
   },

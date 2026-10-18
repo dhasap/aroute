@@ -72,6 +72,7 @@ http.createServer = (...args) => {
     req.headers["x-9r-real-ip"] = ip;
     req.headers["x-9r-peer-token"] = PEER_TOKEN;
     if (viaProxy) req.headers["x-9r-via-proxy"] = "1";
+    if (tryGeminiWebRequest(req, res)) return;
     return handler(req, res);
   };
   const server = origCreate(...rest, wrapped);
@@ -160,7 +161,7 @@ function startGeminiWebSidecar(port = GEMINI_WEB_PORT, cookie = null) {
     try { prev.child.kill("SIGKILL"); } catch {}
     geminiWebChildren.delete(port);
   }
-  const env = { ...process.env, PORT: port };
+  const env = { ...process.env, PORT: port, HOST: "127.0.0.1" };
   if (cookie) env.GEMINI_COOKIES = cookie;
   const child = spawn(bin, [], {
     cwd: path.dirname(bin),
@@ -183,6 +184,33 @@ function startGeminiWebSidecar(port = GEMINI_WEB_PORT, cookie = null) {
     setTimeout(() => startGeminiWebSidecar(port, cur.cookie), delay);
   });
   console.log(`${tag} sidecar starting${cookie ? " (account cookie)" : ""} (pid ${child.pid})`);
+}
+
+
+// ── Unified Gemini Web proxy ──────────────────────────────────────────────────
+// All Gemini Web traffic flows through the main ARoute port under /geminiweb/<port>/...
+// Sidecars themselves bind loopback only (HOST=127.0.0.1) — never exposed directly.
+function tryGeminiWebRequest(req, res) {
+  const m = String(req.url || "").match(/^\/geminiweb\/(\d+)(\/.*)$/);
+  if (!m) return false;
+  const targetPort = m[1];
+  const innerPath = m[2];
+  const fwdHeaders = { ...req.headers };
+  delete fwdHeaders.host;
+  delete fwdHeaders.connection;
+  const preq = http.request(
+    { host: "127.0.0.1", port: targetPort, path: innerPath, method: req.method, headers: fwdHeaders },
+    (pres) => {
+      res.writeHead(pres.statusCode, pres.headers);
+      pres.pipe(res);
+    }
+  );
+  preq.on("error", (e) => {
+    if (!res.headersSent) res.writeHead(502, { "content-type": "application/json" });
+    res.end(JSON.stringify({ error: { message: `Gemini Web sidecar on port ${targetPort} unavailable: ${e.message}` } }));
+  });
+  req.pipe(preq);
+  return true;
 }
 
 function stopGeminiWebSidecar() {
