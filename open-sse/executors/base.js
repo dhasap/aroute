@@ -152,6 +152,13 @@ export class BaseExecutor {
         const cl = response.headers?.get?.("content-length") || "?";
         dbg("FETCH", `${this.provider.toUpperCase()} ← ${response.status} | ttft=${Date.now() - fetchT0}ms | ct=${ct} | cl=${cl}`);
 
+        // Optional per-attempt hook: lets provider executors observe each
+        // upstream response (e.g. to bench a proxy pool that just 403'd so
+        // the lazy connectionProxyUrl getter hops on the next retry).
+        if (this.onAttemptResult) {
+          try { this.onAttemptResult(response, urlIndex, { proxyOptions, headers }); } catch { /* fail-open */ }
+        }
+
         if (await tryRetry(urlIndex, response.status, `status ${response.status}`, response)) { urlIndex--; continue; }
 
         if (this.shouldRetry(response.status, urlIndex)) {

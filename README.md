@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./images/aroute.png?1" alt="ARoute Dashboard" width="800"/>
+  <img src="./images/aroute.png?2" alt="ARoute Dashboard" width="800"/>
   
   # ARoute - FREE AI Router & Token Saver
   
@@ -393,6 +393,16 @@ ARoute works seamlessly with all major AI coding tools:
         <img src="./public/providers/gemini.png" width="70" alt="Vertex AI"/><br/>
         <b>Vertex AI</b><br/>
         <sub>Gemini 3 Pro + GLM-5 + DeepSeek<br/>$300 credits free</sub>
+      </td>
+      <td align="center" width="150">
+        <img src="./public/providers/dahlglobal.png" width="70" alt="Dahl Global"/><br/>
+        <b>Dahl Global</b><br/>
+        <sub>MiniMax M2.7 + GLM 5.3 + DeepSeek V4<br/>First 100M tokens free</sub>
+      </td>
+      <td align="center" width="150">
+        <img src="./public/providers/geminiweb.png" width="70" alt="Gemini Web"/><br/>
+        <b>Gemini Web</b><br/>
+        <sub>Gemini 4 Argon / 3.8 Flash / 3.1 Pro<br/>Paste cookies • multi-account round-robin</sub>
       </td>
     </tr>
   </table>

@@ -7,6 +7,8 @@ import { injectReasoningContent } from "../utils/reasoningContentInjector.js";
 import { resolveSessionId } from "../utils/sessionManager.js";
 import { isMuseSparkModel } from "../providers/models/helpers.js";
 import { applyFingerprintTools } from "../utils/opencodeFingerprint.js";
+import { pickOpencodeProxy, reportOpencodeProxyResult } from "../utils/opencodeProxyRotation.js";
+import { reportPoolResult, pickHealthyPoolExcluding, isPoolCoolingDown } from "@/lib/network/connectionProxy.js";
 import { ANTHROPIC_API_VERSION } from "../providers/shared.js";
 import {
   normalizeResponsesInput,
@@ -421,6 +423,17 @@ export class OpenCodeExecutor extends BaseExecutor {
     super("opencode", PROVIDERS.opencode);
   }
 
+  // Upstream free-tier admission is probabilistic (~10-20% per request): a
+  // server-side pool admits only some requests and rejects the rest with
+  // 403 FreeTierError even for fully compliant fingerprints (verified by
+  // repeated identical probes — same session/tools/headers flip 403→200 with
+  // no client-visible cause). Retrying the same request until admission is
+  // the only reliable strategy; measured attempts-to-success: p50 ≈ 3, p95 ≈ 10.
+  shouldRetry(status, urlIndex) {
+    if (status === 403) return true; // FreeTierError admission lottery — always retry
+    return super.shouldRetry(status, urlIndex);
+  }
+
   prepareRequestCredentials({ body, credentials, providerSessionId, clientTool } = {}) {
     const sourceCredentials = credentials || {};
     const session = resolveOpencodeSession(body, sourceCredentials, providerSessionId, clientTool);
@@ -471,8 +484,56 @@ export class OpenCodeExecutor extends BaseExecutor {
     return injectReasoningContent({ provider: this.provider, model, body });
   }
 
+  // Per-attempt observer wired by the executor: bench a proxy that just
+  // failed so the lazy connectionProxyUrl getter hops before the next retry.
+  onAttemptResult(response, urlIndex, { proxyOptions }) {
+    const url = proxyOptions?.connectionProxyUrl || proxyOptions?.url;
+    if (!url) return;
+    reportPoolResult(url, response.ok);
+  }
+
   async execute(args) {
-    return super.execute({ ...args, credentials: this.prepareRequestCredentials(args) });
+    // Native rotation: the dashboard assigns a proxy pool per request via
+    // providerStrategies.rotateStrategy (round-robin over proxyPools). When
+    // that already configured a proxy, defer to it — our layer is only a
+    // fallback for the no-pool case (OPENCODE_PROXY_FILE).
+    const hasNativeProxy = args.proxyOptions?.connectionProxyEnabled && args.proxyOptions?.connectionProxyUrl;
+    const proxyUrl = hasNativeProxy ? null : pickOpencodeProxy();
+
+    let mergedProxyOptions = args.proxyOptions;
+    if (proxyUrl) {
+      mergedProxyOptions = {
+        ...(args.proxyOptions || {}),
+        enabled: true,
+        connectionProxyEnabled: true,
+        url: proxyUrl,
+        _opencodeProxyUrl: proxyUrl,
+      };
+    } else if (hasNativeProxy) {
+      // Lazily-evaluated proxy options: base.execute's retry loop re-reads
+      // connectionProxyUrl on every attempt, so each retry can hop to a
+      // different healthy pool instead of hammering one benched IP 11×.
+      mergedProxyOptions = {
+        ...args.proxyOptions,
+        get connectionProxyUrl() {
+          const cur = args.proxyOptions.connectionProxyUrl;
+          // Only hop after the current pool has been benched by a failure
+          // report; otherwise keep the assignment stable for this request.
+          return isPoolCoolingDown(cur)
+            ? (pickHealthyPoolExcluding(cur) || cur)
+            : cur;
+        },
+      };
+    }
+
+    const result = await super.execute({ ...args, credentials: this.prepareRequestCredentials(args), proxyOptions: mergedProxyOptions });
+    const usedProxyUrl = proxyUrl || (hasNativeProxy ? args.proxyOptions.connectionProxyUrl : null);
+    if (usedProxyUrl && result?.response) {
+      const ok = result.response.ok;
+      reportPoolResult(usedProxyUrl, ok);
+      if (proxyUrl) reportOpencodeProxyResult(proxyUrl, ok);
+    }
+    return result;
   }
 
   buildUrl(model) {

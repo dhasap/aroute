@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getProviderIconSrc, markProviderIconMissing } from "@/shared/utils/providerIcon";
-import { Card, Button, Badge, Input, Modal, CardSkeleton, OAuthModal, KiroOAuthWrapper, CursorAuthModal, XiaomiMimoAuthModal, IFlowCookieModal, GitLabAuthModal, Toggle, Select, EditConnectionModal, NoAuthProxyCard, ConfirmModal } from "@/shared/components";
+import { Card, Button, Badge, Input, Modal, CardSkeleton, OAuthModal, KiroOAuthWrapper, CursorAuthModal, XiaomiMimoAuthModal, IFlowCookieModal, GeminiWebCookieModal, GitLabAuthModal, Toggle, Select, EditConnectionModal, NoAuthProxyCard, ConfirmModal } from "@/shared/components";
 import { OAUTH_PROVIDERS, APIKEY_PROVIDERS, FREE_PROVIDERS, FREE_TIER_PROVIDERS, WEB_COOKIE_PROVIDERS, getProviderAlias, isOpenAICompatibleProvider, isAnthropicCompatibleProvider, AI_PROVIDERS } from "@/shared/constants/providers";
 import { getModelsByProviderId, getModelKind } from "@/shared/constants/models";
 import { getThinkingLevels } from "open-sse/providers/thinkingLevels.js";
@@ -57,6 +57,8 @@ export default function ProviderDetailPage() {
   const [showOAuthModal, setShowOAuthModal] = useState(false);
   const [showXiaomiMimoModal, setShowXiaomiMimoModal] = useState(false);
   const [showIFlowCookieModal, setShowIFlowCookieModal] = useState(false);
+  const [showGeminiWebCookieModal, setShowGeminiWebCookieModal] = useState(false);
+  const [geminiWebEditConnection, setGeminiWebEditConnection] = useState(null);
   const [showAddApiKeyModal, setShowAddApiKeyModal] = useState(false);
   const [addConnectionError, setAddConnectionError] = useState("");
   const [showBulkImportCodex, setShowBulkImportCodex] = useState(false);
@@ -68,6 +70,7 @@ export default function ProviderDetailPage() {
   const [modelAliases, setModelAliases] = useState({});
   const [customModels, setCustomModels] = useState([]);
   const [headerImgError, setHeaderImgError] = useState(false);
+  const [headerLogoFailed, setHeaderLogoFailed] = useState(false);
   const [modelTestResults, setModelTestResults] = useState({});
   const [modelsTestError, setModelsTestError] = useState("");
   const [testingModelIds, setTestingModelIds] = useState(() => new Set());
@@ -157,6 +160,7 @@ export default function ProviderDetailPage() {
         apiType: providerNode.apiType,
         baseUrl: providerNode.baseUrl,
         type: providerNode.type,
+        prefix: providerNode.prefix,
       }
     : (OAUTH_PROVIDERS[providerId] || APIKEY_PROVIDERS[providerId] || FREE_PROVIDERS[providerId] || FREE_TIER_PROVIDERS[providerId] || WEB_COOKIE_PROVIDERS[providerId]);
   const authModes = providerInfo?.authModes || [];
@@ -869,7 +873,12 @@ export default function ProviderDetailPage() {
     setShowOAuthModal(false);
   };
 
-  const handleIFlowCookieSuccess = () => {
+  const handleGeminiWebCookieSuccess = () => {
+    fetchConnections();
+    setShowGeminiWebCookieModal(false);
+  };
+
+const handleIFlowCookieSuccess = () => {
     fetchConnections();
     setShowIFlowCookieModal(false);
   };
@@ -1549,6 +1558,10 @@ export default function ProviderDetailPage() {
 
   // Determine icon path: OpenAI Compatible providers use specialized icons
   const getHeaderIconPath = () => {
+    // Node-specific logo takes priority: /providers/node-<prefix>.png (drop file to fall back)
+    if ((isOpenAICompatible || isAnthropicCompatible) && providerInfo.prefix && !headerLogoFailed) {
+      return `/providers/node-${providerInfo.prefix}.png`;
+    }
     if (isOpenAICompatible && providerInfo.apiType) {
       return providerInfo.apiType === "responses" ? "/providers/oai-r.png" : "/providers/oai-cc.png";
     }
@@ -1588,6 +1601,7 @@ export default function ProviderDetailPage() {
                 sizes="48px"
                 onError={() => {
                   markProviderIconMissing(providerInfo.id);
+                  setHeaderLogoFailed(true);
                   setHeaderImgError(true);
                 }}
               loading="lazy"
@@ -1810,6 +1824,11 @@ export default function ProviderDetailPage() {
                         Cookie
                       </Button>
                     )}
+                    {!isCompatible && providerId === "geminiweb" && (
+                      <Button size="sm" icon="cookie" variant="secondary" onClick={() => setShowGeminiWebCookieModal(true)}>
+                        Cookie
+                      </Button>
+                    )}
                     {providerId === "codex" && (
                       <Button size="sm" icon="playlist_add" variant="secondary" onClick={() => setShowBulkImportCodex(true)}>
                         {translate("Bulk Add")}
@@ -1871,6 +1890,18 @@ export default function ProviderDetailPage() {
                       icon="cookie"
                       variant="secondary"
                       onClick={() => setShowIFlowCookieModal(true)}
+                      title="Add connection using browser cookie"
+                      className="w-full sm:w-auto"
+                    >
+                      Cookie
+                    </Button>
+                  )}
+                  {providerId === "geminiweb" && (
+                    <Button
+                      size="sm"
+                      icon="cookie"
+                      variant="secondary"
+                      onClick={() => setShowGeminiWebCookieModal(true)}
                       title="Add connection using browser cookie"
                       className="w-full sm:w-auto"
                     >
@@ -2050,6 +2081,14 @@ export default function ProviderDetailPage() {
           isOpen={showIFlowCookieModal}
           onSuccess={handleIFlowCookieSuccess}
           onClose={() => setShowIFlowCookieModal(false)}
+        />
+      )}
+      {providerId === "geminiweb" && (
+        <GeminiWebCookieModal
+          connection={geminiWebEditConnection}
+          isOpen={showGeminiWebCookieModal}
+          onSuccess={handleGeminiWebCookieSuccess}
+          onClose={() => setShowGeminiWebCookieModal(false)}
         />
       )}
       <AddApiKeyModal

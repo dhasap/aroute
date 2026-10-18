@@ -288,7 +288,7 @@ export default function Header({ onMenuClick, showMenuButton = true }) {
                   {icon}
                 </span>
               )}
-              <h1 className="text-base lg:text-2xl font-hand font-bold tracking-tight truncate">
+              <h1 className="anime-title-glow text-base lg:text-2xl font-hand font-bold tracking-tight truncate">
                 {translate(title)}
               </h1>
             </div>

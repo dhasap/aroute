@@ -1,5 +1,33 @@
 # Unreleased
 
+## Features
+- **Dahl Global provider**: new `dahlglobal` free-tier provider (aliases `dahl`, `dahl-global`) —
+  OpenAI-compatible inference at `inference.dahl.global/v1` ("first 100M tokens free"). Three live
+  models (MiniMax M2.7, GLM 5.3 Flash, DeepSeek V4 Flash 0731), official logo (`/providers/dahlglobal.png`,
+  pulled from the site's own icon), `category: "freeTier"` so it sits with the free providers. Free
+  accounts share upstream concurrency — a model can return 429 `model_concurrency` transiently.
+- **Gemini Web — multi-account + round-robin**: each cookie paste now creates its own connection
+  (optional account name) and spawns a dedicated sidecar instance on its own port (4981, 4982, …)
+  with the cookie injected per-process; the custom-server runs a localhost control endpoint the
+  cookie API uses to spawn/replace per-account sidecars. Executor accepts per-connection
+  `providerSpecificData.baseUrl`, so each account routes to its own sidecar; once ≥2 accounts exist
+  the provider auto-switches to round-robin (sticky limit 1, manually overridable via the existing
+  Round Robin toggle). Connection Edit opens the cookie modal (rename / replace cookie).
+- **Custom provider node logos**: OpenAI/Anthropic-compatible nodes pick up
+  `/providers/node-<prefix>.png` when present (list + detail pages) instead of the generic OC/AC
+  icon, falling back gracefully when the file is missing.
+- **Sidecar zombie guard**: custom-server kills orphaned `gemini-web-to-api` processes from
+  previous crashed boots before spawning, preventing multi-process session contention that
+  slowed Gemini Web responses.
+
+## UI/UX
+- **Anime FX theme across landing + dashboard**: sakura-petal canvas particles, rotating magic
+  circle behind the hero, katakana accents, letter-by-letter heading reveal, gacha-style 3D tilt +
+  shine sweep cards, scroll reveals, mascot chibi (wave/hacker/happy poses) on landing, login and
+  GetStarted, starry-night footer, neon-glow page titles, aurora wash + petals inside the dashboard
+  shell — applied globally so every menu page inherits it.
+- **README screenshot** replaced with the current ARoute dashboard (Usage & Analytics view).
+
 ## Fixes
 - **kios thinking params 400 fixed**: KiosAPI's relay rejects vendor-native thinking
   parameters (`enable_thinking`, `thinking:{type}` → 400 "Unsupported parameter(s)") even for

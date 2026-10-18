@@ -1,6 +1,6 @@
 import { platform, arch, hostname } from "os";
 import { PROVIDERS, PROVIDER_OAUTH } from "./providers.js";
-import { ANTIGRAVITY_IDE_USER_AGENT } from "../providers/shared.js";
+import { ANTIGRAVITY_IDE_USER_AGENT, ANTIGRAVITY_CLIENT_METADATA } from "../providers/shared.js";
 import { createRequire } from "module";
 
 // === Gemini CLI === derive từ registry gemini-cli.transport
@@ -134,7 +134,8 @@ export const AG_DEFAULT_TOOLS = new Set([
 
 // Antigravity chat/stream headers
 export const ANTIGRAVITY_HEADERS = {
-  "User-Agent": ANTIGRAVITY_IDE_USER_AGENT
+  "User-Agent": ANTIGRAVITY_IDE_USER_AGENT,
+  "Client-Metadata": ANTIGRAVITY_CLIENT_METADATA
 };
 
 // Cloud Code Assist API endpoints differ by client ecosystem.
@@ -159,11 +160,12 @@ export const LOAD_CODE_ASSIST_HEADERS = {
   "Client-Metadata": JSON.stringify({ ideType: IDE_TYPE.ANTIGRAVITY, platform: getPlatformEnum(), pluginType: PLUGIN_TYPE.GEMINI }),
 };
 
-// Real Antigravity IDE doesn't send X-Goog-Api-Client/Client-Metadata on loadCodeAssist/onboardUser —
-// Google's backend fingerprints those and silently refuses to provision a cloudaicompanionProject.
+// Antigravity fingerprint matches the HaizhuAntigravity activator (proven Sep 2026):
+// UA antigravity/1.107.0 + string-enum Client-Metadata header on every CCA call.
 export const ANTIGRAVITY_LOAD_CODE_ASSIST_HEADERS = {
   "Content-Type": "application/json",
   "User-Agent": ANTIGRAVITY_IDE_USER_AGENT,
+  "Client-Metadata": ANTIGRAVITY_CLIENT_METADATA,
 };
 
 export const LOAD_CODE_ASSIST_METADATA = {

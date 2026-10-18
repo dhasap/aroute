@@ -85,6 +85,11 @@ export class AntigravityService {
       "Authorization": `Bearer ${accessToken}`,
       "Content-Type": "application/json",
       "User-Agent": this.config.loadCodeAssistUserAgent,
+      "Client-Metadata": JSON.stringify({
+        ideType: "ANTIGRAVITY",
+        platform: "PLATFORM_UNSPECIFIED",
+        pluginType: "GEMINI",
+      }),
     };
   }
 

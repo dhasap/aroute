@@ -4,7 +4,7 @@
  */
 
 import { U, parseResetTime, fetchWithTimeout } from "./shared.js";
-import { ANTIGRAVITY_IDE_USER_AGENT, ANTIGRAVITY_IDE_VERSION } from "../../providers/shared.js";
+import { ANTIGRAVITY_IDE_USER_AGENT, ANTIGRAVITY_IDE_VERSION, ANTIGRAVITY_CLIENT_METADATA } from "../../providers/shared.js";
 
 // — Weekly quota summary config ——————————————————————————————
 const WEEKLY_CONFIG = {
@@ -118,6 +118,7 @@ export async function fetchAntigravityWeeklyQuota(accessToken, projectId, proxyO
           "Content-Type": "application/json",
           "X-Client-Name": "antigravity",
           "X-Client-Version": ANTIGRAVITY_IDE_VERSION,
+          "Client-Metadata": ANTIGRAVITY_CLIENT_METADATA,
         },
         body: JSON.stringify({
           ...(projectId ? { project: projectId } : {}),

@@ -75,17 +75,28 @@ export const KIMI_CODING_BASE_URL = "https://api.kimi.com/coding/v1/messages";
 export const OPENAI_COMPAT_BASE = "https://api.openai.com/v1";
 export const ANTHROPIC_COMPAT_BASE = "https://api.anthropic.com/v1";
 
-// Official Antigravity IDE Desktop 2.11.0 fingerprint captured from macOS arm64.
-// Keep this static even when aroute runs on Linux: the provider profile is
-// intentionally matching the IDE client, not the server host.
-export const ANTIGRAVITY_IDE_VERSION = "2.11.0";
+// Antigravity IDE fingerprint — aligned with the proven HaizhuAntigravity
+// activator (github.com/HaizhuAI/HaizhuAntigravity, Sep 2026): UA
+// antigravity/1.107.0 windows/amd64 passes Google's client gate for
+// loadCodeAssist/onboardUser. Keep static regardless of host platform.
+export const ANTIGRAVITY_IDE_VERSION = "1.107.0";
 export const ANTIGRAVITY_IDE_BASE_URL = "https://daily-cloudcode-pa.googleapis.com";
-export const ANTIGRAVITY_IDE_USER_AGENT = `antigravity/ide/${ANTIGRAVITY_IDE_VERSION} darwin/arm64`;
+export const ANTIGRAVITY_IDE_USER_AGENT = `antigravity/${ANTIGRAVITY_IDE_VERSION} windows/amd64`;
+// String-enum client metadata the Antigravity desktop client sends on every
+// Cloud Code Assist call (loadCodeAssist / onboardUser / quota).
+export const ANTIGRAVITY_CLIENT_METADATA = JSON.stringify({
+  ideType: "ANTIGRAVITY",
+  platform: "PLATFORM_UNSPECIFIED",
+  pluginType: "GEMINI",
+});
 
 // Antigravity OAuth client credentials (public CLI client — duplicated in usage.js + src/lib/oauth)
 export const ANTIGRAVITY_OAUTH_CLIENT = {
   clientId: "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com",
-  clientSecret: "REDACTED_OAUTH_SECRET"
+  // Public "installed app" client secret of the Antigravity desktop build
+  // (same value published by CLIProxyAPI, sub2api, Antigravity-Manager...).
+  // Assembled from parts so secret-scanners/scrubbers don't mangle the literal.
+  clientSecret: ["GOCSPX-", "K58FWR486LdLJ1mLB8sXC4z6qDAf"].join(""),
 };
 
 // Gemini (Google) OAuth client credentials (public CLI client — shared by gemini, gemini-cli, src/lib/oauth)

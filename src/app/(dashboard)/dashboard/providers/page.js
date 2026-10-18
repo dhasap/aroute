@@ -271,6 +271,7 @@ export default function ProvidersPage() {
       color: "#10A37F",
       textIcon: "OC",
       apiType: node.apiType,
+      prefix: node.prefix,
     }))
     .filter(
       (p) => matchSearch(p.name) && matchStatus(getProviderStats(p.id, "apikey")),
@@ -283,6 +284,7 @@ export default function ProvidersPage() {
       name: node.name || "Anthropic Compatible",
       color: "#D97757",
       textIcon: "AC",
+      prefix: node.prefix,
     }))
     .filter(
       (p) => matchSearch(p.name) && matchStatus(getProviderStats(p.id, "apikey")),
@@ -848,6 +850,10 @@ function ApiKeyProviderCard({
   };
 
   const getIconPath = () => {
+    // Node-specific logo first: /providers/node-<prefix>.png
+    if ((isCompatible || isAnthropicCompatible) && provider.prefix) {
+      return `/providers/node-${provider.prefix}.png`;
+    }
     if (isCompatible && provider.apiType)
       return provider.apiType === "responses"
         ? "/providers/oai-r.png"

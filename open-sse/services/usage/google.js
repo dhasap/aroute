@@ -3,7 +3,7 @@
  */
 
 import { CLIENT_METADATA } from "../../config/appConstants.js";
-import { ANTIGRAVITY_IDE_USER_AGENT, ANTIGRAVITY_IDE_VERSION, ANTIGRAVITY_OAUTH_CLIENT } from "../../providers/shared.js";
+import { ANTIGRAVITY_IDE_USER_AGENT, ANTIGRAVITY_IDE_VERSION, ANTIGRAVITY_CLIENT_METADATA, ANTIGRAVITY_OAUTH_CLIENT } from "../../providers/shared.js";
 import { U, parseResetTime, normalizeCloudCodeProjectId, fetchWithTimeout } from "./shared.js";
 import { fetchAntigravityWeeklyQuota } from "./antigravity-weekly.js";
 
@@ -131,6 +131,7 @@ export async function getAntigravityUsage(accessToken, providerSpecificData, pro
         "Content-Type": "application/json",
         "X-Client-Name": "antigravity",
         "X-Client-Version": ANTIGRAVITY_IDE_VERSION,
+        "Client-Metadata": ANTIGRAVITY_CLIENT_METADATA,
       },
       body: JSON.stringify({
         ...(projectId ? { project: projectId } : {})

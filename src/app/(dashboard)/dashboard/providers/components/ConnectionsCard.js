@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getStatusVariant as getConnectionStatusVariant } from "@/shared/utils/connectionStatus";
 import PropTypes from "prop-types";
-import { Card, Badge, Button, Modal, Select, Toggle, EditConnectionModal, ConfirmModal } from "@/shared/components";
+import { Card, Badge, Button, Modal, Select, Toggle, EditConnectionModal, ConfirmModal, GeminiWebCookieModal } from "@/shared/components";
 
 // ── CooldownTimer ──────────────────────────────────────────────
 function CooldownTimer({ until }) {
@@ -301,6 +301,7 @@ export default function ConnectionsCard({ providerId, isOAuth }) {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showGwCookieModal, setShowGwCookieModal] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState(null);
   const [providerStrategy, setProviderStrategy] = useState(null);
   const [providerStickyLimit, setProviderStickyLimit] = useState("1");
@@ -447,7 +448,11 @@ export default function ConnectionsCard({ providerId, isOAuth }) {
                   onMoveDown={() => handleSwapPriority(idx, idx + 1)}
                   onToggleActive={(isActive) => handleToggleActive(conn.id, isActive)}
                   onUpdateProxy={(poolId) => handleUpdateProxy(conn.id, poolId)}
-                  onEdit={() => { setSelectedConnection(conn); setShowEditModal(true); }}
+                  onEdit={() => {
+                    setSelectedConnection(conn);
+                    if (providerId === "geminiweb") setShowGwCookieModal(true);
+                    else setShowEditModal(true);
+                  }}
                   onDelete={() => handleDelete(conn.id)}
                 />
               ))}
@@ -473,6 +478,14 @@ export default function ConnectionsCard({ providerId, isOAuth }) {
         onSave={handleUpdateConnection}
         onClose={() => setShowEditModal(false)}
       />
+      {providerId === "geminiweb" && (
+        <GeminiWebCookieModal
+          isOpen={showGwCookieModal}
+          connection={selectedConnection}
+          onSuccess={() => fetch_()}
+          onClose={() => { setShowGwCookieModal(false); setSelectedConnection(null); }}
+        />
+      )}
 
       {/* Confirm Modal */}
       <ConfirmModal

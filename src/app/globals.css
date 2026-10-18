@@ -9,42 +9,42 @@
 
 /* ============================================================
    ARoute palette — adopted from 9remote_private/web
-   Brand orange (dark) / soft coral (light), neutral warm bases
+   Anime violet (light & dark), cool lavender bases
    ============================================================ */
 :root {
-  /* Brand scale (light) - centered on #E56A4A */
-  --color-brand-50: #fff3e6;
-  --color-brand-100: #ffe0c2;
-  --color-brand-200: #f7b98a;
-  --color-brand-300: #ef9557;
-  --color-brand-400: #ea7c3f;
-  --color-brand-500: #E2632F;
-  --color-brand-600: #c2521f;
-  --color-brand-700: #9c4118;
-  --color-brand-800: #773215;
-  --color-brand-900: #4f220f;
+  /* Brand scale (light) - anime violet centered on #8B5CF6 */
+  --color-brand-50: #f3efff;
+  --color-brand-100: #e5dcff;
+  --color-brand-200: #cbb8ff;
+  --color-brand-300: #b18fff;
+  --color-brand-400: #9d6bff;
+  --color-brand-500: #8B5CF6;
+  --color-brand-600: #7445dd;
+  --color-brand-700: #5c35b8;
+  --color-brand-800: #45278f;
+  --color-brand-900: #2e1a63;
 
   /* Primary (legacy alias for backward compat with existing components) */
   --color-primary: var(--color-brand-500);
   --color-primary-hover: var(--color-brand-600);
 
-  /* Surfaces & backgrounds (light) */
-  --color-bg: #FAF4E6;
-  --color-bg-alt: #F3EAD7;
-  --color-surface: #FFFDF6;
-  --color-surface-2: #F1E8D4;
-  --color-surface-3: #E7DCBF;
-  --color-sidebar: rgba(247, 239, 221, 0.9);
+  /* Surfaces & backgrounds (light) - cool lavender-tinted */
+  --color-bg: #F6F4FC;
+  --color-bg-alt: #EEEBF8;
+  --color-surface: #FDFCFF;
+  --color-surface-2: #F0EDFA;
+  --color-surface-3: #E4DFF5;
+  --color-sidebar: rgba(243, 240, 252, 0.9);
 
   /* Borders */
-  --color-border: #C9BD9E;
-  --color-border-subtle: #DED3B4;
+  --color-border: #C9C2E4;
+  --color-border-subtle: #DED9F0;
 
   /* Text */
-  --color-text: #26221A;
-  --color-text-main: #26221A;
-  --color-text-muted: #6E6350;
-  --color-text-subtle: #9A8E74;
+  --color-text: #211D33;
+  --color-text-main: #211D33;
+  --color-text-muted: #6A6284;
+  --color-text-subtle: #948CB0;
 
   /* Status */
   --color-danger: #cf222e;
@@ -58,48 +58,48 @@
 
   /* Shadows */
   --shadow-soft: 2px 3px 0 0 rgba(38,34,26,0.12);
-  --shadow-warm: 0 2px 12px -2px rgba(229, 106, 74, 0.18);
+  --shadow-warm: 0 2px 12px -2px rgba(139, 92, 246, 0.18);
   --shadow-elevated: 0 12px 28px -4px rgba(60, 50, 45, 0.06);
   --shadow-elev:
     inset 0 1px 0 0 rgba(255,255,255,0.8),
     0 1px 2px rgba(15,23,42,0.04),
     0 12px 36px -8px rgba(15,23,42,0.10);
-  --shadow-focus: 0 0 0 3px rgba(229,106,74,0.18);
+  --shadow-focus: 0 0 0 3px rgba(139,92,246,0.18);
 
   color-scheme: light;
 }
 
 .dark {
-  /* Brand scale (dark) - centered on #E56A4A, same as light for consistency */
+  /* Brand scale (dark) - centered on #9D6BFF, same as light for consistency */
   --color-brand-50: #fff3e6;
   --color-brand-100: #ffe0c2;
   --color-brand-200: #f7b98a;
   --color-brand-300: #ef9557;
   --color-brand-400: #ea7c3f;
-  --color-brand-500: #E2632F;
+  --color-brand-500: #8B5CF6;
   --color-brand-600: #c2521f;
   --color-brand-700: #9c4118;
   --color-brand-800: #773215;
   --color-brand-900: #4f220f;
 
-  --color-primary: #E56A4A;
-  --color-primary-hover: #cc5236;
+  --color-primary: #9D6BFF;
+  --color-primary-hover: #7445dd;
 
-  /* Surfaces (dark - Claude-like neutral warm) */
-  --color-bg: #191612;
-  --color-bg-alt: #1F1B16;
-  --color-surface: #24201A;
-  --color-surface-2: #2E2822;
-  --color-surface-3: #3A332B;
-  --color-sidebar: rgba(28, 24, 19, 0.9);
+  /* Surfaces (dark - anime night sky, deep indigo) */
+  --color-bg: #12101F;
+  --color-bg-alt: #171428;
+  --color-surface: #1C1832;
+  --color-surface-2: #262043;
+  --color-surface-3: #322A55;
+  --color-sidebar: rgba(21, 18, 38, 0.9);
 
-  --color-border: #453D33;
-  --color-border-subtle: #352F27;
+  --color-border: #3D3564;
+  --color-border-subtle: #2D2750;
 
-  --color-text: #F2EADB;
-  --color-text-main: #F2EADB;
-  --color-text-muted: #A99C85;
-  --color-text-subtle: #7A6F5D;
+  --color-text: #EEEAFB;
+  --color-text-main: #EEEAFB;
+  --color-text-muted: #A79DD0;
+  --color-text-subtle: #746BA0;
 
   --color-danger: #ef4444;
   --color-success: #22c55e;
@@ -107,13 +107,13 @@
   --color-info: #60a5fa;
 
   --shadow-soft: 0 1px 2px 0 rgba(0,0,0,0.3);
-  --shadow-warm: 0 2px 12px -2px rgba(229, 106, 74, 0.25);
+  --shadow-warm: 0 2px 12px -2px rgba(139, 92, 246, 0.25);
   --shadow-elevated: 0 12px 28px -4px rgba(0, 0, 0, 0.45);
   --shadow-elev:
     inset 0 1px 0 0 rgba(255,255,255,0.06),
     0 1px 2px rgba(0,0,0,0.4),
     0 16px 48px -8px rgba(0,0,0,0.55);
-  --shadow-focus: 0 0 0 3px rgba(229, 106, 74, 0.18);
+  --shadow-focus: 0 0 0 3px rgba(139, 92, 246, 0.18);
 
   color-scheme: dark;
 }
@@ -210,11 +210,11 @@ body {
 
 /* Selection - brand-tinted */
 ::selection {
-  background-color: rgba(229, 106, 74, 0.25);
+  background-color: rgba(139, 92, 246, 0.25);
   color: var(--color-primary);
 }
 .dark ::selection {
-  background-color: rgba(229, 106, 74, 0.3);
+  background-color: rgba(139, 92, 246, 0.3);
   color: var(--color-brand-300);
 }
 
@@ -241,19 +241,19 @@ input, textarea {
 /* Thin horizontal scrollbar - brand colored */
 .scroll-thin-x {
   scrollbar-width: thin;
-  scrollbar-color: rgba(229, 106, 74, 0.55) transparent;
+  scrollbar-color: rgba(139, 92, 246, 0.55) transparent;
 }
 .dark .scroll-thin-x {
-  scrollbar-color: rgba(229, 106, 74, 0.55) transparent;
+  scrollbar-color: rgba(139, 92, 246, 0.55) transparent;
 }
 .scroll-thin-x::-webkit-scrollbar { height: 3px; }
 .scroll-thin-x::-webkit-scrollbar-track { background: transparent; }
 .scroll-thin-x::-webkit-scrollbar-thumb {
-  background: rgba(229, 106, 74, 0.55);
+  background: rgba(139, 92, 246, 0.55);
   border-radius: 3px;
 }
 .dark .scroll-thin-x::-webkit-scrollbar-thumb {
-  background: rgba(229, 106, 74, 0.55);
+  background: rgba(139, 92, 246, 0.55);
 }
 
 /* Global thin mac-like scrollbars (overrides clunky Windows/Linux default) */
@@ -387,12 +387,12 @@ button:disabled,
 
 @keyframes border-glow {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(229, 106, 74, 0.3), 0 0 10px rgba(229, 106, 74, 0.2);
-    border-color: rgba(229, 106, 74, 0.5);
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.3), 0 0 10px rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
   }
   50% {
-    box-shadow: 0 0 10px rgba(229, 106, 74, 0.5), 0 0 20px rgba(229, 106, 74, 0.3);
-    border-color: rgba(229, 106, 74, 0.8);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.8);
   }
 }
 .animate-border-glow { animation: border-glow 2s ease-in-out infinite; }
@@ -425,8 +425,8 @@ button:disabled,
   100% { transform: translateX(220%) skewX(-20deg); }
 }
 @keyframes ctaGlowPulse {
-  0%, 100% { box-shadow: 0 8px 24px -8px rgba(229, 106, 74, 0.45), 0 0 0 0 rgba(229, 106, 74, 0.5); }
-  50% { box-shadow: 0 12px 32px -8px rgba(229, 106, 74, 0.6), 0 0 0 8px rgba(229, 106, 74, 0); }
+  0%, 100% { box-shadow: 0 8px 24px -8px rgba(139, 92, 246, 0.45), 0 0 0 0 rgba(139, 92, 246, 0.5); }
+  50% { box-shadow: 0 12px 32px -8px rgba(139, 92, 246, 0.6), 0 0 0 8px rgba(139, 92, 246, 0); }
 }
 .btn-cta {
   position: relative;
@@ -452,13 +452,13 @@ button:disabled,
 .dot-grid-bg {
   background-color: var(--color-bg);
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(229, 106, 74, 0.10) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(229, 106, 74, 0.06) 0%, transparent 40%);
+    radial-gradient(circle at 15% 20%, rgba(139, 92, 246, 0.10) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 40%);
 }
 .dark .dot-grid-bg {
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(229, 106, 74, 0.18) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(229, 106, 74, 0.10) 0%, transparent 40%);
+    radial-gradient(circle at 15% 20%, rgba(139, 92, 246, 0.18) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.10) 0%, transparent 40%);
 }
 
 /* Landing-style faint grid overlay (use absolute pos inside relative parent) */
@@ -696,3 +696,133 @@ body {
   box-decoration-break: clone;
 }
 .dark .marker-highlight { background-image: linear-gradient(104deg, transparent 0.7%, rgba(239,149,87,0.26) 2.4%, rgba(239,149,87,0.18) 97.6%, transparent 98.8%); }
+
+/* ── Anime FX (v2 theme) ─────────────────────────────────────── */
+@keyframes mc-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes mc-spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+@keyframes hero-glow-text {
+  0%, 100% { text-shadow: 0 0 18px rgba(139,92,246,0.55), 0 0 42px rgba(139,92,246,0.25); }
+  50% { text-shadow: 0 0 26px rgba(139,92,246,0.85), 0 0 64px rgba(59,130,246,0.35); }
+}
+.animate-hero-glow { animation: hero-glow-text 3.2s ease-in-out infinite; }
+
+@keyframes char-in {
+  from { opacity: 0; transform: translateY(14px) rotateX(40deg); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+.char-in { display: inline-block; animation: char-in 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+
+@keyframes speedline-move {
+  from { background-position: 0 0; }
+  to { background-position: -600px 0; }
+}
+.speedline-bg {
+  background-image: url("/animefx/speedlines.jpg");
+  background-size: cover;
+  animation: speedline-move 6s linear infinite;
+}
+
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-12px) rotate(1.5deg); }
+}
+.animate-mascot-float { animation: mascot-float 4.5s ease-in-out infinite; }
+
+@keyframes katakana-in {
+  from { opacity: 0; letter-spacing: 0.6em; }
+  to { opacity: 1; letter-spacing: 0.25em; }
+}
+.animate-katakana { animation: katakana-in 1.4s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* star twinkle for footer sky */
+@keyframes twinkle { 0%,100% { opacity: 0.9; } 50% { opacity: 0.45; } }
+.animate-twinkle { animation: twinkle 2.6s ease-in-out infinite; }
+
+/* gacha shine sweep on hover */
+.shine-sweep { position: relative; overflow: hidden; }
+.shine-sweep::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%);
+  transform: translateX(-120%);
+  transition: transform 0.7s ease;
+  pointer-events: none;
+}
+.shine-sweep:hover::after { transform: translateX(120%); }
+
+/* Sidebar anime FX */
+.anime-sidebar {
+  background-image:
+    radial-gradient(1200px 400px at -20% -10%, rgba(139, 92, 246, 0.10), transparent 60%),
+    radial-gradient(800px 500px at 120% 110%, rgba(236, 72, 153, 0.07), transparent 60%);
+}
+.anime-title-glow {
+  animation: anime-neon-pulse 3.2s ease-in-out infinite;
+}
+@keyframes anime-neon-pulse {
+  0%, 100% { text-shadow: 0 0 14px rgba(139, 92, 246, 0.55), 0 0 34px rgba(139, 92, 246, 0.22); }
+  50%      { text-shadow: 0 0 20px rgba(139, 92, 246, 0.85), 0 0 52px rgba(167, 139, 250, 0.45); }
+}
+.anime-nav-item { position: relative; }
+.anime-nav-item::before {
+  content: "";
+  position: absolute; left: -6px; top: 50%;
+  width: 4px; height: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #8B5CF6, #EC4899);
+  transform: translateY(-50%);
+  transition: height 0.22s ease;
+}
+.anime-nav-active::before { height: 60%; box-shadow: 0 0 10px rgba(139,92,246,0.8); }
+.anime-nav-item:hover::before { height: 34%; }
+
+/* ── Dashboard Anime FX (menu pages) ─────────────────────────── */
+.anime-main {
+  background-image:
+    radial-gradient(1000px 500px at 85% -10%, rgba(139, 92, 246, 0.07), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(236, 72, 153, 0.05), transparent 60%);
+}
+.anime-aurora {
+  background:
+    radial-gradient(600px 300px at 20% 0%, rgba(139, 92, 246, 0.08), transparent 70%),
+    radial-gradient(700px 400px at 90% 100%, rgba(167, 139, 250, 0.06), transparent 70%);
+  animation: anime-aurora-drift 14s ease-in-out infinite alternate;
+}
+@keyframes anime-aurora-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); opacity: 0.8; }
+  to   { transform: translate3d(2%, 1.5%, 0) scale(1.06); opacity: 1; }
+}
+.anime-header {
+  background-image: linear-gradient(90deg, rgba(139,92,246,0.12), rgba(236,72,153,0.06) 40%, transparent 70%);
+}
+.anime-card { position: relative; overflow: hidden; }
+.anime-card::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(139,92,246,0.10) 48%, rgba(236,72,153,0.10) 52%, transparent 65%);
+  transform: translateX(-120%);
+  transition: none;
+  pointer-events: none;
+}
+.anime-card:hover::after { animation: anime-shine 0.9s ease; }
+@keyframes anime-shine { to { transform: translateX(120%); } }
+.anime-card-icon { transition: all 0.25s ease; }
+.anime-card:hover .anime-card-icon {
+  color: #8B5CF6;
+  text-shadow: 0 0 12px rgba(139,92,246,0.7);
+  transform: scale(1.08);
+}
+.anime-btn { position: relative; overflow: hidden; }
+.anime-btn::before {
+  content: "";
+  position: absolute; top: 0; left: -80%;
+  width: 50%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: skewX(-20deg);
+  transition: none;
+  pointer-events: none;
+}
+.anime-btn:hover::before { animation: anime-btn-sweep 0.7s ease; }
+.anime-btn:hover { box-shadow: 0 0 18px rgba(139,92,246,0.35); }
+@keyframes anime-btn-sweep { to { left: 130%; } }

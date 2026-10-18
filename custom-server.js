@@ -127,7 +127,106 @@ http.createServer = (...args) => {
   return server;
 };
 
+// ── Gemini Web sidecar (vendored gemini-web-to-api) ───────────────────────────
+// Managed child processes so ARoute is a single deploy. Multi-account: one
+// sidecar per connection, each on its own port (4981, 4982, ...), with the
+// account's cookie injected via GEMINI_COOKIES env (DB is the source of truth —
+// synced by the cookie API route). Port 4981 also falls back to the .env file
+// for backward compatibility.
+const { spawn } = require("child_process");
+
+const GEMINI_WEB_PORT = process.env.GEMINI_WEB_PORT || "4981";
+const geminiWebChildren = new Map(); // port -> { child, retries, cookie }
+let geminiWebShuttingDown = false;
+
+function geminiWebBinary() {
+  const candidates = [
+    path.join(__dirname, "vendor", "gemini-web", "gemini-web-to-api"),
+    path.join(__dirname, "..", "vendor", "gemini-web", "gemini-web-to-api"),
+    path.join(process.env.HOME || "", "gemini-web", "gemini-web-to-api"),
+  ];
+  return candidates.find((p) => fs.existsSync(p));
+}
+
+function startGeminiWebSidecar(port = GEMINI_WEB_PORT, cookie = null) {
+  const bin = geminiWebBinary();
+  if (!bin) {
+    console.error("[GeminiWeb] sidecar binary not found — provider disabled");
+    return;
+  }
+  port = String(port);
+  const prev = geminiWebChildren.get(port);
+  if (prev) {
+    try { prev.child.kill("SIGKILL"); } catch {}
+    geminiWebChildren.delete(port);
+  }
+  const env = { ...process.env, PORT: port };
+  if (cookie) env.GEMINI_COOKIES = cookie;
+  const child = spawn(bin, [], {
+    cwd: path.dirname(bin),
+    env,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  const tag = `[GeminiWeb:${port}]`;
+  const entry = { child, retries: 0, cookie };
+  geminiWebChildren.set(port, entry);
+  child.stdout.on("data", (d) => process.stdout.write(`${tag} ${d}`));
+  child.stderr.on("data", (d) => process.stderr.write(`${tag} ${d}`));
+  child.once("exit", (code, signal) => {
+    const cur = geminiWebChildren.get(port);
+    if (!cur || cur.child !== child) return; // replaced — ignore
+    geminiWebChildren.delete(port);
+    if (geminiWebShuttingDown) return;
+    cur.retries += 1;
+    const delay = Math.min(30000, 2000 * cur.retries);
+    console.error(`${tag} exited (code=${code} signal=${signal}) — restart in ${delay}ms`);
+    setTimeout(() => startGeminiWebSidecar(port, cur.cookie), delay);
+  });
+  console.log(`${tag} sidecar starting${cookie ? " (account cookie)" : ""} (pid ${child.pid})`);
+}
+
+function stopGeminiWebSidecar() {
+  geminiWebShuttingDown = true;
+  for (const [, entry] of geminiWebChildren) {
+    try { entry.child.kill("SIGTERM"); } catch {}
+  }
+}
+
+// Local control endpoint: lets API routes start/replace per-account sidecars.
+// POST http://127.0.0.1:<port+10000>/__geminiweb/start  body: {port, cookie}
+const GEMINI_WEB_CONTROL_PORT = Number(GEMINI_WEB_PORT) + 10000;
+function startGeminiWebControl() {
+  const srv = http.createServer((req, res) => {
+    if (req.method !== "POST" || !req.url.startsWith("/__geminiweb/start")) {
+      res.writeHead(404).end();
+      return;
+    }
+    let body = "";
+    req.on("data", (c) => { body += c; if (body.length > 1e6) req.destroy(); });
+    req.on("end", () => {
+      try {
+        const { port, cookie } = JSON.parse(body || "{}");
+        if (!port) { res.writeHead(400).end(JSON.stringify({ error: "port required" })); return; }
+        startGeminiWebSidecar(port, cookie || null);
+        res.writeHead(200).end(JSON.stringify({ ok: true }));
+      } catch (e) {
+        res.writeHead(500).end(JSON.stringify({ error: e.message }));
+      }
+    });
+  });
+  srv.listen(GEMINI_WEB_CONTROL_PORT, "127.0.0.1");
+  console.log(`[GeminiWeb] control endpoint on :${GEMINI_WEB_CONTROL_PORT}`);
+}
+
+process.once("SIGINT", () => { stopGeminiWebSidecar(); process.exit(0); });
+process.once("SIGTERM", () => { stopGeminiWebSidecar(); process.exit(0); });
+
 if (require.main === module) {
+  // Zombie guard: kill orphan sidecars from previous (crashed) boots before binding.
+  // Keep our own children (none yet at this point) — pkill by binary name is safe here.
+  try { require("child_process").execSync("pkill -9 -f gemini-web/gemini-web-to-api || true"); } catch {}
+  startGeminiWebSidecar();
+  startGeminiWebControl();
   const standalone = path.join(__dirname, "server.js");
   if (fs.existsSync(standalone)) {
     require(standalone);

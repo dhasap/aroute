@@ -1,5 +1,6 @@
 "use client";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
+import Reveal from "./Reveal";
 
 export default function GetStarted() {
   const { copied, copy } = useCopyToClipboard();
@@ -9,52 +10,79 @@ export default function GetStarted() {
   };
 
   return (
-    <section className="py-24 px-6 bg-[#120f0d]">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative py-24 px-6 overflow-hidden">
+      {/* Manga speed-lines dramatic background */}
+      <div
+        className="absolute inset-0 speedline-bg opacity-[0.07] pointer-events-none"
+        aria-hidden="true"
+      ></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-[#12101f] via-transparent to-[#12101f] pointer-events-none" aria-hidden="true"></div>
+
+      <div className="relative max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-16 items-start">
-          {/* Left: Steps */}
+          {/* Left: Steps + mascot */}
           <div className="flex-1">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Get Started in 30 Seconds</h2>
-            <p className="text-gray-400 text-lg mb-8">
-              Install ARoute, configure your providers via web dashboard, and start routing AI requests.
-            </p>
-            
-            <div className="flex flex-col gap-6">
-              <div className="flex gap-4">
-                <div className="flex-none w-8 h-8 rounded-full bg-[#f97815]/20 text-[#f97815] flex items-center justify-center font-bold">1</div>
+            <Reveal>
+              <div className="flex items-start gap-4">
+                <img
+                  src="/animefx/mascot-wave.png"
+                  alt="ARoute mascot waving"
+                  className="w-20 h-20 animate-mascot-float select-none"
+                  draggable="false"
+                />
                 <div>
-                  <h4 className="font-bold text-lg">Install ARoute</h4>
-                  <p className="text-sm text-gray-500 mt-1">Run npx command to start the server instantly</p>
+                  <div className="text-xs text-[#8B5CF6]/80 font-medium tracking-[0.25em] mb-1 select-none" aria-hidden="true">はじめに</div>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-2">Get Started in 30 Seconds</h2>
+                  <p className="text-gray-400 text-lg">
+                    Install ARoute, configure your providers via web dashboard, and start routing AI requests.
+                  </p>
                 </div>
               </div>
-              
-              <div className="flex gap-4">
-                <div className="flex-none w-8 h-8 rounded-full bg-[#f97815]/20 text-[#f97815] flex items-center justify-center font-bold">2</div>
-                <div>
-                  <h4 className="font-bold text-lg">Open Dashboard</h4>
-                  <p className="text-sm text-gray-500 mt-1">Configure providers and API keys via web interface</p>
+            </Reveal>
+
+            <div className="flex flex-col gap-6 mt-8">
+              <Reveal variant="left" delay={100}>
+                <div className="flex gap-4">
+                  <div className="flex-none w-8 h-8 rounded-full bg-[#8B5CF6]/20 text-[#8B5CF6] flex items-center justify-center font-bold">1</div>
+                  <div>
+                    <h4 className="font-bold text-lg">Install ARoute</h4>
+                    <p className="text-sm text-gray-500 mt-1">Run npx command to start the server instantly</p>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex gap-4">
-                <div className="flex-none w-8 h-8 rounded-full bg-[#f97815]/20 text-[#f97815] flex items-center justify-center font-bold">3</div>
-                <div>
-                  <h4 className="font-bold text-lg">Route Requests</h4>
-                  <p className="text-sm text-gray-500 mt-1">Point your CLI tools to http://localhost:20128</p>
+              </Reveal>
+
+              <Reveal variant="left" delay={200}>
+                <div className="flex gap-4">
+                  <div className="flex-none w-8 h-8 rounded-full bg-[#8B5CF6]/20 text-[#8B5CF6] flex items-center justify-center font-bold">2</div>
+                  <div>
+                    <h4 className="font-bold text-lg">Open Dashboard</h4>
+                    <p className="text-sm text-gray-500 mt-1">Configure providers and API keys via web interface</p>
+                  </div>
                 </div>
-              </div>
+              </Reveal>
+
+              <Reveal variant="left" delay={300}>
+                <div className="flex gap-4">
+                  <div className="flex-none w-8 h-8 rounded-full bg-[#8B5CF6]/20 text-[#8B5CF6] flex items-center justify-center font-bold">3</div>
+                  <div>
+                    <h4 className="font-bold text-lg">Route Requests</h4>
+                    <p className="text-sm text-gray-500 mt-1">Point your CLI tools to http://localhost:20128</p>
+                  </div>
+                </div>
+              </Reveal>
             </div>
           </div>
 
           {/* Right: Code block */}
-          <div className="flex-1 w-full">
-            <div className="rounded-xl overflow-hidden bg-[#1e1e1e] border border-[#3a2f27] shadow-2xl">
+          <Reveal variant="right" className="flex-1 w-full">
+            <div className="rounded-xl overflow-hidden bg-[#1e1e1e] border border-[#2c2650] shadow-2xl">
               {/* Terminal header */}
               <div className="flex items-center gap-2 px-4 py-3 bg-[#252526] border-b border-gray-700">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 <div className="ml-2 text-xs text-gray-500 font-mono">terminal</div>
+                <img src="/animefx/mascot-hacker.png" alt="" className="ml-auto w-8 h-8 opacity-80" aria-hidden="true" draggable="false" />
               </div>
               
               {/* Terminal content */}
@@ -71,9 +99,9 @@ export default function GetStarted() {
                 </div>
                 
                 <div className="text-gray-400 mb-6">
-                  <span className="text-[#f97815]">&gt;</span> Starting ARoute...<br/>
-                  <span className="text-[#f97815]">&gt;</span> Server running on <span className="text-blue-400">http://localhost:20128</span><br/>
-                  <span className="text-[#f97815]">&gt;</span> Dashboard: <span className="text-blue-400">http://localhost:20128/dashboard</span><br/>
+                  <span className="text-[#8B5CF6]">&gt;</span> Starting ARoute...<br/>
+                  <span className="text-[#8B5CF6]">&gt;</span> Server running on <span className="text-blue-400">http://localhost:20128</span><br/>
+                  <span className="text-[#8B5CF6]">&gt;</span> Dashboard: <span className="text-blue-400">http://localhost:20128/dashboard</span><br/>
                   <span className="text-green-400">&gt;</span> Ready to route! ✓
                 </div>
                 
@@ -88,10 +116,9 @@ export default function GetStarted() {
                 </div>
               </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>
   );
 }
-

@@ -150,12 +150,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-4 relative overflow-hidden">
-      {/* Faint grid background */}
-      <div className="landing-grid absolute inset-0 pointer-events-none" aria-hidden="true" />
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Anime night-sky hero art */}
+      <div
+        className="absolute inset-0 pointer-events-none bg-cover bg-center"
+        style={{ backgroundImage: "url(/hero-anime-sm.jpg)" }}
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 bg-bg/70 dark:bg-bg/60 pointer-events-none" aria-hidden="true" />
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">ARoute</h1>
+          <img
+            src="/animefx/mascot-wave.png"
+            alt="ARoute mascot"
+            className="w-24 h-24 mx-auto mb-2 animate-mascot-float select-none drop-shadow-[0_0_18px_rgba(139,92,246,0.5)]"
+            draggable="false"
+          />
+          <img
+            src="/icons/icon-192.png"
+            alt="ARoute logo"
+            className="w-16 h-16 mx-auto mb-3 rounded-2xl shadow-[var(--shadow-warm)]"
+          />
+          <h1 className="text-3xl font-bold text-primary mb-1">ARoute</h1>
+          <div className="text-xs text-[#8B5CF6]/80 tracking-[0.25em] mb-2 select-none" aria-hidden="true">ダッシュボード</div>
           <p className="text-text-muted">
             {samlAvailable
               ? "Sign in with SAML 2.0 Single Sign-On"
