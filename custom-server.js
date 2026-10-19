@@ -253,7 +253,9 @@ if (require.main === module) {
   // Zombie guard: kill orphan sidecars from previous (crashed) boots before binding.
   // Keep our own children (none yet at this point) — pkill by binary name is safe here.
   try { require("child_process").execSync("pkill -9 -f gemini-web/gemini-web-to-api || true"); } catch {}
-  startGeminiWebSidecar();
+  // Auto-start the base sidecar only when a default cookie exists in env —
+  // otherwise the sidecar exits immediately and we'd loop-restart forever.
+  if (process.env.GEMINI_COOKIES) startGeminiWebSidecar();
   startGeminiWebControl();
   const standalone = path.join(__dirname, "server.js");
   if (fs.existsSync(standalone)) {
