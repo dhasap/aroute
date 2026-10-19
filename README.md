@@ -80,17 +80,24 @@ Result: Never stop coding, minimal cost + 20-40% token savings via RTK
 Grab the artifact from [Releases](https://github.com/dhasap/aroute/releases), then:
 
 ```bash
-mkdir aroute && tar -xzf aroute-v0.5.75-standalone.tar.gz -C aroute
+mkdir aroute && tar -xzf aroute-v0.6.0-standalone.tar.gz -C aroute
 cd aroute
-node custom-server.js --port 20128
+PORT=20128 HOSTNAME=0.0.0.0 node custom-server.js
 ```
 
-The bundle already ships the built server, static assets, `public/` and a pruned
-`node_modules`, so **nothing gets compiled**. It was built with Node `v22.22.2`;
+The bundle already ships the built server, static assets, `public/` (including
+the Anime FX assets), the vendored Gemini Web sidecar binary and a pruned
+`node_modules`, so **nothing gets compiled and no VPS rebuild is needed** —
+unpack, run, done. It was built with Node `v22.22.2` (any Node ≥ 22.5 works);
 on a non-Linux platform `better-sqlite3` simply fails to load and the DB driver
-falls back to `node:sqlite` (Node ≥ 22.5) and then `sql.js` — all three are
-bundled, so no `node-gyp` either. Without a `.env` the initial dashboard
-password is `123456` — change it in Settings right after the first login.
+falls back to `node:sqlite` and then `sql.js` — all three are bundled, so no
+`node-gyp` either. Without a `.env` the initial dashboard password is `123456`
+— change it in Settings right after the first login.
+
+Gemini Web runs fully inside this one process: sidecars bind loopback only and
+are reached through the same port under `/geminiweb/<port>/...`, so accounts
+never expose extra ports. Run it as a background service with e.g.
+`pm2 start custom-server.js --name aroute` or a systemd unit.
 
 **Option B · Run from source:**
 
