@@ -6,6 +6,7 @@ import path from "path";
 import os from "os";
 import { createProviderConnection, getProviderConnections, updateProviderConnection } from "@/models";
 import { getSettings, updateSettings } from "@/lib/localDb";
+import { normalizeCookieInput, cookieLooksValid } from "@/shared/lib/normalizeCookie";
 
 const run = promisify(execFile);
 
@@ -13,10 +14,6 @@ const GEMINI_WEB_BASE_PORT = Number(process.env.GEMINI_WEB_PORT || 4981);
 const CONTROL_PORT = GEMINI_WEB_BASE_PORT + 10000;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-function validCookieShape(c) {
-  return c.includes("__Secure-1PSID=") && c.includes("__Secure-1PSIDTS=");
-}
 
 async function healthOk(port) {
   try {
@@ -59,9 +56,16 @@ async function chatOk(port) {
   } catch { return false; }
 }
 
+/** Always respond with JSON — never let an error bubble into an HTML error page. */
+function jsonError(message, status = 400, extra = {}) {
+  return NextResponse.json({ error: message, ...extra }, { status });
+}
+
 /**
  * POST /api/oauth/geminiweb/cookie
- * Body: { cookie, name?, connectionId? }
+ * Body: { cookie, name?, connectionId? } — `cookie` accepted in ANY supported
+ * shape (raw header, "Cookie:" prefixed, JSON object/array, Set-Cookie lines,
+ * base64). Normalized server-side before use.
  *  - connectionId present → replace that account's cookie (same sidecar port).
  *  - otherwise → create a NEW account: first uses legacy port 4981 (.env),
  *    additional accounts get ports 4982+ spawned with per-process GEMINI_COOKIES.
@@ -69,31 +73,44 @@ async function chatOk(port) {
  */
 export async function POST(request) {
   try {
-    const { cookie, name, connectionId } = await request.json();
-    if (!cookie || typeof cookie !== "string") {
-      return NextResponse.json({ error: "Cookie is required" }, { status: 400 });
-    }
-    const trimmed = cookie.trim();
-    if (!validCookieShape(trimmed)) {
-      return NextResponse.json(
-        { error: "Cookie must contain __Secure-1PSID and __Secure-1PSIDTS (copy the full Cookie header from gemini.google.com)" },
-        { status: 400 }
-      );
+    // Guard: this route must ALWAYS answer JSON, even on weird content types.
+    let body;
+    const rawText = await request.text().catch(() => "");
+    try {
+      body = rawText ? JSON.parse(rawText) : {};
+      if (typeof body !== "object" || body === null) body = { cookie: body };
+    } catch {
+      // Body wasn't JSON — maybe the cookie was pasted as plain text body.
+      body = { cookie: rawText };
     }
 
-    // Legacy .env write for port 4981 (backward compatible with old sidecar boot)
+    const norm = normalizeCookieInput(body.cookie);
+    if (!cookieLooksValid(norm.cookie)) {
+      return jsonError(
+        "Cookie tidak valid — harus memuat __Secure-1PSID dan __Secure-1PSIDTS. " +
+        "Salin header Cookie lengkap dari gemini.google.com (F12 → Network → request apa saja → Cookie), " +
+        "atau paste JSON / base64 / format apa pun yang berisi kedua field itu."
+      );
+    }
+    const cookie = norm.cookie;
+    const name = (body.name && String(body.name).trim()) || norm.name || null;
+
+    // Legacy .env write for port 4981 (backward compatible with old sidecar boot).
+    // The value is double-quoted so the raw cookie's "; " and quotes survive
+    // `source .env` (unquoted cookies previously corrupted the whole env file).
     const envPaths = [
       path.join(process.cwd(), "vendor", "gemini-web", ".env"),
       path.join(process.cwd(), "..", "vendor", "gemini-web", ".env"),
       path.join(os.homedir(), "gemini-web", ".env"),
     ];
+    const envSafe = cookie.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
     const seen = new Set();
     for (const envPath of envPaths) {
       if (seen.has(envPath)) continue;
       seen.add(envPath);
       let env = "";
       try { env = fs.readFileSync(envPath, "utf8"); } catch { env = "APP_ENV=production\nPORT=4981\n"; }
-      const cookieLine = `GEMINI_COOKIES=${trimmed}`;
+      const cookieLine = `GEMINI_COOKIES="${envSafe}"`;
       if (/^GEMINI_COOKIES=/m.test(env)) env = env.replace(/^GEMINI_COOKIES=.*$/m, cookieLine);
       else env = env.trimEnd() + "\n" + cookieLine + "\n";
       try { fs.writeFileSync(envPath, env); } catch {}
@@ -103,19 +120,21 @@ export async function POST(request) {
 
     let conn;
     let port;
+    const connectionId = body.connectionId || null;
     if (connectionId) {
-      conn = connections.find((c) => c.id === connectionId);
-      if (!conn) return NextResponse.json({ error: "Connection not found" }, { status: 404 });
+      conn = connections.find((c) => c.id === body.connectionId);
+      if (!conn) return jsonError("Connection not found", 404);
       port = conn.providerSpecificData?.sidecarPort || GEMINI_WEB_BASE_PORT;
+    } else if (connections.length === 0) {
+      port = GEMINI_WEB_BASE_PORT;
     } else {
-      // New account: reuse the legacy port only if it has no connection yet.
+      // New account: next free sidecar port.
       const usedPorts = new Set(connections.map((c) => c.providerSpecificData?.sidecarPort || GEMINI_WEB_BASE_PORT));
-      if (connections.length === 0) {
-        port = GEMINI_WEB_BASE_PORT;
-      } else {
-        port = GEMINI_WEB_BASE_PORT + 1;
-        while (usedPorts.has(port)) port += 1;
-      }
+      port = GEMINI_WEB_BASE_PORT + 1;
+      while (usedPorts.has(port)) port += 1;
+    }
+
+    if (!conn) {
       const psd = {
         connectionProxyEnabled: false,
         connectionProxyUrl: "",
@@ -126,11 +145,11 @@ export async function POST(request) {
       const created = await createProviderConnection({
         provider: "geminiweb",
         authType: "apikey",
-        name: (name && name.trim()) || `Gemini Web #${connections.length + 1}`,
+        name: name || `Gemini Web #${connections.length + 1}`,
         email: null,
         priority: connections.length,
         isActive: true,
-        apiKey: "local-sidecar",
+        apiKey: null,
         testStatus: "active",
         providerSpecificData: psd,
       });
@@ -139,17 +158,17 @@ export async function POST(request) {
     }
 
     // Spawn/replace that account's sidecar, wait health, verify chat.
-    await spawnSidecar(port, trimmed);
+    await spawnSidecar(port, cookie);
     let healthy = false;
     for (let i = 0; i < 10; i++) {
       await sleep(2000);
       if (await healthOk(port)) { healthy = true; break; }
     }
     if (!healthy) {
-      return NextResponse.json({ error: `Sidecar on port ${port} did not become healthy — cookies may be expired or invalid. Check /tmp/aroute.log` }, { status: 502 });
+      return jsonError(`Sidecar di port ${port} tidak hidup — cookie mungkin expired/invalid. Cek log server.`, 502);
     }
     if (!(await chatOk(port))) {
-      return NextResponse.json({ error: "Cookie accepted by sidecar but chat failed" }, { status: 502 });
+      return jsonError("Cookie diterima sidecar tapi chat gagal — kemungkinan cookie ditolak Google (401). Coba paste cookie fresh.", 502);
     }
 
     await updateProviderConnection(conn.id, {
@@ -180,11 +199,11 @@ export async function POST(request) {
       connectionId: conn.id,
       port,
       accounts: total,
-      message: connectionId
+      message: body.connectionId
         ? `Account updated — sidecar healthy on :${port}, chat verified`
         : `Account "${conn.name}" connected on :${port} — ${total} account${total > 1 ? "s" : ""} total, chat verified`,
     });
   } catch (err) {
-    return NextResponse.json({ error: err.message || "Unexpected error" }, { status: 500 });
+    return jsonError(err?.message || "Unexpected error", 500);
   }
 }

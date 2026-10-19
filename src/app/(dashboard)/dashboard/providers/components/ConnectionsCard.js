@@ -314,9 +314,15 @@ export default function ConnectionsCard({ providerId, isOAuth }) {
         fetch("/api/proxy-pools?isActive=true", { cache: "no-store" }),
         fetch("/api/settings", { cache: "no-store" }),
       ]);
-      const connData = await connRes.json();
-      const proxyData = await proxyRes.json();
-      const settingsData = settingsRes.ok ? await settingsRes.json() : {};
+      const safeJson = async (res) => {
+        try {
+          if (!(res.headers.get("content-type") || "").includes("application/json")) return {};
+          return await res.json();
+        } catch { return {}; }
+      };
+      const connData = await safeJson(connRes);
+      const proxyData = await safeJson(proxyRes);
+      const settingsData = await safeJson(settingsRes);
       if (connRes.ok) setConnections((connData.connections || []).filter((c) => c.provider === providerId));
       if (proxyRes.ok) setProxyPools(proxyData.proxyPools || []);
       const override = (settingsData.providerStrategies || {})[providerId] || {};
