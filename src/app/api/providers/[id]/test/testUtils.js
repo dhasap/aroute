@@ -848,6 +848,24 @@ case "llm7": {
         }, effectiveProxy);
         return { valid: res.ok, error: res.ok ? null : "Invalid API key", refreshed: false };
       }
+      case "geminiweb": {
+        // Gemini Web sidecars run locally per-connection; test the sidecar
+        // directly (its /models endpoint is cheap and needs no real gen).
+        const psd = connection.providerSpecificData || {};
+        const port = psd.sidecarPort;
+        if (!port) return { valid: false, error: "Missing sidecar port" };
+        try {
+          const res = await fetch(`http://127.0.0.1:${port}/openai/v1/models`, {
+            headers: { Authorization: `Bearer ${connection.apiKey}` },
+            signal: AbortSignal.timeout(8000),
+          });
+          if (res.ok) return { valid: true, error: null };
+          if (res.status === 401 || res.status === 403) return { valid: false, error: "Sidecar rejected credentials" };
+          return { valid: false, error: `Sidecar responded ${res.status}` };
+        } catch (err) {
+          return { valid: false, error: `Sidecar not running on port ${port} — start it via the cookie route or control endpoint` };
+        }
+      }
       default: {
         // Generic fallback so a new OpenAI-compatible registry provider is never
         // reported as "Provider test not supported" for lacking a hardcoded case.

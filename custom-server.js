@@ -162,6 +162,12 @@ function startGeminiWebSidecar(port = GEMINI_WEB_PORT, cookie = null) {
     geminiWebChildren.delete(port);
   }
   const env = { ...process.env, PORT: port, HOST: "127.0.0.1" };
+  // Egress for the sidecar: on hosts where Google is only reachable via a proxy
+  // (fake-IP egress VMs), GEMINI_WEB_PROXY supplies it — direct dials would fail.
+  if (process.env.GEMINI_WEB_PROXY) {
+    env.HTTPS_PROXY = env.HTTPS_PROXY || process.env.GEMINI_WEB_PROXY;
+    env.https_proxy = env.https_proxy || process.env.GEMINI_WEB_PROXY;
+  }
   if (cookie) env.GEMINI_COOKIES = cookie;
   const child = spawn(bin, [], {
     cwd: path.dirname(bin),
