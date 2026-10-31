@@ -14,6 +14,10 @@ function rowToCombo(row) {
   };
   // Optional context-window override; NULL = auto (max over member models).
   if (row.contextWindow != null) combo.contextWindow = Number(row.contextWindow);
+  // Optional per-combo system prompt; NULL/absent = no injection.
+  if (row.systemPrompt != null && String(row.systemPrompt).trim() !== "") {
+    combo.systemPrompt = String(row.systemPrompt);
+  }
   return combo;
 }
 
@@ -49,9 +53,12 @@ export async function createCombo(data) {
   // Explicit context window (optional). null/undefined → auto.
   const cw = Number(data.contextWindow);
   if (Number.isFinite(cw) && cw > 0) combo.contextWindow = Math.floor(cw);
+  // Optional system prompt (optional). Non-empty trimmed string → store; else NULL.
+  const sp = typeof data.systemPrompt === "string" ? data.systemPrompt.trim() : "";
+  if (sp) combo.systemPrompt = sp;
   db.run(
-    `INSERT INTO combos(id, name, kind, models, contextWindow, createdAt, updatedAt) VALUES(?, ?, ?, ?, ?, ?, ?)`,
-    [combo.id, combo.name, combo.kind, stringifyJson(combo.models), combo.contextWindow ?? null, combo.createdAt, combo.updatedAt]
+    `INSERT INTO combos(id, name, kind, models, contextWindow, systemPrompt, createdAt, updatedAt) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`,
+    [combo.id, combo.name, combo.kind, stringifyJson(combo.models), combo.contextWindow ?? null, combo.systemPrompt ?? null, combo.createdAt, combo.updatedAt]
   );
   return combo;
 }
@@ -71,9 +78,12 @@ export async function updateCombo(id, data) {
     } else {
       cw = null;
     }
+    // systemPrompt: non-empty string → store; null/undefined/"" → clear to NULL.
+    let sp = merged.systemPrompt;
+    sp = typeof sp === "string" && sp.trim() !== "" ? sp.trim() : null;
     db.run(
-      `UPDATE combos SET name = ?, kind = ?, models = ?, contextWindow = ?, updatedAt = ? WHERE id = ?`,
-      [merged.name, merged.kind, stringifyJson(merged.models || []), cw, merged.updatedAt, id]
+      `UPDATE combos SET name = ?, kind = ?, models = ?, contextWindow = ?, systemPrompt = ?, updatedAt = ? WHERE id = ?`,
+      [merged.name, merged.kind, stringifyJson(merged.models || []), cw, sp, merged.updatedAt, id]
     );
     // Return what was actually persisted, not `merged`: the raw client payload
     // can say something the write rejected (contextWindow "auto"/0 both store

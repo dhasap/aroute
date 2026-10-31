@@ -92,3 +92,16 @@ export async function getComboModels(modelStr) {
   }
   return null;
 }
+
+/**
+ * Full combo lookup (models + optional per-combo system prompt).
+ * Returns null when modelStr is not a combo.
+ */
+export async function getComboFull(modelStr) {
+  if (modelStr.includes("/")) return null;
+  const combo = await getComboByName(modelStr);
+  if (combo && combo.models && combo.models.length > 0) {
+    return combo;
+  }
+  return null;
+}

@@ -9,7 +9,8 @@ import {
 } from "../services/auth.js";
 import { handleAntigravityQuotaError, clearAntigravityStrikes } from "../services/antigravityQuota.js";
 import { getSettings } from "@/lib/localDb";
-import { getModelInfo, getComboModels } from "../services/model.js";
+import { getModelInfo, getComboFull } from "../services/model.js";
+import { injectSystemPrompt } from "open-sse/rtk/systemInject.js";
 import { handleChatCore } from "open-sse/handlers/chatCore.js";
 import { DEFAULT_HEADROOM_URL } from "@/lib/headroom/detect";
 import { getTransform as getPxpipeTransform } from "@/lib/pxpipe/loader.js";
@@ -20,6 +21,7 @@ import { augmentModelsWithCapacityAdapter, withCapacityAdapterStripping, getActi
 import { handleBypassRequest } from "open-sse/utils/bypassHandler.js";
 import { HTTP_STATUS } from "open-sse/config/runtimeConfig.js";
 import { detectFormatByEndpoint } from "open-sse/translator/formats.js";
+import { detectFormat } from "open-sse/services/provider.js";
 import * as log from "../utils/logger.js";
 import { updateProviderCredentials, checkAndRefreshToken } from "../services/tokenRefresh.js";
 import { getProjectIdForConnection } from "open-sse/services/projectId.js";
@@ -93,8 +95,13 @@ export async function handleChat(request, clientRawRequest = null) {
   const requiredCapabilities = detectRequiredCapabilities(body);
 
   // Check if model is a combo (has multiple models with fallback)
-  const comboModels = await getComboModels(modelStr);
+  const comboFull = await getComboFull(modelStr);
+  const comboModels = comboFull ? comboFull.models : null;
   if (comboModels) {
+    // Per-combo system prompt (SOUL.md-style): inject once into the client body
+    // before any member dispatch. handleComboChat reuses the same body object, so
+    // every member attempt and fusion judge inherit it; the injector is idempotent.
+    injectComboSystemPrompt(body, comboFull);
     // Check for combo-specific strategy first, fallback to global
     const comboStrategies = settings.comboStrategies || {};
     const comboSpecificStrategy = comboStrategies[modelStr]?.fallbackStrategy;
@@ -161,6 +168,25 @@ export async function handleChat(request, clientRawRequest = null) {
 }
 
 /**
+ * Per-combo system prompt injection (SOUL.md-style).
+ * Mutates the request body in place ONCE per request (idempotent — the injector
+ * dedupes on exact prompt match). Fail-open: any error leaves the body untouched.
+ * Body at this point is the CLIENT format; detectFormat sniffs it, matching
+ * chatCore's own source detection (which also honors detectFormatByEndpoint —
+ * both resolve to a format the injector handles).
+ */
+function injectComboSystemPrompt(body, combo) {
+  try {
+    const prompt = combo?.systemPrompt;
+    if (!prompt || typeof prompt !== "string" || !prompt.trim()) return;
+    if (!body || typeof body !== "object") return;
+    injectSystemPrompt(body, detectFormat(body), prompt);
+  } catch (_) {
+    // fail-open
+  }
+}
+
+/**
  * Handle single model chat request
  */
 async function handleSingleModelChat(body, modelStr, clientRawRequest = null, request = null, apiKey = null) {
@@ -168,8 +194,13 @@ async function handleSingleModelChat(body, modelStr, clientRawRequest = null, re
 
   // If provider is null, this might be a combo name - check and handle
   if (!modelInfo.provider) {
-    const comboModels = await getComboModels(modelStr);
+    const comboFull = await getComboFull(modelStr);
+    const comboModels = comboFull ? comboFull.models : null;
     if (comboModels) {
+      // Same per-combo system prompt injection as the top-level path (this path
+      // runs when a combo name reaches handleSingleModelChat directly, e.g. via
+      // capacity-adapter dispatch). Idempotent, so double-injection is harmless.
+      injectComboSystemPrompt(body, comboFull);
       const chatSettings = await getSettings();
       // Check for combo-specific strategy first, fallback to global
       const comboStrategies = chatSettings.comboStrategies || {};

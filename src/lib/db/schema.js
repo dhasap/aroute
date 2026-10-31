@@ -94,6 +94,8 @@ export const TABLES = {
       models: "TEXT NOT NULL",
       // NULL = auto (max over member models); explicit override wins when set.
       contextWindow: "INTEGER",
+      // Optional per-combo system prompt injected into every request (NULL = off).
+      systemPrompt: "TEXT",
       createdAt: "TEXT NOT NULL",
       updatedAt: "TEXT NOT NULL",
     },

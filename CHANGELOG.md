@@ -1,3 +1,40 @@
+# v0.7.0 (2026-11-01)
+
+## Features
+- **Zro provider**: new `zro` free-tier provider (aliases `moonmath`, `moonmath-ai`) —
+  OpenAI-compatible inference at `zro.moonmath.ai/v1`. Two 1M-context models
+  (`deepseek-v4.1-flash`, `glm-5.3-flash`), official Zro logo
+  (`/providers/zro.png`, rasterized from the vendor's own white SVG mark),
+  `category: "freeTier"` so it sits with the free providers.
+- **Playground page** (`/dashboard/playground`): chat directly with any model or
+  combo routed through ARoute — combos, aliases and token-saver all apply.
+  Two-step cascade model picker (Provider → Model of that provider) built as
+  custom portal dropdowns (native `<select>` popups fail inside the desktop-app
+  webview), streaming SSE responses, temperature / max-tokens / per-request
+  system prompt controls, session persistence in localStorage (capped at 200
+  messages). Dashboard-cookie guarded proxy APIs (`/api/playground/chat`,
+  `/api/playground/models`) forward into the `/v1` engine with an internal API
+  key that never leaves the server — required because `dashboardGuard` demands
+  an API key on `/api/v1/*` from non-loopback origins (tunnel access).
+- **Combo system prompt (SOUL.md-style)**: `combos.systemPrompt` (migration 003,
+  TEXT, ≤64KB) set via the combo editor; injected once per request before
+  dispatch, format-aware and idempotent, covering every combo member attempt
+  AND the fusion judge.
+
+## Fixes
+- **Playground model picker state**: provider/model selection is event-driven —
+  two useEffects watching each other's state ping-ponged and silently reverted
+  the user's pick; a `useMemo` declared below its consumer effect also threw a
+  TDZ error that blanked the page ("This page couldn't load") while the build
+  passed.
+- **Playground dropdowns**: panels render as `createPortal(..., document.body)`
+  with `position: fixed` because the Card's `.anime-card` transform turns
+  `position: fixed` into card-relative coordinates (dropdown appeared ~150px
+  off) and its `overflow: hidden` clipped the scrollable list; the
+  mousedown-outside handler ignores clicks inside `[data-menu-panel]` — without
+  that guard the portal panel unmounted before the item's click fired, so a
+  selection never stuck.
+
 # Unreleased
 
 ## Features

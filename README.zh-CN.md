@@ -291,6 +291,11 @@ ARoute 与所有主流 AI 编程工具无缝协作：
         <b>Vertex AI</b><br/>
         <sub>Gemini 3 Pro + GLM-5 + DeepSeek<br/>$300 免费额度</sub>
       </td>
+      <td align="center" width="150">
+        <img src="./public/providers/zro.png" width="70" alt="Zro"/><br/>
+        <b>Zro</b><br/>
+        <sub>DeepSeek V4.1 Flash + GLM 5.3 Flash<br/>1M 上下文 • 免费等级</sub>
+      </td>
     </tr>
   </table>
 </div>
@@ -469,6 +474,13 @@ ARoute 与所有主流 AI 编程工具无缝协作：
 - 混合订阅、低价和免费等级
 - 为组合命名以便访问
 - 使用云同步跨设备共享组合
+- **组合级系统提示词**（SOUL.md 风格）：为组合设定独立的人设/指令，注入到组合处理的每个请求 — 包括所有成员和融合评审
+
+### 🖥️ Playground
+
+- 直接在仪表盘中与任何模型或组合对话 — 无需外部客户端
+- 两步选择器（提供商 → 模型）、流式响应、温度 / 最大 token / 系统提示词控制
+- 走同一个 `/v1` 引擎，组合、别名和 token 节省器全部生效
 
 ### 📝 请求日志
 

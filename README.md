@@ -411,6 +411,11 @@ ARoute works seamlessly with all major AI coding tools:
         <b>Gemini Web</b><br/>
         <sub>Gemini 4 Argon / 3.8 Flash / 3.1 Pro<br/>Paste cookies • multi-account round-robin</sub>
       </td>
+      <td align="center" width="150">
+        <img src="./public/providers/zro.png" width="70" alt="Zro"/><br/>
+        <b>Zro</b><br/>
+        <sub>DeepSeek V4.1 Flash + GLM 5.3 Flash<br/>1M context • free tier</sub>
+      </td>
     </tr>
   </table>
 </div>
@@ -678,6 +683,13 @@ Seamless translation between formats:
 - Mix subscription, cheap, and free tiers
 - Name your combos for easy access
 - Share combos across devices with Cloud Sync
+- **Per-combo system prompt** (SOUL.md-style): give a combo its own persona/instructions, injected into every request the combo handles — members and fusion judge alike
+
+### 🖥️ Playground
+
+- Chat with any model or combo directly in the dashboard — no external client needed
+- Two-step picker (Provider → Model), streaming responses, temperature / max-tokens / system prompt controls
+- Goes through the same `/v1` engine, so combos, aliases and token savers all apply
 
 ### 📝 Request Logging
 

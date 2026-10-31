@@ -121,6 +121,7 @@ import p116 from "./tokenrouter.js";
 import p128 from "./tokenharbor.js";
 import p129 from "./geminiweb.js";
 import p130 from "./dahlglobal.js";
+import p131 from "./zro.js";
 import p117 from "./selfhosted-stt.js";
 import p118 from "./selfhosted-tts.js";
 import p119 from "./selfhosted-embedding.js";
@@ -260,4 +261,5 @@ export default [
   p126,
   p129,
   p130,
+  p131,
 ];

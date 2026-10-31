@@ -48,7 +48,17 @@ export async function PUT(request, { params }) {
         return NextResponse.json({ error: "Context window must be a positive whole number" }, { status: 400 });
       }
     }
-    
+
+    // Validate system prompt if present in the payload (string, or null/"" = clear)
+    if (body.systemPrompt !== null && body.systemPrompt !== undefined && body.systemPrompt !== "") {
+      if (typeof body.systemPrompt !== "string") {
+        return NextResponse.json({ error: "System prompt must be a string" }, { status: 400 });
+      }
+      if (body.systemPrompt.length > 65536) {
+        return NextResponse.json({ error: "System prompt too long (max 65536 chars)" }, { status: 400 });
+      }
+    }
+
     // Capture previous name to invalidate rotation state on rename
     const prev = await getComboById(id);
     const combo = await updateCombo(id, body);

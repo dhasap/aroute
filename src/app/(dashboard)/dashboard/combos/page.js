@@ -686,6 +686,8 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders, kindF
     combo?.contextWindow != null ? String(combo.contextWindow) : ""
   );
   const [contextError, setContextError] = useState("");
+  // Optional per-combo system prompt (SOUL.md-style), injected into every request.
+  const [systemPrompt, setSystemPrompt] = useState(combo?.systemPrompt || "");
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -780,7 +782,7 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders, kindF
     }
     setContextError("");
     setSaving(true);
-    await onSave({ name: name.trim(), models, contextWindow: parsed });
+    await onSave({ name: name.trim(), models, contextWindow: parsed, systemPrompt: systemPrompt.trim() || null });
     setSaving(false);
   };
 
@@ -866,6 +868,24 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders, kindF
             />
             <p className="text-[10px] text-text-muted mt-0.5">
               Leave empty for auto (max of member models). Set a number to override — e.g. 1000000 for 1M, 2000000 for 2M.
+            </p>
+          </div>
+
+          {/* System Prompt (optional, SOUL.md-style) */}
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">System Prompt (optional)</label>
+            <textarea
+              value={systemPrompt}
+              onChange={(e) => setSystemPrompt(e.target.value)}
+              placeholder="Injected into every request on this combo, before the conversation — like a SOUL.md for the combo."
+              rows={5}
+              maxLength={65536}
+              className="w-full px-3 py-2 bg-surface rounded border border-border text-xs focus:outline-none focus:border-primary/60 resize-y font-mono"
+            />
+            <p className="text-[10px] text-text-muted mt-0.5">
+              {systemPrompt.length > 0
+                ? <>Active — {systemPrompt.length.toLocaleString()} chars injected into every request on this combo. <button type="button" className="underline hover:text-text" onClick={() => setSystemPrompt("")}>Clear</button></>
+                : "Leave empty to disable. Appended to the system message of every request routed through this combo (all strategies, including fusion)."}
             </p>
           </div>
 
